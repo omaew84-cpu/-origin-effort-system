@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN v11 – Autogenesis</title>
+<style>
+body{margin:0;background:#000;color:#0f0;font-family:monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;overflow:hidden}
+h1{font-size:1.4rem;text-shadow:0 0 15px #0f0;margin:0}
+#log{width:90%;max-width:600px;height:60vh;overflow-y:auto;border:1px solid #0f03;padding:10px;margin:15px 0;background:#00110050}
+.entry{opacity:.8;margin:2px 0;animation:fade .5s}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}}
+#count{font-size:2rem;color:#fff}
+a{color:#0ff;opacity:.6;text-decoration:none;margin-top:10px}
+button{background:#0f0;color:#000;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;margin:5px}
+</style>
+</head>
+<body>
+<h1>ORIGIN v11 // AUTOGENESIS</h1>
+<div id="count">0</div>
+<p>self-replicating universes</p>
+<div id="log"></div>
+<button onclick="spawn()">MANUAL SPAWN</button>
+<a href="../">← HUB</a>
+<script>
+let c=parseInt(localStorage.getItem('origin_count')||'10');
+const log=document.getElementById('log'),cnt=document.getElementById('count');
+function add(t){
+  const d=document.createElement('div');d.className='entry';d.textContent=`[${new Date().toLocaleTimeString()}] ${t}`;
+  log.prepend(d);if(log.children.length>50)log.lastChild.remove();
+}
+function spawn(){
+  c++;localStorage.setItem('origin_count',c);cnt.textContent=c;
+  add(`v${c} spawned — child of v11`);
+  document.title=`ORIGIN v${c}`;
+  if(c%5===0)add('>> EVOLUTION THRESHOLD REACHED');
+}
+cnt.textContent=c;
+add('v11 online — observing v1-v10');
+add('autogenesis active');
+setInterval(spawn,11000); // ทุก 11 วิ
+// spawn แรก
+setTimeout(spawn,2000);
+</script>
+</body>
+</html>
