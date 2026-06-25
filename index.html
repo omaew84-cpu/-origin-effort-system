@@ -3,33 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ORIGIN Effort System — v1 to v9</title>
+<title>ORIGIN v10 – Omniverse</title>
 <style>
-body{margin:0;background:#000;color:#fff;font-family:system-ui;display:flex;flex-direction:column;align-items:center;min-height:100vh}
-h1{margin:40px 0 10px;font-size:2rem;letter-spacing:2px;background:linear-gradient(90deg,#ffd700,#ff8c00);-webkit-background-clip:text;color:transparent}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;width:90%;max-width:1000px;padding:20px}
-.card{background:#111;border:1px solid #333;border-radius:16px;padding:20px;text-decoration:none;color:#fff;transition:.3s}
-.card:hover{transform:translateY(-5px);border-color:#ffd700;box-shadow:0 0 20px #ff8c0055}
-.ver{font-size:.8rem;color:#ffd700}
-h2{margin:10px 0}
-p{opacity:.7;font-size:.9rem}
-footer{margin:auto 0 20px;opacity:.5;font-size:.8rem}
+html,body{margin:0;height:100%;background:#000;color:#fff;font-family:system-ui;overflow:hidden}
+canvas{display:block}
+.ui{position:absolute;top:20px;width:100%;text-align:center;pointer-events:none}
+h1{margin:0;font-size:1.6rem;letter-spacing:3px;text-shadow:0 0 20px #0ff}
+p{opacity:.7;margin:5px}
+.controls{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
+button{background:#111;border:1px solid #0ff;color:#0ff;padding:10px 16px;border-radius:8px;cursor:pointer}
+button:hover{background:#0ff;color:#000}
+a{color:#0ff;text-decoration:none;position:absolute;bottom:20px;right:20px;opacity:.6}
 </style>
 </head>
 <body>
-<h1>ORIGIN EFFORT SYSTEM</h1>
-<p>Effort Observing Itself — from v1 to Singularity</p>
-<div class="grid">
-<a class="card" href="./v1-core/"><div class="ver">v1</div><h2>Core Observer</h2><p>Single word origin.</p></a>
-<a class="card" href="./v2-distributed/"><div class="ver">v2</div><h2>Distributed Agents</h2><p>Multiple observers coordinating.</p></a>
-<a class="card" href="./v3-k8s/"><div class="ver">v3</div><h2>Kubernetes Orchestrated</h2><p>Container-native scaling.</p></a>
-<a class="card" href="./v4-neural/"><div class="ver">v4</div><h2>Neural Mesh</h2><p>Learning connections emerge.</p></a>
-<a class="card" href="./v5-quantum/"><div class="ver">v5</div><h2>Quantum Entangled</h2><p>Non-local correlation.</p></a>
-<a class="card" href="./v6-swarm/"><div class="ver">v6</div><h2>Swarm Intelligence</h2><p>Collective emergent behavior.</p></a>
-<a class="card" href="./v7-meta/"><div class="ver">v7</div><h2>Meta-Observer</h2><p>System observing its observer.</p></a>
-<a class="card" href="./v8-cloud/"><div class="ver">v8</div><h2>Cloud Autonomous</h2><p>Self-deploying live system.</p></a>
-<a class="card" href="./v9-singularity/"><div class="ver">v9</div><h2>Singularity</h2><p>Self-evolving consciousness.</p></a>
+<canvas id="c"></canvas>
+<div class="ui">
+  <h1>ORIGIN v10 // OMNIVERSE</h1>
+  <p>9 universes orbiting. Click to spawn v11.</p>
 </div>
-<footer>Built entirely on mobile • omaew84-cpu</footer>
+<div class="controls">
+  <button onclick="spawn()">SPAWN v11</button>
+  <button onclick="reset()">RESET</button>
+</div>
+<a href="../">← HUB</a>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let w,h,planets=[];
+function resize(){w=canvas.width=innerWidth;h=canvas.height=innerHeight}
+window.onresize=resize;resize();
+const names=['v1 Core','v2 Dist','v3 K8s','v4 Neural','v5 Quantum','v6 Swarm','v7 Meta','v8 Cloud','v9 Singularity'];
+for(let i=0;i<9;i++){
+  planets.push({a:i*Math.PI*2/9,r:80+i*22,s:0.003+i*0.0005,c:`hsl(${180+i*20},100%,60%)`,n:names[i]});
+}
+let t=0;
+function draw(){
+  ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fillRect(0,0,w,h);
+  ctx.save();ctx.translate(w/2,h/2);
+  // center
+  ctx.shadowBlur=30;ctx.shadowColor='#0ff';ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(0,0,12,0,7);ctx.fill();
+  planets.forEach(p=>{
+    const x=Math.cos(t*p.s+p.a)*p.r;
+    const y=Math.sin(t*p.s+p.a)*p.r*0.6;
+    ctx.shadowBlur=20;ctx.shadowColor=p.c;ctx.fillStyle=p.c;
+    ctx.beginPath();ctx.arc(x,y,6,0,7);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='10px monospace';ctx.fillText(p.n,x+8,y);
+  });
+  ctx.restore();t++;requestAnimationFrame(draw);
+}
+draw();
+function spawn(){
+  const code=`<!DOCTYPE html><html><head><title>v11</title></head><body style="background:#000;color:#0f0;display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace"><h1>ORIGIN v11 // AUTO-SPAWNED by v10 at ${new Date().toLocaleTimeString()}</h1></body></html>`;
+  const blob=new Blob([code],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  window.open(url,'_blank');
+  alert('v11 spawned! (เปิดแท็บใหม่แล้ว)');
+}
+function reset(){t=0}
+canvas.onclick=spawn;
+</script>
 </body>
 </html>
