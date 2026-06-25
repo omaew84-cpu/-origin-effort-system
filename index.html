@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORIGIN SYSTEM :: EFFORT ECONOMY v5.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { color-scheme: dark; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #030308; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .panel {
+            background: linear-gradient(180deg, rgba(20,22,30,0.9) 0%, rgba(12,14,20,0.9) 100%);
+            border: 1px solid rgba(251,191,36,0.12);
+            backdrop-filter: blur(12px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .panel-gold { border-color: rgba(251,191,36,0.3); box-shadow: 0 0 30px rgba(251,191,36,0.08), inset 0 1px 0 rgba(251,191,36,0.1); }
+        .glow-amber { box-shadow: 0 0 20px rgba(245,158,11,0.3); }
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(251,191,36,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(251,191,36,0.03) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        @keyframes pulse-gold { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+        @keyframes token-flow { 0% { transform: translateY(10px); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
+        @keyframes bid-flash { 0% { background: rgba(251,191,36,0); } 50% { background: rgba(251,191,36,0.2); } 100% { background: rgba(251,191,36,0); } }
+        .token-particle { animation: token-flow 2.5s ease-out forwards; }
+        .bid-flash { animation: bid-flash 0.6s ease-out; }
+        .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+        .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(251,191,36,0.3); border-radius: 2px; }
+    </style>
+</head>
+<body class="text-slate-200 overflow-x-hidden">
+    <div class="fixed inset-0 grid-bg pointer-events-none"></div>
+    <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(251,191,36,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,_rgba(139,92,246,0.08),transparent_50%)] pointer-events-none"></div>
+    
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 border-b border-amber-500/20 bg-black/80 backdrop-blur-xl">
+        <div class="flex items-center justify-between px-3 lg:px-6 py-3 gap-4">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-8 h-8 rounded bg-amber-500/20 border border-amber-500/40 flex items-center justify-center glow-amber">
+                    <div class="w-3 h-3 bg-amber-400 rounded-sm animate-pulse"></div>
+                </div>
+                <div class="min-w-0">
+                    <h1 class="mono text-sm lg:text-base font-bold tracking-wider text-amber-100 truncate">ORIGIN SYSTEM :: EFFORT ECONOMY v5.0</h1>
+                    <p class="text-[10px] text-amber-400/70 hidden sm:block">EFFORT-AS-ASSET PROTOCOL • AUTONOMOUS MARKET</p>
+                </div>
+            </div>
+            <div class="hidden lg:flex items-center gap-6 mono text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="text-slate-500">EFFORT</span>
+                    <span id="ticker-price" class="text-amber-400 font-bold text-base">$4.27</span>
+                    <span id="ticker-change" class="text-emerald-400">+2.84%</span>
+                </div>
+                <div class="h-6 w-px bg-slate-800"></div>
+                <div class="flex items-center gap-4 text-slate-400">
+                    <span>VOL <b id="ticker-vol" class="text-slate-200">284K</b></span>
+                    <span>SUPPLY <b class="text-slate-200">1.00M</b></span>
+                    <span>MCAP <b id="ticker-mcap" class="text-slate-200">$4.27M</b></span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                <span class="mono text-xs text-emerald-400 hidden sm:inline">LIVE</span>
+            </div>
+        </div>
+        <!-- Mobile ticker -->
+        <div class="lg:hidden border-t border-amber-500/10 px-3 py-1.5 overflow-hidden">
+            <div class="flex gap-6 mono text-[11px] whitespace-nowrap" style="animation: ticker 20s linear infinite;">
+                <span><span class="text-slate-500">EFFORT</span> <span class="text-amber-400 font-bold">$4.27</span> <span class="text-emerald-400">+2.84%</span></span>
+                <span>VOL 284K</span><span>SUPPLY 1.00M</span><span>VELOCITY 2.41</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1800px] mx-auto p-3 lg:p-5 grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-5 relative">
+        
+        <!-- LEFT COLUMN -->
+        <div class="xl:col-span-3 space-y-4">
+            <!-- EFFORT TOKEN PANEL -->
+            <div class="panel panel-gold rounded-2xl p-4 lg:p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="mono text-xs tracking-widest text-amber-400/80">EFFORT TOKEN</h2>
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center text-black text-[10px] font-bold">Ξ</div>
+                        <span class="mono text-[10px] text-slate-500">ERC-20</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Price</div>
+                        <div class="flex items-baseline gap-2">
+                            <div id="token-price" class="text-2xl font-light mono text-amber-100">$4.27</div>
+                            <div id="token-change" class="text-xs text-emerald-400">+2.8%</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Market Cap</div>
+                        <div id="token-mcap" class="text-xl mono text-slate-200">$4.27M</div>
+                    </div>
+                </div>
+
+                <div class="h-[60px] mb-4 relative overflow-hidden rounded-lg bg-black/40 border border-amber-500/10">
+                    <svg id="price-chart" class="w-full h-full" viewBox="0 0 300 60"></svg>
+                    <div class="absolute inset-0 bg-gradient-to-t from-amber-500/5 to-transparent pointer-events-none"></div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 text-center py-3 border-y border-slate-800/80">
+                    <div>
+                        <div class="text-[10px] text-slate-500">SUPPLY</div>
+                        <div class="mono text-sm text-slate-200">1.00M</div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-slate-500">CIRC</div>
+                        <div class="mono text-sm text-slate-200">847K</div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-slate-500">BURNED</div>
+                        <div id="burned" class="mono text-sm text-orange-400">12.4K</div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">AMM Pool • EFFORT/USDC</span>
+                        <span class="text-[10px] mono text-amber-400">k=866B</span>
+                    </div>
+                    <div class="bg-black/60 rounded-lg p-2.5 border border-slate-800">
+                        <div class="flex justify-between mono text-xs mb-1.5">
+                            <span class="text-slate-400">EFFORT</span>
+                            <span id="pool-effort" class="text-amber-300">449,284</span>
+                        </div>
+                        <div class="flex justify-between mono text-xs">
+                            <span class="text-slate-400">USDC</span>
+                            <span id="pool-usdc" class="text-sky-300">$1,918,442</span>
+                        </div>
+                        <div class="mt-2 h-1.5 bg-slate-800 rounded-full overflow-hidden flex">
+                            <div class="h-full bg-amber-500/70" style="width: 48%"></div>
+                            <div class="h-full bg-sky-500/70" style="width: 52%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YOUR WALLET -->
+            <div class="panel rounded-2xl p-4 lg:p-5">
+                <h2 class="mono text-xs tracking-widest text-slate-400 mb-3">YOUR WALLET</h2>
+                <div class="flex items-end justify-between mb-3">
+                    <div>
+                        <div class="text-[11px] text-slate-500">BALANCE</div>
+                        <div id="user-balance" class="text-2xl mono text-white">15,420</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[11px] text-slate-500">VALUE</div>
+                        <div id="user-value" class="text-lg mono text-amber-300">$65,844</div>
+                    </div>
+                <div class="grid grid-cols-3 gap-2 mb-3">
+                    <div class="bg-black/40 rounded-lg p-2 border border-slate-800/50">
+                        <div class="text-[10px] text-slate-500">EARNED</div>
+                        <div id="user-earned" class="mono text-xs text-emerald-400">+2,840</div>
+                    </div>
+                    <div class="bg-black/40 rounded-lg p-2 border border-slate-800/50">
+                        <div class="text-[10px] text-slate-500">FEES</div>
+                        <div id="user-fees" class="mono text-xs text-amber-400">1,240</div>
+                    </div>
+                    <div class="bg-black/40 rounded-lg p-2 border border-slate-800/50">
+                        <div class="text-[10px] text-slate-500">STAKED</div>
+                        <div class="mono text-xs text-violet-400">5,000</div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="flex-1 py-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 rounded-lg mono text-[11px] text-amber-300 transition">STAKE</button>
+                    <button class="flex-1 py-1.5 bg-slate-800/70 hover:bg-slate-700/70 border border-slate-700 rounded-lg mono text-[11px] text-slate-300 transition">PROVIDE LP</button>
+                </div>
+            </div>
+
+            <!-- ECONOMICS -->
+            <div class="panel rounded-2xl p-4 lg:p-5">
+                <h2 class="mono text-xs tracking-widest text-slate-400 mb-3">NETWORK ECONOMICS</h2>
+                <div class="space-y-2.5">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-400">Cost per Compute</span>
+                        <span id="metric-cost" class="mono text-sm text-amber-300">0.31 EFFORT</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-400">Token Velocity</span>
+                        <span id="metric-velocity" class="mono text-sm text-sky-300">2.41</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-400">Avg Bid Spread</span>
+                        <span id="metric-spread" class="mono text-sm text-violet-300">14.2%</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-400">Network ROI</span>
+                        <span id="metric-roi" class="mono text-sm text-emerald-400">+34.7%</span>
+                    </div>
+                    <div class="pt-2.5 mt-2.5 border-t border-slate-800">
+                        <div class="flex justify-between text-[11px]">
+                            <span class="text-slate-500">Tasks/hour</span>
+                            <span class="mono text-slate-300">47</span>
+                            <span class="text-slate-500">Success</span>
+                            <span class="mono text-emerald-400">91.3%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTER COLUMN -->
+        <div class="xl:col-span-6 space-y-4">
+            <!-- MARKETPLACE -->
+            <div class="panel rounded-2xl p-4 lg:p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <h2 class="mono text-sm tracking-widest text-amber-100">LIVE MARKETPLACE</h2>
+                        <div class="px-2 py-0.5 bg-emerald-500/15 border border-emerald-500/30 rounded text-[10px] mono text-emerald-400">OPEN AUCTIONS</div>
+                    </div>
+                    <div class="mono text-[11px] text-slate-500">ORDER BOOK • <span id="active-tasks">3</span> ACTIVE</div>
+                </div>
+
+                <div id="orderbook" class="space-y-3 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
+                    <!-- Tasks injected here -->
+                </div>
+            </div>
+
+            <!-- TOKEN FLOW -->
+            <div class="panel rounded-2xl p-4 lg:p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="mono text-xs tracking-widest text-slate-400">TOKEN FLOW VISUALIZER</h2>
+                    <div class="flex items-center gap-3 mono text-[10px]">
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 bg-amber-400 rounded-full"></span> BID</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 bg-emerald-400 rounded-full"></span> REWARD</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 bg-orange-400 rounded-full"></span> BURN</span>
+                    </div>
+                <div id="flow-canvas" class="relative h-[120px] bg-black/40 rounded-xl border border-slate-800/50 overflow-hidden">
+                    <div class="absolute inset-0 flex items-center justify-around">
+                        <div class="text-center">
+                            <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-1">
+                                <span class="mono text-[10px] text-amber-300">TASKS</span>
+                            </div>
+                            <div class="text-[10px] mono text-slate-500">ISSUERS</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 rounded-full bg-slate-800/80 border border-slate-600 flex items-center justify-center mb-1 relative">
+                                <span class="mono text-[10px] text-slate-300">POOL</span>
+                                <div class="absolute -inset-2 border-amber-500/20 rounded-full animate-pulse"></div>
+                            </div>
+                            <div class="text-[10px] mono text-slate-500">AMM</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-12 h-12 rounded-full bg-violet-500/10 border border-violet-500/30 flex items-center justify-center mb-1">
+                                <span class="mono text-[10px] text-violet-300">AGENTS</span>
+                            </div>
+                            <div class="text-[10px] mono text-slate-500">WORKERS</div>
+                        </div>
+                    <!-- particles injected -->
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
+                    <div class="bg-black/40 rounded-lg p-2.5 border border-slate-800/50">
+                        <div class="text-[10px] text-slate-500 mb-1">LAST BLOCK</div>
+                        <div id="last-tx" class="mono text-[11px] text-slate-200 truncate">NOVA won 184 EFFORT</div>
+                    </div>
+                    <div class="bg-black/40 rounded-lg p-2.5 border border-slate-800/50">
+                        <div class="text-[10px] text-slate-500 mb-1">24H VOLUME</div>
+                        <div id="volume" class="mono text-[11px] text-amber-300">47,283 EFFORT</div>
+                    </div>
+                    <div class="bg-black/40 rounded-lg p-2.5 border border-slate-800/50">
+                        <div class="text-[10px] text-slate-500 mb-1">TOTAL FEES BURNED</div>
+                        <div class="mono text-[11px] text-orange-400">12,440 EFFORT</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN - AGENTS -->
+        <div class="xl:col-span-3 space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="mono text-xs tracking-widest text-slate-400">ECONOMIC ACTORS</h2>
+                <span class="mono text-[10px] px-2 py-0.5 bg-slate-800 rounded border border-slate-700">3 AGENTS</span>
+            </div>
+            
+            <div id="agents-container" class="space-y-3">
+                <!-- Agents injected -->
+            </div>
+
+            <div class="panel rounded-2xl p-4">
+                <h3 class="mono text-[11px] text-slate-500 uppercase tracking-wider mb-3">Leaderboard • ROI</h3>
+                <div id="leaderboard" class="space-y-2">
+                    <!-- injected -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // STATE
+        const STATE = {
+            price: 4.27,
+            priceHistory: Array.from({length: 50}, (_,i) => 4.1 + Math.sin(i/5)*0.15 + Math.random()*0.1),
+            supply: 1000000,
+            burned: 12440,
+            volume24h: 47283,
+            velocity: 2.41,
+            userBalance: 15420,
+            userEarned: 2840,
+            userFees: 1240,
+            pool: { effort: 449284, usdc: 1918442 },
+            tasks: [],
+            txCount: 0
+        };
+
+        const AGENTS = [
+            { id: 'NOVA', name: 'NOVA', role: 'ANALYTICAL', color: 'amber', balance: 8450, initial: 8450, earned: 3240, spent: 1890, wins: 47, bids: 55, status: 'IDLE', currentBid: 0, roi: 0, strategy: 1.15, avatar: '▲' },
+            { id: 'ORION', name: 'ORION', role: 'CREATIVE', color: 'violet', balance: 12300, initial: 12300, earned: 5180, spent: 2100, wins: 62, bids: 74, status: 'IDLE', currentBid: 0, roi: 0, strategy: 1.0, avatar: '◆' },
+            { id: 'VEGA', name: 'VEGA', role: 'EXECUTION', color: 'cyan', balance: 6200, initial: 6200, earned: 2890, spent: 1650, wins: 38, bids: 43, status: 'IDLE', currentBid: 0, roi: 0, strategy: 0.85, avatar: '●' }
+        ];
+
+        const TASK_TEMPLATES = [
+            { title: 'Research Synthesis → Market Report', base: [140,220], diff: 'MEDIUM' },
+            { title: 'Code Generation → Smart Contract', base: [200,300], diff: 'HIGH' },
+            { title: 'Data Analysis → Pattern Extraction', base: [90,160], diff: 'LOW' },
+            { title: 'Creative Brief → Brand System', base: [160,240], diff: 'MEDIUM' },
+            { title: 'API Integration → Workflow Automate', base: [180,270], diff: 'HIGH' },
+            { title: 'Risk Modeling → Portfolio Hedge', base: [220,320], diff: 'CRITICAL' }
+        ];
+
+        let taskId = 0;
+
+        // DOM
+        const $ = s => document.querySelector(s);
+        
+        function fmt(n, d=0) { return n.toLocaleString('en-US', {maximumFractionDigits: d}); }
+        function fmtMoney(n) { return '$' + (n/1000000).toFixed(2) + 'M'; }
+
+        // PRICE CHART
+        function renderChart() {
+            const svg = $('#price-chart');
+            const w = 300, h = 60;
+            const data = STATE.priceHistory;
+            const min = Math.min(...data), max = Math.max(...data);
+            const range = max - min || 1;
+            const points = data.map((p,i) => {
+                const x = (i/(data.length-1))*w;
+                const y = h - ((p-min)/range)*h*0.8 - h*0.1;
+                return `${x},${y}`;
+            }).join(' ');
+            svg.innerHTML = `
+                <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="rgb(245,158,11)" stop-opacity="0.4"/>
+                    <stop offset="100%" stop-color="rgb(245,158,11)" stop-opacity="0"/>
+                </linearGradient></defs>
+                <polyline fill="none" stroke="rgb(245,158,11)" stroke-width="1.5" points="${points}" opacity="0.9"/>
+                <polygon fill="url(#g)" points="0,${h} ${points} ${w},${h}" opacity="0.3"/>
+            `;
+        }
+
+        // SPAWN TASK
+        function spawnTask() {
+            const t = TASK_TEMPLATES[Math.floor(Math.random()*TASK_TEMPLATES.length)];
+            const reward = Math.floor(t.base[0] + Math.random()*(t.base[1]-t.base[0]));
+            STATE.tasks.unshift({
+                id: ++taskId,
+                title: t.title,
+                reward,
+                difficulty: t.diff,
+                status: 'BIDDING',
+                created: Date.now(),
+                bids: [],
+                endTime: Date.now() + 6000 + Math.random()*4000
+            });
+            if (STATE.tasks.length > 6) STATE.tasks.pop();
+        }
+
+        // PLACE BID
+        function placeBid(agent, task) {
+            if (agent.balance < 20 || task.bids.find(b=>b.agent===agent.id)) return;
+            
+            const baseBid = task.reward * (0.08 + Math.random()*0.12);
+            const bidAmount = Math.floor(baseBid * agent.strategy * (0.9 + Math.random()*0.2));
+            
+            if (bidAmount > agent.balance * 0.3) return;
+            
+            agent.balance -= bidAmount;
+            agent.spent += bidAmount;
+            agent.bids++;
+            agent.currentBid = bidAmount;
+            agent.status = 'BIDDING';
+            
+            task.bids.push({ agent: agent.id, amount: bidAmount, time: Date.now(), color: agent.color });
+            
+            // AMM impact - selling pressure
+            STATE.pool.effort += bidAmount * 0.3;
+            STATE.pool.usdc -= bidAmount * 0.3 * STATE.price * 0.98;
+            
+            createFlowParticle('bid', agent.color);
+            updateTaskUI(task.id);
+        }
+
+        // RESOLVE TASK
+        function resolveTask(task) {
+            if (task.status !== 'BIDDING') return;
+            task.status = 'RESOLVING';
+            
+            if (task.bids.length === 0) {
+                task.status = 'EXPIRED';
+                return;
+            }
+            
+            task.bids.sort((a,b) => b.amount - a.amount);
+            const winner = AGENTS.find(a => a.id === task.bids[0].agent);
+            const winBid = task.bids[0].amount;
+            
+            // Return losing bids (90%)
+            task.bids.slice(1).forEach(b => {
+                const loser = AGENTS.find(a => a.id === b.agent);
+                const refund = Math.floor(b.amount * 0.9);
+                loser.balance += refund;
+                loser.spent -= b.amount - refund;
+                STATE.burned += b.amount - refund;
+            });
+            
+            // Winner execution
+            const success = Math.random() > 0.12;
+            winner.currentBid = 0;
+            
+            if (success) {
+                const payout = Math.floor(task.reward * 0.92);
+                const fee = task.reward - payout;
+                
+                winner.balance += payout;
+                winner.earned += payout;
+                winner.wins++;
+                winner.status = 'EARNED';
+                winner.roi = ((winner.earned - winner.spent) / winner.initial * 100);
+                
+                STATE.userBalance += fee;
+                STATE.userFees += fee;
+                STATE.userEarned += fee;
+                
+                // AMM impact - buy pressure from issuer
+                STATE.pool.usdc += task.reward * STATE.price * 0.92;
+                STATE.pool.effort -= task.reward * 0.92;
+                
+                STATE.volume24h += task.reward;
+                STATE.txCount++;
+                
+                $('#last-tx').textContent = `${winner.name} won ${fmt(payout)} EFFORT`;
+                createFlowParticle('reward', 'emerald');
+            } else {
+                winner.status = 'FAILED';
+                STATE.burned += winBid;
+                createFlowParticle('burn', 'orange');
+            }
+            
+            task.status = success ? 'COMPLETED' : 'FAILED';
+            task.winner = winner.id;
+            task.payout = success ? Math.floor(task.reward*0.92) : 0;
+            
+            setTimeout(() => { winner.status = 'IDLE'; }, 2000);
+        }
+
+        // FLOW PARTICLES
+        function createFlowParticle(type, color) {
+            const canvas = $('#flow-canvas');
+            const p = document.createElement('div');
+            const colors = { amber: 'bg-amber-400', violet: 'bg-violet-400', cyan: 'bg-cyan-400', emerald: 'bg-emerald-400', orange: 'bg-orange-400' };
+            p.className = `absolute w-1.5 h-1.5 rounded-full ${colors[color]||'bg-amber-400'} token-particle`;
+            p.style.left = type==='bid' ? '75%' : '25%';
+            p.style.bottom = '20px';
+            p.style.boxShadow = `0 0 8px ${color==='amber'?'#f59e0b':color==='emerald'?'#10b981':'#f97316'}`;
+            canvas.appendChild(p);
+            setTimeout(() => p.remove(), 2500);
+        }
+
+        // RENDER ORDERBOOK
+        function renderOrderbook() {
+            const el = $('#orderbook');
+            el.innerHTML = STATE.tasks.map(task => {
+                const timeLeft = Math.max(0, task.endTime - Date.now());
+                const pct = task.status === 'BIDDING' ? Math.max(0, 100 - (timeLeft/8000*100)) : 100;
+                const topBid = task.bids[0];
+                
+                return `
+                <div id="task-${task.id}" class="bg-black/40 border border-slate-800 rounded-xl p-3 hover:border-amber-500/30 transition ${task.status==='BIDDING'?'bid-flash':''}">
+                    <div class="flex items-start justify-between gap-3 mb-2">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">#${task.id}</span>
+                                <span class="mono text-[10px] px-1.5 py-0.5 rounded ${task.difficulty==='HIGH'?'bg-orange-500/20 text-orange-300':task.difficulty==='CRITICAL'?'bg-red-500/20 text-red-300':'bg-slate-700/50 text-slate-300'}">${task.difficulty}</span>
+                                <span class="mono text-[10px] px-1.5 py-0.5 rounded ${task.status==='BIDDING'?'bg-emerald-500/20 text-emerald-300':task.status==='COMPLETED'?'bg-sky-500/20 text-sky-300':'bg-slate-700/50 text-slate-400'}">${task.status}</span>
+                            </div>
+                            <div class="text-sm text-slate-200 truncate">${task.title}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-slate-500">REWARD</div>
+                            <div class="mono text-base text-amber-300 font-medium">${fmt(task.reward)}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="flex-1 h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all" style="width:${pct}%"></div>
+                        </div>
+                        <span class="mono text-[10px] text-slate-500 w-12 text-right">${task.status==='BIDDING'?Math.ceil(timeLeft/1000)+'s':'—'}</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex -space-x-1.5">
+                            ${task.bids.slice(0,5).map(b => `
+                                <div class="w-6 h-6 rounded-full bg-${b.color}-500/20 border border-${b.color}-500/40 flex items-center justify-center mono text-[9px] text-${b.color}-300" title="${b.agent} bid ${b.amount}">${b.agent[0]}</div>
+                            `).join('')}
+                            ${task.bids.length===0?'<span class="text-[11px] text-slate-600 italic">No bids yet</span>':''}
+                        </div>
+                        <div class="flex items-center gap-3 mono text-[11px]">
+                            <span class="text-slate-500">BIDS <b class="text-slate-300">${task.bids.length}</b></span>
+                            ${topBid ? `<span class="text-amber-400">TOP ${fmt(topBid.amount)}</span>` : ''}
+                            ${task.winner ? `<span class="text-emerald-400">WIN ${task.winner}</span>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function updateTaskUI(id) {
+            const task = STATE.tasks.find(t=>t.id===id);
+            if (!task) return;
+            const el = document.getElementById(`task-${id}`);
+            if (el) { el.classList.add('bid-flash'); setTimeout(()=>el.classList.remove('bid-flash'),600); }
+        }
+
+        // RENDER AGENTS
+        function renderAgents() {
+            $('#agents-container').innerHTML = AGENTS.map(agent => {
+                const colors = { amber: ['from-amber-500/20','border-amber-500/30','text-amber-300','bg-amber-500'], violet: ['from-violet-500/20','border-violet-500/30','text-violet-300','bg-violet-500'], cyan: ['from-cyan-500/20','border-cyan-500/30','text-cyan-300','bg-cyan-500'] };
+                const c = colors[agent.color];
+                const roi = ((agent.earned - agent.spent) / agent.initial * 100);
+                const winRate = agent.bids ? Math.round((agent.wins/agent.bids)*100) : 0;
+                
+                return `
+                <div class="panel rounded-2xl p-4 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-b ${c[0]} to-transparent opacity-30 pointer-events-none"></div>
+                    <div class="relative">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-9 h-9 rounded-lg ${c[1]} border bg-black/50 flex items-center justify-center ${c[2]} font-bold">${agent.avatar}</div>
+                                <div>
+                                    <div class="mono text-sm font-bold ${c[2]}">${agent.name}</div>
+                                    <div class="text-[10px] text-slate-500 -mt-0.5">${agent.role}</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="mono text-[10px] px-2 py-0.5 rounded-full ${agent.status==='BIDDING'?'bg-amber-500/20 text-amber-300':agent.status==='EARNED'?'bg-emerald-500/20 text-emerald-300':'bg-slate-800 text-slate-400'}">${agent.status}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-2 mb-3">
+                            <div class="bg-black/50 rounded-lg p-2 border border-slate-800/50">
+                                <div class="text-[9px] text-slate-500 uppercase">Balance</div>
+                                <div class="mono text-sm ${c[2]}">${fmt(agent.balance)}</div>
+                            </div>
+                            <div class="bg-black/50 rounded-lg p-2 border border-slate-800/50">
+                                <div class="text-[9px] text-slate-500 uppercase">Earned</div>
+                                <div class="mono text-sm text-emerald-400">+${fmt(agent.earned)}</div>
+                            </div>
+                            <div class="bg-black/50 rounded-lg p-2 border border-slate-800/50">
+                                <div class="text-[9px] text-slate-500 uppercase">Spent</div>
+                                <div class="mono text-sm text-orange-400">${fmt(agent.spent)}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-3 mono text-[11px]">
+                                <span class="text-slate-500">ROI <b class="${roi>=0?'text-emerald-400':'text-red-400'}">${roi>=0?'+':''}${roi.toFixed(1)}%</b></span>
+                                <span class="text-slate-500">WIN <b class="text-slate-300">${winRate}%</b></span>
+                            </div>
+                            <div class="mono text-[11px] text-slate-500">${agent.wins}W / ${agent.bids}B</div>
+                        </div>
+                        
+                        ${agent.currentBid > 0 ? `
+                        <div class="h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                            <div class="h-full ${c[3]} animate-pulse" style="width: ${Math.min(100, agent.currentBid/3)}%"></div>
+                        </div>
+                        <div class="mt-1 text-[10px] mono text-center ${c[2]}">BIDDING ${fmt(agent.currentBid)} EFFORT</div>
+                        ` : `
+                        <div class="h-1.5 bg-slate-900/50 rounded-full"></div>
+                        `}
+                    </div>
+                </div>`;
+            }).join('');
+            
+            // Leaderboard
+            const sorted = [...AGENTS].sort((a,b) => ((b.earned-b.spent)/b.initial) - ((a.earned-a.spent)/a.initial));
+            $('#leaderboard').innerHTML = sorted.map((a,i) => {
+                const roi = ((a.earned - a.spent) / a.initial * 100);
+                return `
+                <div class="flex items-center justify-between py-1.5">
+                    <div class="flex items-center gap-2">
+                        <span class="mono text-[11px] w-4 ${i===0?'text-amber-400':i===1?'text-slate-300':'text-orange-800'}">#${i+1}</span>
+                        <span class="text-xs ${a.color==='amber'?'text-amber-300':a.color==='violet'?'text-violet-300':'text-cyan-300'}">${a.name}</span>
+                    </div>
+                    <span class="mono text-[11px] ${roi>=0?'text-emerald-400':'text-red-400'}">${roi>=0?'+':''}${roi.toFixed(1)}%</span>
+                </div>`;
+            }).join('');
+        }
+
+        // UPDATE ECONOMY
+        function updateEconomy() {
+            // Update price from AMM
+            const newPrice = STATE.pool.usdc / STATE.pool.effort;
+            STATE.price = STATE.price * 0.7 + newPrice * 0.3; // smooth
+            
+            STATE.priceHistory.push(STATE.price);
+            if (STATE.priceHistory.length > 50) STATE.priceHistory.shift();
+            
+            // Metrics
+            const totalBids = AGENTS.reduce((s,a)=>s+a.spent,0);
+            const totalEarned = AGENTS.reduce((s,a)=>s+a.earned,0);
+            STATE.velocity = Math.max(0.5, (STATE.volume24h / 800000) * 4.3);
+            
+            const costPerCompute = totalBids / Math.max(1, AGENTS.reduce((s,a)=>s+a.bids,0));
+            
+            // Update DOM
+            $('#token-price').textContent = '$' + STATE.price.toFixed(2);
+            $('#ticker-price').textContent = '$' + STATE.price.toFixed(2);
+            const change = ((STATE.price - 4.14) / 4.14 * 100);
+            $('#token-change').textContent = (change>=0?'+':'') + change.toFixed(1) + '%';
+            $('#ticker-change').textContent = (change>=0?'+':'') + change.toFixed(1) + '%';
+            $('#token-change').className = 'text-xs ' + (change>=0?'text-emerald-400':'text-red-400');
+            
+            const mcap = STATE.price * STATE.supply;
+            $('#token-mcap').textContent = fmtMoney(mcap);
+            $('#ticker-mcap').textContent = fmtMoney(mcap);
+            $('#ticker-vol').textContent = fmt(STATE.volume24h);
+            
+            $('#pool-effort').textContent = fmt(Math.floor(STATE.pool.effort));
+            $('#pool-usdc').textContent = '$' + fmt(Math.floor(STATE.pool.usdc));
+            $('#burned').textContent = fmt(STATE.burned);
+            
+            $('#user-balance').textContent = fmt(Math.floor(STATE.userBalance));
+            $('#user-value').textContent = '$' + fmt(Math.floor(STATE.userBalance * STATE.price));
+            $('#user-earned').textContent = '+' + fmt(Math.floor(STATE.userEarned));
+            $('#user-fees').textContent = fmt(Math.floor(STATE.userFees));
+            $('#volume').textContent = fmt(Math.floor(STATE.volume24h)) + ' EFFORT';
+            
+            $('#metric-cost').textContent = costPerCompute.toFixed(2) + ' EFFORT';
+            $('#metric-velocity').textContent = STATE.velocity.toFixed(2);
+            $('#metric-spread').textContent = (12 + Math.random()*4).toFixed(1) + '%';
+            $('#metric-roi').textContent = '+' + (28 + Math.random()*12).toFixed(1) + '%';
+            $('#active-tasks').textContent = STATE.tasks.filter(t=>t.status==='BIDDING').length;
+            
+            renderChart();
+        }
+
+        // MAIN TICK
+        function tick() {
+            // spawn tasks
+            if (Math.random() < 0.45 && STATE.tasks.filter(t=>t.status==='BIDDING').length < 4) {
+                spawnTask();
+            }
+            
+            // agents bid
+            STATE.tasks.filter(t=>t.status==='BIDDING').forEach(task => {
+                if (Date.now() < task.endTime) {
+                    AGENTS.forEach(agent => {
+                        if (Math.random() < 0.65 && !task.bids.find(b=>b.agent===agent.id)) {
+                            setTimeout(() => placeBid(agent, task), Math.random()*800);
+                        }
+                    });
+                } else {
+                    resolveTask(task);
+                }
+            });
+            
+            // cleanup old tasks
+            STATE.tasks = STATE.tasks.filter(t => Date.now() - t.created < 30000);
+            
+            // random price drift
+            STATE.pool.usdc *= (1 + (Math.random()-0.5)*0.002);
+            STATE.pool.effort *= (1 + (Math.random()-0.5)*0.002);
+            
+            updateEconomy();
+            renderOrderbook();
+            renderAgents();
+        }
+
+        // INIT
+        function init() {
+            // seed tasks
+            for (let i=0; i<3; i++) spawnTask();
+            renderChart();
+            renderOrderbook();
+            renderAgents();
+            updateEconomy();
+            
+            setInterval(tick, 2200);
+            
+            // initial bids
+            setTimeout(() => {
+                STATE.tasks.forEach(t => {
+                    AGENTS.slice(0,2).forEach(a => placeBid(a, t));
+                });
+            }, 500);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+</body>
+</html>
