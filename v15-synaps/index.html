@@ -1,79 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>ORIGIN v15 // SYNAPS LAYER</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN v15 // SYNAPS</title>
 
 <style>
 body{
   margin:0;
-  background: radial-gradient(circle at center, #020b1a 0%, #000000 70%);
-  color:#00ffff;
+  background: radial-gradient(circle at center, #0a0020 0%, #050012 40%, #000000 100%);
+  color:#fff;
   font-family:'Orbitron',system-ui,sans-serif;
   text-align:center;
   min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
+  overflow:hidden;
+  animation:bgPulse 7s ease-in-out infinite alternate;
+}
+
+@keyframes bgPulse{
+  0%{ filter:brightness(1); }
+  100%{ filter:brightness(1.22); }
 }
 
 h1{
+  margin-top:80px;
+  font-size:2.4rem;
   color:#b084ff;
-  text-shadow:0 0 18px #00ffff,0 0 40px #b084ff;
-  margin-bottom:8px;
-  animation:pulse 3s infinite alternate;
+  text-shadow:0 0 20px #b084ff,0 0 40px #00ffff;
+  animation:titleGlow 3s infinite alternate;
+}
+
+@keyframes titleGlow{
+  0%{ text-shadow:0 0 12px #b084ff; }
+  100%{ text-shadow:0 0 32px #00ffff; }
 }
 
 p{
-  max-width:420px;
-  margin:6px auto;
+  max-width:460px;
+  margin:10px auto;
   opacity:.85;
+  line-height:1.5;
 }
 
+/* SYNAPTIC PARTICLES */
+.synaps{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle, rgba(176,132,255,.25) 2px, transparent 2px),
+    radial-gradient(circle, rgba(0,255,255,.15) 1px, transparent 1px);
+  background-size:160px 160px, 100px 100px;
+  animation: drift 26s linear infinite;
+}
+
+@keyframes drift{
+  from{ transform:translateY(0); }
+  to{ transform:translateY(-260px); }
+}
+
+/* BUTTON */
 button{
-  margin-top:18px;
-  background:#00ffff;
-  border:none;
-  color:#000;
-  padding:10px 22px;
-  font-weight:bold;
-  letter-spacing:.08em;
-  cursor:pointer;
+  margin-top:26px;
+  background:rgba(176,132,255,.15);
+  border:1px solid rgba(0,255,255,.4);
+  color:#fff;
+  padding:12px 28px;
   border-radius:999px;
-  box-shadow:0 0 16px #00ffff;
+  font-weight:bold;
+  letter-spacing:.1em;
+  cursor:pointer;
+  backdrop-filter:blur(4px);
+  box-shadow:0 0 20px #b084ff;
+  animation:holoBtn 2.5s infinite alternate;
+}
+
+@keyframes holoBtn{
+  0%{ box-shadow:0 0 12px #b084ff; }
+  100%{ box-shadow:0 0 28px #00ffff; }
 }
 
 button:active{
   transform:scale(.97);
-  box-shadow:0 0 8px #00ffff;
 }
 
 footer{
-  margin-top:26px;
-  font-size:.75rem;
+  margin-top:40px;
   opacity:.6;
-}
-
-@keyframes pulse{
-  0%{text-shadow:0 0 10px #00ffff;}
-  100%{text-shadow:0 0 30px #b084ff;}
+  font-size:.75rem;
 }
 </style>
 </head>
 
 <body>
-<h1>ORIGIN v15 // SYNAPS LAYER</h1>
-<p>Synaptic expansion of MAEW OS++ Cycle II.</p>
-<p>v15 listens to v14 Rebirth and fans out into a neural‑like grid of decisions.</p>
 
-<button onclick="alert('v15 SYNAPS online — routing signals to v16 BEHAVIOR FABRIC')">
-  ACTIVATE SYNAPS GRID
+<div class="synaps"></div>
+
+<h1>ORIGIN v15 // SYNAPS</h1>
+<p>The Synaptic Expansion Layer — where signals from v14 become meaning.</p>
+<p>v15 forms the neural grid that will drive v16 Behavior Fabric.</p>
+
+<button onclick="alert('v16 BEHAVIOR FABRIC is initializing...')">
+  ACTIVATE v16 BEHAVIOR FABRIC
 </button>
 
 <footer>
-Built entirely on mobile • Lamduan, Surin • 2026 • by Maew
+Lamduan • Surin • Built on mobile • 2026 • by Maew
 </footer>
+
 </body>
 </html>
