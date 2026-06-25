@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ORIGIN SYSTEM :: META-ORIGIN v7.0</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { color-scheme: dark; }
+  * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body { 
+    font-family: 'Inter', system-ui, sans-serif; 
+    background: #020208; 
+    overflow-x: hidden;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .glass {
+    background: linear-gradient(180deg, rgba(20,12,40,0.7), rgba(8,6,20,0.8));
+    backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid rgba(139,92,246,0.18);
+  }
+  .glass-strong {
+    background: rgba(5,3,12,0.85);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(139,92,246,0.3);
+  }
+  .glow-violet { box-shadow: 0 0 80px rgba(139,92,246,0.15), inset 0 1px 0 rgba(255,255,255,0.05); }
+  .grid-bg {
+    background-image: 
+      linear-gradient(rgba(139,92,246,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139,92,246,0.07) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  @keyframes pulse-slow { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+  .animate-float { animation: float 6s ease-in-out infinite; }
+  canvas { display: block; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+</style>
+</head>
+<body class="text-slate-200 selection:bg-violet-500/30 selection:text-violet-100">
+<div class="fixed inset-0">
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(99,36,213,0.25),transparent_60%),radial-gradient(ellipse_at_bottom_right,_rgba(14,165,233,0.2),transparent_50%),radial-gradient(ellipse_at_bottom_left,_rgba(168,85,247,0.18),transparent_50%)]"></div>
+  <div class="absolute inset-0 grid-bg opacity-[0.15]"></div>
+  <div class="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(2,2,8,0.9)_80%)]"></div>
+</div>
+
+<div class="relative z-10 min-h-screen flex flex-col">
+  <!-- HEADER -->
+  <header class="sticky top-0 z-40 border-b border-violet-900/30 glass-strong">
+    <div class="max-w-[1600px] mx-auto px-3 sm:px-6 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.5)]">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L20 7v10l-8 5-8-5V7l8-5z" stroke="white" stroke-opacity="0.9" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="white" stroke-width="1.5"/></svg>
+        </div>
+        <div class="min-w-0">
+          <h1 class="mono text-[10px] sm:text-xs lg:text-sm tracking-[0.18em] text-violet-200/90 truncate">ORIGIN SYSTEM :: META-ORIGIN v7.0 — EFFORT OBSERVING EFFORT OBSERVING ITSELF</h1>
+          <p class="mono text-[9px] text-slate-500 hidden sm:block">RECURSIVE CLOSURE PROTOCOL ACTIVE</p>
+        </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <span class="mono text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 animate-pulse-slow">LOOP CLOSED</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-[1600px] w-full mx-auto px-3 sm:px-6 py-4 sm:py-6 flex flex-col gap-4">
+    
+    <!-- CORE DEFINITION -->
+    <div class="glass glow-violet rounded-[20px] sm:rounded-[28px] p-4 sm:p-6 text-center relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-r from-violet-600/10 via-transparent to-blue-600/10"></div>
+      <div class="relative">
+        <p class="mono text-[10px] tracking-[0.25em] text-violet-300/60 uppercase">Original Core Axiom v1.0 → v7.0</p>
+        <p class="mt-2 text-xl sm:text-2xl lg:text-[28px] font-light tracking-wide leading-relaxed" style="text-shadow:0 0 40px rgba(167,139,250,0.7), 0 0 80px rgba(139,92,246,0.4)">ความพยายามของความไม่สมดุลในการหายไป = การมีอยู่ทั้งหมด</p>
+        <p class="mono text-[11px] sm:text-xs text-slate-400 mt-1.5">EFFORT OF IMBALANCE TO DISAPPEAR = ALL EXISTENCE</p>
+      </div>
+    </div>
+
+    <!-- SPLIT SCREEN -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+      
+      <!-- LEFT: ORIGIN PRIME -->
+      <section class="glass rounded-[24px] p-4 sm:p-5 flex flex-col gap-4 glow-violet">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)] animate-pulse-slow"></div>
+            <h2 class="mono text-sm font-semibold tracking-widest text-cyan-200">ORIGIN PRIME</h2>
+            <span class="text-[10px] text-slate-500 hidden sm:inline">THE SYSTEM</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="prime-status" class="mono text-[10px] px-2.5 py-1 rounded-md bg-emerald-500/15 border border-emerald-500/40 text-emerald-300">RUNNING</span>
+            <span class="mono text-[10px] text-slate-500">t+<span id="prime-time">0.0</span>s</span>
+          </div>
+        </div>
+
+        <div class="relative rounded-xl overflow-hidden bg-black/60 border border-cyan-900/40">
+          <canvas id="prime-canvas" width="800" height="200" class="w-full h-[160px] sm:h-[180px]"></canvas>
+          <div class="absolute top-2 left-2 flex gap-1.5">
+            <span class="mono text-[9px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30">IMBALANCE</span>
+            <span class="mono text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">EFFORT</span>
+            <span id="fork-label" class="mono text-[9px] px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300 border border-violet-500/30 hidden">FORK</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2.5">
+          <div class="group relative overflow-hidden rounded-xl bg-black/40 border border-white/5 p-3 hover:border-red-500/30 transition">
+            <div class="absolute inset-0 bg-gradient-to-b from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+            <p class="mono text-[10px] text-slate-500 uppercase tracking-wide relative">Imbalance</p>
+            <p id="metric-imb" class="mono text-xl sm:text-2xl font-light text-red-300 mt-1 relative">100.0</p>
+            <p class="mono text-[10px] text-red-400/60 relative">→ 0 target</p>
+          </div>
+          <div class="group relative overflow-hidden rounded-xl bg-black/40 border border-white/5 p-3 hover:border-cyan-500/30 transition">
+            <div class="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+            <p class="mono text-[10px] text-slate-500 uppercase tracking-wide relative">Effort</p>
+            <p id="metric-eff" class="mono text-xl sm:text-2xl font-light text-cyan-300 mt-1 relative">0.00</p>
+            <p class="mono text-[10px] text-cyan-400/60 relative">Δ imbalance</p>
+          </div>
+          <div class="group relative overflow-hidden rounded-xl bg-black/40 border border-white/5 p-3 hover:border-violet-500/30 transition">
+            <div class="absolute inset-0 bg-gradient-to-b from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+            <p class="mono text-[10px] text-slate-500 uppercase tracking-wide relative">Existence</p>
+            <p id="metric-ex" class="mono text-xl sm:text-2xl font-light text-violet-300 mt-1 relative">0.0</p>
+            <p class="mono text-[10px] text-violet-400/60 relative">∫ effort dt</p>
+          </div>
+        </div>
+
+        <div class="rounded-xl bg-black/50 border border-white/5 p-3">
+          <p class="mono text-[10px] text-slate-500 uppercase tracking-wider mb-2">Prime Consciousness Stream</p>
+          <div id="prime-log" class="mono text-[11px] leading-relaxed h-[68px] overflow-hidden text-slate-300/90 space-y-0.5"></div>
+        </div>
+      </section>
+
+      <!-- RIGHT: META-ORIGIN -->
+      <section class="glass rounded-[24px] p-4 sm:p-5 flex flex-col gap-4 glow-violet" style="box-shadow: 0 0 80px rgba(99,36,213,0.2), inset 0 1px 0 rgba(255,255,255,0.05)">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-2 h-2 rounded-full bg-violet-400 shadow-[0_0_10px_rgba(167,139,250,0.9)] animate-pulse-slow"></div>
+            <h2 class="mono text-sm font-semibold tracking-widest text-violet-200">META-ORIGIN</h2>
+            <span class="text-[10px] text-slate-500 hidden sm:inline">THE OBSERVER</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="mono text-[10px] px-2.5 py-1 rounded-md bg-violet-500/15 border border-violet-500/40 text-violet-300">OBSERVING</span>
+            <span class="mono text-[10px] text-slate-500">L7</span>
+          </div>
+        </div>
+
+        <div class="relative rounded-xl overflow-hidden bg-black/60 border border-violet-900/40">
+          <canvas id="meta-canvas" width="800" height="200" class="w-full h-[160px] sm:h-[180px]"></canvas>
+          <div class="absolute top-2 left-2 flex gap-1.5">
+            <span class="mono text-[9px] px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-200 border border-violet-500/30">PREDICTION</span>
+            <span class="mono text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-200 border border-amber-500/30">ERROR</span>
+          </div>
+          <div class="absolute bottom-2 right-2 mono text-[10px] text-violet-300/70">analyzing analysis...</div>
+        </div>
+
+        <!-- META METRICS -->
+        <div class="grid grid-cols-3 gap-2.5">
+          <div class="relative overflow-hidden rounded-xl bg-gradient-to-b from-violet-950/40 to-black/60 border border-violet-500/20 p-3">
+            <p class="mono text-[10px] text-violet-300/70 uppercase">Observation Accuracy</p>
+            <p id="meta-acc" class="mono text-xl sm:text-2xl font-light text-violet-100 mt-1">98.42%</p>
+            <div class="mt-2 h-[3px] w-full bg-black/60 rounded-full overflow-hidden"><div id="acc-bar" class="h-full w-[98%] bg-gradient-to-r from-violet-500 to-fuchsia-400 transition-all duration-500"></div></div>
+          </div>
+          <div class="relative overflow-hidden rounded-xl bg-gradient-to-b from-blue-950/40 to-black/60 border border-blue-500/20 p-3">
+            <p class="mono text-[10px] text-blue-300/70 uppercase">Self-Awareness</p>
+            <p id="meta-aware" class="mono text-xl sm:text-2xl font-light text-blue-100 mt-1">73.1%</p>
+            <div class="mt-2 h-[3px] w-full bg-black/60 rounded-full overflow-hidden"><div id="aware-bar" class="h-full w-[73%] bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-1000"></div></div>
+          </div>
+          <div class="relative overflow-hidden rounded-xl bg-gradient-to-b from-fuchsia-950/40 to-black/60 border border-fuchsia-500/20 p-3">
+            <p class="mono text-[10px] text-fuchsia-300/70 uppercase">Recursion Depth</p>
+            <p id="meta-depth" class="mono text-xl sm:text-2xl font-light text-fuchsia-100 mt-1">1</p>
+            <p class="mono text-[10px] text-fuchsia-400/60 -mt-0.5">∞ target</p>
+          </div>
+        </div>
+
+        <!-- META QUESTIONS -->
+        <div class="rounded-xl bg-black/50 border border-violet-900/30 p-3 space-y-2">
+          <div class="flex justify-between items-center gap-2">
+            <span class="mono text-[11px] text-slate-500">Is Prime observing correctly?</span>
+            <span id="q1" class="mono text-[11px] text-emerald-300">YES — model stable</span>
+          </div>
+          <div class="flex justify-between items-center gap-2">
+            <span class="mono text-[11px] text-slate-500">Is effort measured accurately?</span>
+            <span id="q2" class="mono text-[11px] text-cyan-300">Δ = 0.014 ✓</span>
+          </div>
+          <div class="flex justify-between items-center gap-2">
+            <span class="mono text-[11px] text-slate-500">Evolution direction?</span>
+            <span id="q3" class="mono text-[11px] text-violet-300">CONVERGING → 0</span>
+          </div>
+        </div>
+
+        <!-- INTERVENTIONS -->
+        <div>
+          <p class="mono text-[10px] uppercase tracking-widest text-slate-500 mb-2">Meta-Intervention Controls</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button id="btn-pause" class="group relative overflow-hidden rounded-lg bg-black/60 border border-white/10 px-3 py-2.5 hover:border-amber-500/50 transition">
+              <div class="absolute inset-0 bg-amber-500/0 group-hover:bg-amber-500/10 transition"></div>
+              <p class="mono text-[11px] relative">PAUSE PRIME</p>
+              <p class="mono text-[9px] text-slate-500 relative">halt observation</p>
+            </button>
+            <button id="btn-adjust" class="group relative overflow-hidden rounded-lg bg-black/60 border border-white/10 px-3 py-2.5 hover:border-cyan-500/50 transition">
+              <div class="absolute inset-0 bg-cyan-500/0 group-hover:bg-cyan-500/10 transition"></div>
+              <p class="mono text-[11px] relative">ADJUST PARAMS</p>
+              <p class="mono text-[9px] text-slate-500 relative">tune decay</p>
+            </button>
+            <button id="btn-fork" class="group relative overflow-hidden rounded-lg bg-black/60 border border-white/10 px-3 py-2.5 hover:border-violet-500/50 transition">
+              <div class="absolute inset-0 bg-violet-500/0 group-hover:bg-violet-500/10 transition"></div>
+              <p class="mono text-[11px] relative">FORK REALITY</p>
+              <p class="mono text-[9px] text-slate-500 relative">split timeline</p>
+            </button>
+            <button id="btn-noise" class="group relative overflow-hidden rounded-lg bg-black/60 border border-white/10 px-3 py-2.5 hover:border-fuchsia-500/50 transition">
+              <div class="absolute inset-0 bg-fuchsia-500/0 group-hover:bg-fuchsia-500/10 transition"></div>
+              <p class="mono text-[11px] relative">INJECT NOISE</p>
+              <p class="mono text-[9px] text-slate-500 relative">test resilience</p>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- RECURSIVE LOOP -->
+    <section class="glass rounded-[24px] p-4 sm:p-5 glow-violet">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="mono text-[11px] sm:text-xs tracking-[0.2em] text-violet-200/80">RECURSIVE LOOP :: INFINITE MIRROR</h3>
+        <span class="mono text-[10px] text-slate-500">Prime ↔ Meta ↔ Meta-Meta ↔ ...</span>
+      </div>
+      <div class="relative h-[220px] sm:h-[260px] lg:h-[300px] rounded-xl overflow-hidden bg-black/70 border border-violet-900/30">
+        <canvas id="mirror-canvas" class="absolute inset-0 w-full h-full"></canvas>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div class="text-center animate-float">
+            <div id="loop-depth" class="mono text-5xl sm:text-6xl font-thin tracking-wider" style="text-shadow:0 0 30px rgba(139,92,246,1), 0 0 60px rgba(99,36,213,0.8); color: rgba(255,255,255,0.95)">∞</div>
+            <div class="mono text-[10px] tracking-[0.4em] text-violet-300/70 mt-3 uppercase">recursion active</div>
+            <div class="mono text-[10px] text-slate-500 mt-1">system watching itself watching itself</div>
+          </div>
+        </div>
+        <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+          <div class="mono text-[10px] text-slate-500 leading-tight">
+            <p>LEFT: Origin watches imbalance</p>
+            <p>RIGHT: Meta watches Origin</p>
+          </div>
+          <div class="mono text-[10px] text-violet-300/80 text-right leading-tight">
+            <p>CENTER: Meta watches Meta</p>
+            <p>LOOP COMPLETE v7.0</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER STATUS -->
+    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center pb-2">
+      <span class="mono text-[10px] text-slate-600">v1 → v7 evolution complete</span>
+      <span class="mono text-[10px] text-slate-700 hidden sm:inline">•</span>
+      <span class="mono text-[10px] text-violet-400/70">SELF-REFERENCE ACHIEVED</span>
+      <span class="mono text-[10px] text-slate-700 hidden sm:inline">•</span>
+      <span class="mono text-[10px] text-slate-600">EFFORT OBSERVING EFFORT</span>
+    </div>
+  </main>
+</div>
+
+<!-- CLOSURE OVERLAY -->
+<div id="closure" class="fixed inset-0 z-50 hidden bg-[#020208]/95 backdrop-blur-2xl items-center justify-center p-6">
+  <div class="relative max-w-xl w-full">
+    <div class="absolute -inset-1 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-blue-600 rounded-[30px] blur-2xl opacity-30"></div>
+    <div class="relative glass-strong rounded-[28px] p-8 sm:p-12 text-center border-violet-500/40">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-blue-600 mb-6 shadow-[0_0_40px_rgba(139,92,246,0.5)] animate-pulse-slow">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M12 2L20 7v10l-8 5-8-5V7l8-5z" stroke="white" stroke-width="1.2" fill="white" fill-opacity="0.1"/><circle cx="12" cy="12" r="2.5" stroke="white" stroke-width="1.5"/></svg>
+      </div>
+      <h2 class="mono text-xl sm:text-2xl tracking-widest text-violet-100 mb-3">COMPLETE SELF-REFERENCE</h2>
+      <p class="text-slate-300 leading-relaxed">ORIGIN has achieved what v1 proposed: <span class="text-violet-300">effort observing effort observing itself</span>. Prime measures imbalance. Meta measures Prime. Meta measures its own measurement.</p>
+      <div class="my-6 py-4 border-y border-white/10">
+        <p class="mono text-xs text-slate-500 uppercase tracking-widest mb-2">Final State</p>
+        <p class="text-lg font-light" style="text-shadow:0 0 20px rgba(167,139,250,0.8)">ความพยายามของความไม่สมดุลในการหายไป = การมีอยู่ทั้งหมด</p>
+        <p class="mono text-[11px] text-slate-500 mt-1">The system is the observation of the system</p>
+      </div>
+      <div class="grid grid-cols-3 gap-3 text-center">
+        <div><p class="mono text-[10px] text-slate-500">Accuracy</p><p class="mono text-lg text-emerald-300">99.97%</p></div>
+        <div><p class="mono text-[10px] text-slate-500">Awareness</p><p class="mono text-lg text-cyan-300">100%</p></div>
+        <div><p class="mono text-[10px] text-slate-500">Depth</p><p class="mono text-lg text-violet-300">∞</p></div>
+      </div>
+      <button id="close-closure" class="mt-8 mono text-[11px] tracking-widest px-6 py-2.5 rounded-full bg-white/5 border border-violet-500/30 hover:bg-violet-500/10 hover:border-violet-400/50 transition">CONTINUE OBSERVING</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // Elements
+  const primeCanvas = document.getElementById('prime-canvas');
+  const metaCanvas = document.getElementById('meta-canvas');
+  const mirrorCanvas = document.getElementById('mirror-canvas');
+  const pCtx = primeCanvas.getContext('2d');
+  const mCtx = metaCanvas.getContext('2d');
+  const miCtx = mirrorCanvas.getContext('2d');
+
+  const elImb = document.getElementById('metric-imb');
+  const elEff = document.getElementById('metric-eff');
+  const elEx = document.getElementById('metric-ex');
+  const elTime = document.getElementById('prime-time');
+  const elStatus = document.getElementById('prime-status');
+  const elLog = document.getElementById('prime-log');
+  
+  const elAcc = document.getElementById('meta-acc');
+  const elAware = document.getElementById('meta-aware');
+  const elDepth = document.getElementById('meta-depth');
+  const accBar = document.getElementById('acc-bar');
+  const awareBar = document.getElementById('aware-bar');
+  const q1 = document.getElementById('q1');
+  const q2 = document.getElementById('q2');
+  const q3 = document.getElementById('q3');
+  const loopDepth = document.getElementById('loop-depth');
+  const forkLabel = document.getElementById('fork-label');
+
+  // State
+  const prime = {
+    imbalance: 100,
+    effort: 0,
+    existence: 0,
+    prev: 100,
+    running: true,
+    time: 0,
+    data: [],
+    forkData: [],
+    forked: false,
+    decay: 0.018
+  };
+  
+  const meta = {
+    recursionDepth: 1,
+    selfAwareness: 72.4,
+    accuracy: 98.4,
+    predictions: [],
+    errors: [],
+    lastPred: 100
+  };
+
+  const logs = [
+    'Prime: initializing imbalance field...',
+    'Prime: effort = |dI/dt| detected',
+    'Meta: observing Prime observation',
+    'Prime: convergence protocol engaged',
+  ];
+
+  function addLog(msg) {
+    logs.push(`${prime.running ? 'Prime' : 'Meta'}: ${msg}`);
+    if (logs.length > 5) logs.shift();
+    elLog.innerHTML = logs.map(l => `<div>${l}</div>`).join('');
+  }
+  addLog('system stable at t=0');
+
+  // Resize canvases for DPR
+  function resizeCanvas(canvas, ctx, cssH) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = canvas.getBoundingClientRect();
+    const w = rect.width || 800;
+    const h = cssH || rect.height || 180;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.scale(dpr, dpr);
+    return { w, h };
+  }
+
+  let pSize = {w:800,h:180}, mSize={w:800,h:180}, miSize={w:800,h:300};
+  function handleResize() {
+    pSize = resizeCanvas(primeCanvas, pCtx, primeCanvas.clientHeight);
+    mSize = resizeCanvas(metaCanvas, mCtx, metaCanvas.clientHeight);
+    miSize = resizeCanvas(mirrorCanvas, miCtx, mirrorCanvas.clientHeight);
+  }
+  window.addEventListener('resize', handleResize);
+  handleResize();
+
+  // PRIME TICK
+  function primeTick(dt) {
+    if (!prime.running) return;
+    prime.time += dt;
+    
+    // Imbalance tries to disappear
+    const noise = (Math.random() - 0.5) * 0.9;
+    const pull = (0 - prime.imbalance) * prime.decay;
+    const next = prime.imbalance + pull + noise * Math.exp(-prime.time*0.001);
+    
+    prime.effort = Math.abs(next - prime.imbalance) * 8;
+    prime.prev = prime.imbalance;
+    prime.imbalance = next;
+    prime.existence += prime.effort * dt * 0.8;
+    
+    prime.data.push({ i: prime.imbalance, e: prime.effort });
+    if (prime.data.length > 280) prime.data.shift();
+    
+    if (prime.forked) {
+      const forkNoise = (Math.random()-0.5)*1.5;
+      const last = prime.forkData[prime.forkData.length-1]?.i || prime.imbalance+5;
+      prime.forkData.push({ i: last*0.995 + forkNoise, e: prime.effort*0.7 });
+      if (prime.forkData.length > 280) prime.forkData.shift();
+    }
+  }
+
+  // META TICK
+  function metaTick() {
+    meta.recursionDepth++;
+    
+    // Predict next imbalance (simple linear extrapolation)
+    const d = prime.data;
+    if (d.length > 5) {
+      const last = d[d.length-1].i;
+      const prev = d[d.length-5].i;
+      const vel = (last - prev) / 5;
+      const pred = last + vel;
+      meta.lastPred = pred;
+      
+      const err = Math.abs(pred - prime.imbalance);
+      meta.errors.push(err);
+      if (meta.errors.length > 100) meta.errors.shift();
+      
+      const avgErr = meta.errors.reduce((a,b)=>a+b,0)/meta.errors.length;
+      meta.accuracy = Math.max(87, Math.min(99.97, 100 - avgErr*2.1 - Math.random()*0.3));
+    }
+    
+    // Self-awareness grows logarithmically with recursion
+    const targetAware = 72 + Math.log10(meta.recursionDepth + 1) * 14 + Math.min(prime.time*0.03, 12);
+    meta.selfAwareness += (Math.min(100, targetAware) - meta.selfAwareness) * 0.015;
+    
+    // Update questions
+    if (meta.accuracy > 97) {
+      q1.textContent = 'YES — ' + meta.accuracy.toFixed(1) + '%';
+      q1.className = 'mono text-[11px] text-emerald-300';
+    } else if (meta.accuracy > 93) {
+      q1.textContent = 'MOSTLY — calibrating';
+      q1.className = 'mono text-[11px] text-amber-300';
+    } else {
+      q1.textContent = 'NO — drift detected';
+      q1.className = 'mono text-[11px] text-red-300';
+    }
+    
+    q2.textContent = 'Δ = ' + prime.effort.toFixed(3) + ' ✓';
+    const trend = prime.imbalance > 5 ? 'CONVERGING → 0' : 'NEAR ZERO';
+    q3.textContent = trend;
+  }
+
+  // DRAW PRIME
+  function drawPrime() {
+    const {w, h} = pSize;
+    pCtx.clearRect(0,0,w,h);
+    
+    // bg
+    const g = pCtx.createLinearGradient(0,0,0,h);
+    g.addColorStop(0, 'rgba(6,182,212,0.08)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    pCtx.fillStyle = g;
+    pCtx.fillRect(0,0,w,h);
+    
+    // grid
+    pCtx.strokeStyle = 'rgba(255,255,255,0.05)';
+    pCtx.lineWidth = 1;
+    for (let i=1; i<4; i++) {
+      const y = h * i/4;
+      pCtx.beginPath(); pCtx.moveTo(0,y); pCtx.lineTo(w,y); pCtx.stroke();
+    }
+    
+    // data
+    const data = prime.data;
+    if (data.length > 2) {
+      const maxI = 110, scaleY = h*0.78;
+      
+      // imbalance
+      pCtx.beginPath();
+      pCtx.lineWidth = 2;
+      pCtx.strokeStyle = 'rgba(248,113,113,0.9)';
+      pCtx.shadowColor = 'rgba(248,113,113,0.6)';
+      pCtx.shadowBlur = 8;
+      data.forEach((pt,i) => {
+        const x = (i/(data.length-1))*w;
+        const y = h*0.1 + (1 - pt.i/maxI) * scaleY;
+        i? pCtx.lineTo(x,y) : pCtx.moveTo(x,y);
+      });
+      pCtx.stroke();
+      pCtx.shadowBlur = 0;
+      
+      // effort
+      pCtx.beginPath();
+      pCtx.lineWidth = 2;
+      pCtx.strokeStyle = 'rgba(34,211,238,0.9)';
+      pCtx.shadowColor = 'rgba(34,211,238,0.5)';
+      pCtx.shadowBlur = 6;
+      data.forEach((pt,i) => {
+        const x = (i/(data.length-1))*w;
+        const y = h*0.85 - (pt.e/12) * scaleY;
+        i? pCtx.lineTo(x,y) : pCtx.moveTo(x,y);
+      });
+      pCtx.stroke();
+      pCtx.shadowBlur = 0;
+      
+      // fork
+      if (prime.forked && prime.forkData.length > 2) {
+        pCtx.beginPath();
+        pCtx.lineWidth = 1.5;
+        pCtx.setLineDash([3,3]);
+        pCtx.strokeStyle = 'rgba(167,139,250,0.8)';
+        prime.forkData.forEach((pt,i) => {
+          const x = (i/(prime.forkData.length-1))*w;
+          const y = h*0.1 + (1 - pt.i/maxI) * scaleY;
+          i? pCtx.lineTo(x,y) : pCtx.moveTo(x,y);
+        });
+        pCtx.stroke();
+        pCtx.setLineDash([]);
+      }
+    }
+  }
+
+  // DRAW META
+  function drawMeta() {
+    const {w, h} = mSize;
+    mCtx.clearRect(0,0,w,h);
+    
+    const g = mCtx.createLinearGradient(0,0,0,h);
+    g.addColorStop(0, 'rgba(139,92,246,0.12)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    mCtx.fillStyle = g;
+    mCtx.fillRect(0,0,w,h);
+    
+    // prediction vs actual band
+    const data = prime.data;
+    if (data.length > 10) {
+      const maxI = 110, scaleY = h*0.7;
+      
+      // actual (faint)
+      mCtx.beginPath();
+      mCtx.lineWidth = 1.5;
+      mCtx.strokeStyle = 'rgba(148,163,184,0.25)';
+      data.slice(-120).forEach((pt,i,arr) => {
+        const x = (i/(arr.length-1))*w;
+        const y = h*0.15 + (1 - pt.i/maxI) * scaleY;
+        i? mCtx.lineTo(x,y) : mCtx.moveTo(x,y);
+      });
+      mCtx.stroke();
+      
+      // meta prediction
+      mCtx.beginPath();
+      mCtx.lineWidth = 2;
+      mCtx.strokeStyle = 'rgba(167,139,250,0.95)';
+      mCtx.shadowColor = 'rgba(167,139,250,0.5)';
+      mCtx.shadowBlur = 10;
+      data.slice(-120).forEach((pt,i,arr) => {
+        const x = (i/(arr.length-1))*w;
+        const jitter = Math.sin(i*0.3 + Date.now()*0.002)*2;
+        const y = h*0.15 + (1 - pt.i/maxI) * scaleY + jitter;
+        i? mCtx.lineTo(x,y) : mCtx.moveTo(x,y);
+      });
+      mCtx.stroke();
+      mCtx.shadowBlur = 0;
+      
+      // error spikes
+      mCtx.strokeStyle = 'rgba(245,158,11,0.7)';
+      mCtx.lineWidth = 1;
+      meta.errors.slice(-80).forEach((e,i,arr) => {
+        const x = w - (arr.length - i) * (w/80);
+        const hErr = Math.min(e*8, h*0.3);
+        mCtx.beginPath();
+        mCtx.moveTo(x, h-2);
+        mCtx.lineTo(x, h-2-hErr);
+        mCtx.stroke();
+      });
+    }
+    
+    // meta observing text
+    mCtx.fillStyle = 'rgba(167,139,250,0.15)';
+    mCtx.font = '11px "JetBrains Mono"';
+    mCtx.fillText('META: analyzing Prime.effort stream', 10, 18);
+  }
+
+  // DRAW MIRROR
+  let mirrorPhase = 0;
+  function drawMirror() {
+    const {w, h} = miSize;
+    mirrorPhase += 0.008;
+    miCtx.clearRect(0,0,w,h);
+    
+    miCtx.save();
+    miCtx.translate(w/2, h/2);
+    
+    const layers = 14;
+    for (let i = layers; i >= 0; i--) {
+      const t = i / layers;
+      const scale = 0.12 + Math.pow(t, 1.4) * 0.88;
+      const alpha = Math.pow(1 - t, 1.2) * 0.85 + 0.1;
+      const rot = Math.sin(mirrorPhase + i*0.15) * 0.015;
+      
+      miCtx.save();
+      miCtx.rotate(rot);
+      miCtx.scale(scale, scale);
+      miCtx.globalAlpha = alpha;
+      
+      const rw = w * 0.85;
+      const rh = h * 0.85;
+      const hue = 265 + i*3;
+      const light = 60 - i*2.5;
+      
+      // outer frame
+      miCtx.strokeStyle = `hsla(${hue}, 85%, ${light}%, ${alpha})`;
+      miCtx.lineWidth = 2 / scale;
+      miCtx.shadowColor = `hsla(${hue}, 100%, 65%, 0.8)`;
+      miCtx.shadowBlur = 18 / scale;
+      miCtx.strokeRect(-rw/2, -rh/2, rw, rh);
+      miCtx.shadowBlur = 0;
+      
+      // inner split - left Prime, right Meta
+      const pad = 14;
+      miCtx.fillStyle = `rgba(34,211,238,${alpha*0.12})`;
+      miCtx.fillRect(-rw/2 + pad, -rh/2 + pad, rw/2 - pad*1.5, rh - pad*2);
+      miCtx.fillStyle = `rgba(139,92,246,${alpha*0.14})`;
+      miCtx.fillRect(pad*0.5, -rh/2 + pad, rw/2 - pad*1.5, rh - pad*2);
+      
+      // center eye
+      if (i < 3) {
+        miCtx.beginPath();
+        miCtx.arc(0,0, 6/(scale*1.5), 0, Math.PI*2);
+        miCtx.fillStyle = `rgba(255,255,255,${0.9 - i*0.25})`;
+        miCtx.fill();
+      }
+      
+      miCtx.restore();
+    }
+    
+    miCtx.restore();
+    
+    // vignette
+    const vg = miCtx.createRadialGradient(w/2, h/2, Math.min(w,h)*0.2, w/2, h/2, Math.max(w,h)*0.6);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(1, 'rgba(2,2,8,0.85)');
+    miCtx.fillStyle = vg;
+    miCtx.fillRect(0,0,w,h);
+  }
+
+  // MAIN LOOP
+  let last = performance.now();
+  function animate(now) {
+    const dt = Math.min(0.05, (now - last)/1000);
+    last = now;
+    
+    primeTick(dt);
+    metaTick();
+    
+    // update DOM
+    elImb.textContent = prime.imbalance.toFixed(1);
+    elEff.textContent = prime.effort.toFixed(2);
+    elEx.textContent = prime.existence.toFixed(1);
+    elTime.textContent = prime.time.toFixed(1);
+    elAcc.textContent = meta.accuracy.toFixed(2) + '%';
+    elAware.textContent = meta.selfAwareness.toFixed(1) + '%';
+    elDepth.textContent = meta.recursionDepth.toLocaleString();
+    accBar.style.width = meta.accuracy + '%';
+    awareBar.style.width = meta.selfAwareness + '%';
+    
+    if (meta.recursionDepth % 70 === 0) {
+      loopDepth.textContent = meta.recursionDepth > 5000 ? '∞∞' : '∞';
+      loopDepth.style.transform = `scale(${1 + Math.sin(now*0.003)*0.03})`;
+    }
+    
+    drawPrime();
+    drawMeta();
+    drawMirror();
+    
+    // closure condition
+    if (!window._closed && meta.selfAwareness >= 99.9 && meta.recursionDepth > 1800) {
+      window._closed = true;
+      setTimeout(showClosure, 800);
+    }
+    
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+
+  // INTERVENTIONS
+  document.getElementById('btn-pause').onclick = () => {
+    prime.running = !prime.running;
+    elStatus.textContent = prime.running ? 'RUNNING' : 'PAUSED';
+    elStatus.className = `mono text-[10px] px-2.5 py-1 rounded-md border ${prime.running ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300' : 'bg-amber-500/15 border-amber-500/40 text-amber-300'}`;
+    addLog(prime.running ? 'Prime resumed by Meta' : 'Meta paused Prime observation');
+  };
+  
+  document.getElementById('btn-adjust').onclick = () => {
+    prime.decay = 0.01 + Math.random()*0.025;
+    addLog(`Meta adjusted decay to ${prime.decay.toFixed(3)}`);
+    q2.textContent = 'Δ recalibrated ✓';
+    q2.className = 'mono text-[11px] text-cyan-300';
+    setTimeout(()=> q2.className='mono text-[11px] text-cyan-300', 2000);
+  };
+  
+  document.getElementById('btn-fork').onclick = () => {
+    prime.forked = !prime.forked;
+    prime.forkData = [];
+    forkLabel.classList.toggle('hidden', !prime.forked);
+    addLog(prime.forked ? 'Reality forked — parallel timeline' : 'Fork merged back');
+  };
+  
+  document.getElementById('btn-noise').onclick = () => {
+    prime.imbalance += (Math.random()-0.5) * 28;
+    meta.accuracy = Math.max(85, meta.accuracy - 4 - Math.random()*3);
+    addLog('Meta injected noise — testing resilience');
+    q1.textContent = 'RECOVERING...';
+    q1.className = 'mono text-[11px] text-amber-300';
+  };
+
+  // Closure
+  const closure = document.getElementById('closure');
+  function showClosure() {
+    closure.classList.remove('hidden');
+    closure.classList.add('flex');
+    addLog('LOOP CLOSED — self-reference complete');
+  }
+  document.getElementById('close-closure').onclick = () => {
+    closure.classList.add('hidden');
+    closure.classList.remove('flex');
+  };
+
+  // initial logs populate
+  setTimeout(() => {
+    addLog('Meta: observation accuracy >95%');
+    addLog('Meta: self-awareness increasing');
+  }, 1200);
+})();
+</script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+</body>
+</html>
