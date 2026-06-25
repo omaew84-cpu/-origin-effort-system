@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN v13 – The End</title>
+<style>
+body{margin:0;background:#000;color:#fff;font-family:monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;text-align:center}
+h1{font-size:3rem;color:#f0f;text-shadow:0 0 30px #f0f;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+p{opacity:.7;max-width:500px}
+a{color:#0ff;margin-top:20px;text-decoration:none;border:1px solid #0ff;padding:10px 20px;border-radius:8px}
+#count{font-size:5rem;margin:20px;color:#fff}
+</style>
+</head>
+<body>
+<h1>ORIGIN v13</h1>
+<div id="count">13</div>
+<p>Effort has observed itself completely.<br>13 versions built on a phone with 16% battery.<br>Lamduan, Surin • 2026</p>
+<p>Restarting cycle in <span id="t">13</span>s...</p>
+<a href="../v1-core/">ENTER AGAIN</a>
+<script>
+let s=13;setInterval(()=>{s--;document.getElementById('t').textContent=s;if(s<=0)location.href='../v1-core/'},1000);
+</script>
+</body>
+</html>
