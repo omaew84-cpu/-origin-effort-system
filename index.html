@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>ORIGIN SYSTEM — Distributed</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  * { font-variant-ligatures: none; }
+  html, body { background: #000; }
+  body { overscroll-behavior: none; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+  .grid-bg {
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .blink { animation: blink 1.2s steps(2, start) infinite; }
+  @keyframes blink { to { visibility: hidden; } }
+</style>
+</head>
+<body class="bg-black text-white font-mono antialiased selection:bg-white/20 selection:text-white">
+  <div class="min-h-screen flex flex-col relative">
+    <div class="pointer-events-none absolute inset-0 grid-bg opacity-[0.15]"></div>
+    <div class="pointer-events-none absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-white/[0.06] to-transparent"></div>
+    
+    <header class="relative z-10 border-b border-white/10 backdrop-blur-sm">
+      <div class="max-w-[1400px] mx-auto px-4 md:px-8 h-[56px] md:h-[64px] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-[22px] h-[22px] border border-white/20 flex items-center justify-center">
+            <div class="w-1.5 h-1.5 bg-white animate-pulse"></div>
+          </div>
+          <h1 class="text-xs md:text-[13px] tracking-[0.18em] font-medium">ORIGIN SYSTEM :: DISTRIBUTED EFFORT LOOP v2.0</h1>
+        </div>
+        <div class="flex items-center gap-3 md:gap-5">
+          <div class="hidden sm:flex items-center gap-3 md:gap-4">
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)] animate-pulse"></span>
+              <span class="text-[10px] tracking-widest text-white/70">NODE-1</span>
+              <span class="text-[9px] text-emerald-400/70 hidden md:inline">ACTIVE</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)] animate-pulse" style="animation-delay:0.2s"></span>
+              <span class="text-[10px] tracking-widest text-white/70">NODE-2</span>
+              <span class="text-[9px] text-emerald-400/70 hidden md:inline">ACTIVE</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)] animate-pulse" style="animation-delay:0.4s"></span>
+              <span class="text-[10px] tracking-widest text-white/70">NODE-3</span>
+              <span class="text-[9px] text-emerald-400/70 hidden md:inline">ACTIVE</span>
+            </div>
+          </div>
+          <div class="w-px h-4 bg-white/10 hidden sm:block"></div>
+          <div class="flex items-center gap-2">
+            <span class="hidden sm:inline text-[10px] uppercase tracking-widest text-white/40">observing</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400/90 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="relative z-10 flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 md:py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 items-start">
+        
+        <!-- EFFORT STREAM -->
+        <section class="group border border-white/10 bg-black/60 backdrop-blur-xl rounded-[12px] overflow-hidden">
+          <div class="border-b border-white/10 px-4 md:px-5 py-3 flex items-center justify-between bg-white/[0.01]">
+            <div class="flex items-center gap-2.5">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="text-white/50"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-opacity="0.5"/></svg>
+              <h2 class="text-[11px] uppercase tracking-[0.2em] text-white/60">EFFORT STREAM</h2>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="effort-count" class="text-[10px] text-white/35 font-medium">0 events</span>
+              <div class="w-px h-3 bg-white/10"></div>
+              <span class="text-[10px] text-emerald-400/70">DISTRIBUTED</span>
+            </div>
+          <div class="relative">
+            <div id="effort-log" class="h-[300px] sm:h-[360px] lg:h-[440px] overflow-y-auto px-4 md:px-5 py-4 text-[12px] leading-[20px] font-mono tracking-wide">
+            </div>
+            <div class="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-black to-transparent"></div>
+          </div>
+          <div class="border-t border-white/5 px-4 md:px-5 py-2.5 bg-white/[0.005] flex items-center justify-between">
+            <span class="text-[10px] text-white/30 uppercase tracking-widest">node • timestamp • action</span>
+            <span class="text-[10px] text-white/20">live</span>
+          </div>
+        </section>
+
+        <!-- EXECUTION CORE -->
+        <section class="group border border-white/10 bg-black/60 backdrop-blur-xl rounded-[12px] overflow-hidden">
+          <div class="border-b border-white/10 px-4 md:px-5 py-3 flex items-center justify-between bg-white/[0.01]">
+            <div class="flex items-center gap-2.5">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="text-white/50"><rect x="2.5" y="2.5" width="9" height="9" stroke="currentColor" stroke-opacity="0.5"/></svg>
+              <h2 class="text-[11px] uppercase tracking-[0.2em] text-white/60">EXECUTION CORE</h2>
+            </div>
+            <span class="text-[10px] text-white/35">id: distributed-3n</span>
+          </div>
+          
+          <div class="px-4 md:px-5 py-5">
+            <div class="flex flex-wrap gap-2.5">
+              <button id="run-btn" onclick="runTask()" class="relative inline-flex items-center justify-center gap-2.5 px-5 h-10 border border-white/15 bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/25 active:bg-white/[0.05] transition-all duration-200 rounded-[8px] text-[12px] tracking-[0.14em] uppercase font-medium focus:outline-none focus:ring-1 focus:ring-white/30 disabled:opacity-40 disabled:cursor-not-allowed group/btn">
+                <span class="w-1.5 h-1.5 bg-white/80 group-hover/btn:bg-white transition-colors"></span>
+                RUN TASK
+              </button>
+              <button id="spawn-btn" onclick="spawnAgent()" class="relative inline-flex items-center justify-center gap-2 px-4 h-10 border border-white/10 bg-transparent hover:bg-white/[0.05] hover:border-white/20 transition-all duration-200 rounded-[8px] text-[11px] tracking-[0.14em] uppercase font-medium text-white/70 hover:text-white/90 disabled:opacity-40 disabled:cursor-not-allowed">
+                SPAWN AGENT
+              </button>
+              <button id="analyze-btn" onclick="analyzePattern()" class="relative inline-flex items-center justify-center gap-2 px-4 h-10 border border-white/10 bg-transparent hover:bg-white/[0.05] hover:border-white/20 transition-all duration-200 rounded-[8px] text-[11px] tracking-[0.14em] uppercase font-medium text-white/70 hover:text-white/90 disabled:opacity-40 disabled:cursor-not-allowed">
+                ANALYZE PATTERN
+              </button>
+            </div>
+            <div class="mt-3 flex items-center justify-between">
+              <div class="flex items-center gap-2 text-[11px] text-white/40">
+                <span>distributed execution across 3 nodes</span>
+              </div>
+              <div class="text-[10px] text-white/30">agents: <span id="agent-count" class="text-white/60">0</span></div>
+            </div>
+
+            <div class="mt-5">
+              <div class="flex items-center justify-between mb-2.5">
+                <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">OUTPUT</span>
+                <span id="output-status" class="text-[10px] text-white/30">idle</span>
+              </div>
+              <div class="relative border border-white/10 rounded-[8px] bg-[#050505] overflow-hidden">
+                <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"></div>
+                <pre id="output" class="h-[240px] lg:h-[260px] overflow-auto p-4 text-[12px] leading-[18px] text-white/70 whitespace-pre-wrap break-all font-mono">// awaiting execution
+// press RUN TASK to initialize distributed consensus</pre>
+              </div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-3 gap-3">
+              <div class="border border-white/5 rounded-lg p-3 bg-white/[0.01]">
+                <div class="text-[10px] text-white/35 uppercase tracking-wide mb-1">Status</div>
+                <div id="metric-status" class="text-[13px] text-white/80">READY</div>
+              </div>
+              <div class="border border-white/5 rounded-lg p-3 bg-white/[0.01]">
+                <div class="text-[10px] text-white/35 uppercase tracking-wide mb-1">Compute</div>
+                <div id="metric-compute" class="text-[13px] text-white/80">—</div>
+              </div>
+              <div class="border border-white/5 rounded-lg p-3 bg-white/[0.01]">
+                <div class="text-[10px] text-white/35 uppercase tracking-wide mb-1">Cycles</div>
+                <div id="metric-cycles" class="text-[13px] text-white/80">0</div>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <div class="flex items-center justify-between mb-2.5">
+                <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">ZK PROOF</span>
+                <span id="zk-status" class="text-[10px] text-white/30">idle</span>
+              </div>
+              <div class="relative border border-white/10 rounded-[8px] bg-[#050505] overflow-hidden">
+                <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent"></div>
+                <pre id="zk-proof" class="h-[120px] overflow-auto p-3 text-[11px] leading-[16px] text-white/50 whitespace-pre-wrap break-all font-mono">// awaiting distributed task
+// proof will appear here</pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- COGNITIVE LAYER -->
+        <section class="lg:col-span-2 group border border-white/10 bg-black/60 backdrop-blur-xl rounded-[12px] overflow-hidden">
+          <div class="border-b border-white/10 px-4 md:px-5 py-3 flex items-center justify-between bg-white/[0.01]">
+            <div class="flex items-center gap-2.5">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="text-white/50"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-opacity="0.5"/><circle cx="7" cy="7" r="1.5" fill="currentColor" fill-opacity="0.5"/></svg>
+              <h2 class="text-[11px] uppercase tracking-[0.2em] text-white/60">COGNITIVE LAYER</h2>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[10px] text-white/35">self-analysis</span>
+              <span id="cog-status" class="w-1.5 h-1.5 rounded-full bg-emerald-400/80"></span>
+            </div>
+          </div>
+          
+          <div class="p-4 md:p-5">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5">
+              <div class="lg:col-span-5 space-y-3">
+                <div class="border border-white/5 rounded-lg p-3.5 bg-white/[0.01]">
+                  <div class="text-[10px] uppercase tracking-widest text-white/40 mb-2">AI Analysis</div>
+                  <div id="cog-analysis" class="text-[12px] leading-5 text-white/70 font-mono">initializing pattern recognition...</div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div class="border border-white/5 rounded-lg p-3.5 bg-white/[0.01]">
+                    <div class="text-[10px] uppercase tracking-widest text-white/40 mb-2">Bottleneck Detection</div>
+                    <div id="cog-bottleneck" class="text-[12px] leading-5 text-white/70 font-mono">—</div>
+                  </div>
+                  <div class="border border-white/5 rounded-lg p-3.5 bg-white/[0.01]">
+                    <div class="text-[10px] uppercase tracking-widest text-white/40 mb-2">Optimization</div>
+                    <div id="cog-suggestion" class="text-[12px] leading-5 text-white/70 font-mono">—</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="lg:col-span-7">
+                <div class="border border-white/5 rounded-lg p-3.5 bg-white/[0.01] h-full">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="text-[10px] uppercase tracking-widest text-white/40">Effort Over Time</div>
+                    <div class="text-[10px] text-white/30"><span id="graph-fps" class="text-emerald-300/80">0.0</span> evt/s</div>
+                  </div>
+                  <div class="relative h-[140px] md:h-[154px] bg-[#050505] rounded border border-white/5 overflow-hidden">
+                    <canvas id="effort-graph" class="w-full h-full"></canvas>
+                    <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                  </div>
+                  <div class="mt-2.5 flex items-center gap-4 text-[10px] text-white/30">
+                    <span>window: 72s</span>
+                    <span>nodes: 3</span>
+                    <span class="hidden sm:inline">last analysis: <span id="cog-last" class="text-white/50">—</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="relative z-10 border-t border-white/5 mt-auto">
+      <div class="max-w-[1400px] mx-auto px-4 md:px-8 h-12 flex items-center justify-between text-[10px] text-white/25">
+        <span class="uppercase tracking-widest">origin v2.0 • distributed self-observing</span>
+        <span id="clock" class="tabular-nums">00:00:00</span>
+      </div>
+    </footer>
+  </div>
+
+<script>
+const nodes = ['NODE-1','NODE-2','NODE-3'];
+const effort = [];
+let cycleCount = 0;
+let agents = [];
+let agentId = 0;
+let pendingEvents = 0;
+let graphData = Array(90).fill(0);
+let isRunning = false;
+
+function observe(action, node='CORE') {
+  const now = new Date();
+  const time = now.toLocaleTimeString('en-GB', { hour12: false });
+  effort.push({ action, time, node, ts: Date.now() });
+  if (effort.length > 600) effort.shift();
+  pendingEvents++;
+  updateLog();
+}
+
+function updateLog() {
+  const log = document.getElementById('effort-log');
+  const items = effort.slice(-200);
+  const html = items.map(e => {
+    const color = e.node==='NODE-1' ? 'text-cyan-300/80' : e.node==='NODE-2' ? 'text-violet-300/80' : e.node==='NODE-3' ? 'text-amber-300/80' : e.node==='CORE' ? 'text-emerald-300/70' : 'text-white/50';
+    return `<div class="flex gap-2.5"><span class="text-white/25 w-[56px] tabular-nums shrink-0">${e.time}</span><span class="${color} w-[58px] shrink-0">${e.node}</span><span class="text-white/75 truncate">${e.action}</span></div>`;
+  }).join('');
+  log.innerHTML = html + '<div class="mt-1"><span class="blink text-white/50">_</span></div>';
+  log.scrollTop = log.scrollHeight;
+  document.getElementById('effort-count').textContent = `${effort.length} events`;
+}
+
+function generateZKProof(result) {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  const hash = Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join('');
+  return `zk-proof {\n  circuit: "effort_consensus_v2",\n  task: "${result.task_id}",\n  nodes: 3,\n  commitment: "0x${hash.slice(0,16)}…${hash.slice(-8)}",\n  proof: "0x${hash}",\n  verified: true,\n  timestamp: "${new Date().toISOString()}"\n}`;
+}
+
+function runTask(autonomous=false) {
+  if (isRunning) return;
+  isRunning = true;
+  
+  const btn = document.getElementById('run-btn');
+  const spawnBtn = document.getElementById('spawn-btn');
+  const analyzeBtn = document.getElementById('analyze-btn');
+  const output = document.getElementById('output');
+  const statusEl = document.getElementById('output-status');
+  
+  btn.disabled = true;
+  spawnBtn.disabled = true;
+  analyzeBtn.disabled = true;
+  
+  observe(autonomous ? 'agent_trigger' : 'execute_task', 'CORE');
+  
+  document.getElementById('metric-status').textContent = 'RUNNING';
+  document.getElementById('metric-status').className = 'text-[13px] text-amber-400/80';
+  statusEl.textContent = 'distributing';
+  statusEl.className = 'text-[10px] text-amber-400/70';
+  
+  output.textContent = '{\n  "status": "DISTRIBUTING",\n  "nodes": 3,\n  "phase": "dispatch"\n}';
+  output.className = 'h-[240px] lg:h-[260px] overflow-auto p-4 text-[12px] leading-[18px] whitespace-pre-wrap break-all font-mono text-white/40';
+
+  document.getElementById('zk-status').textContent = 'generating';
+  document.getElementById('zk-status').className = 'text-[10px] text-amber-400/70';
+  document.getElementById('zk-proof').textContent = '// proving distributed execution...';
+  document.getElementById('zk-proof').className = 'h-[120px] overflow-auto p-3 text-[11px] leading-[16px] text-white/40 whitespace-pre-wrap break-all font-mono';
+
+  const taskId = 't_' + Math.random().toString(36).slice(2,8);
+  const results = [];
+  let completed = 0;
+
+  nodes.forEach((node, i) => {
+    setTimeout(() => {
+      observe('execute_shard', node);
+      const compute = Number((Math.random()*0.42 + 0.08).toFixed(6));
+      results.push({ node, compute, status: 'ok' });
+      completed++;
+      
+      output.textContent = JSON.stringify({
+        task_id: taskId,
+        phase: 'executing',
+        progress: `${completed}/3`,
+        nodes: results
+      }, null, 2);
+      
+      if (completed === 3) {
+        setTimeout(finalize, 200);
+      }
+    }, 320 + i*260 + Math.random()*180);
+  });
+
+  function finalize() {
+    const totalCompute = results.reduce((a,b)=>a+b.compute,0);
+    cycleCount++;
+    
+    const result = {
+      status: "SUCCESS",
+      task_id: taskId,
+      distributed: true,
+      nodes: results,
+      total_compute: Number(totalCompute.toFixed(6)),
+      reflection: "3-node consensus achieved",
+      timestamp: new Date().toISOString()
+    };
+    
+    output.textContent = JSON.stringify(result, null, 2);
+    output.className = 'h-[240px] lg:h-[260px] overflow-auto p-4 text-[12px] leading-[18px] whitespace-pre-wrap break-all font-mono text-emerald-300/80';
+    
+    const proof = generateZKProof(result);
+    const zkEl = document.getElementById('zk-proof');
+    zkEl.textContent = proof;
+    zkEl.className = 'h-[120px] overflow-auto p-3 text-[11px] leading-[16px] text-emerald-300/70 whitespace-pre-wrap break-all font-mono';
+    
+    document.getElementById('zk-status').textContent = 'verified';
+    document.getElementById('zk-status').className = 'text-[10px] text-emerald-400/80';
+    
+    document.getElementById('metric-status').textContent = 'SUCCESS';
+    document.getElementById('metric-status').className = 'text-[13px] text-emerald-400/80';
+    document.getElementById('metric-compute').textContent = totalCompute.toFixed(3);
+    document.getElementById('metric-cycles').textContent = cycleCount;
+    statusEl.textContent = 'complete';
+    statusEl.className = 'text-[10px] text-emerald-400/70';
+    
+    observe('task_completed', 'CORE');
+    nodes.forEach(n => setTimeout(() => observe('consensus_ok', n), 100 + Math.random()*200));
+    
+    setTimeout(() => {
+      document.getElementById('metric-status').textContent = 'READY';
+      document.getElementById('metric-status').className = 'text-[13px] text-white/80';
+      statusEl.textContent = 'idle';
+      statusEl.className = 'text-[10px] text-white/30';
+      isRunning = false;
+      btn.disabled = false;
+      spawnBtn.disabled = false;
+      analyzeBtn.disabled = false;
+    }, 2200);
+  }
+}
+
+function spawnAgent() {
+  agentId++;
+  const id = `AGENT-${String(agentId).padStart(2,'0')}`;
+  observe('spawn_agent:'+id, 'CORE');
+  
+  const agent = { id, active: true };
+  agents.push(agent);
+  document.getElementById('agent-count').textContent = agents.length;
+  
+  const btn = document.getElementById('spawn-btn');
+  const original = btn.textContent;
+  btn.textContent = 'SPAWNED';
+  setTimeout(() => btn.textContent = original, 1200);
+  
+  const interval = setInterval(() => {
+    if (!agent.active) { clearInterval(interval); return; }
+    if (Math.random() > 0.35) {
+      const node = nodes[Math.floor(Math.random()*nodes.length)];
+      observe(`agent_task:${id}`, node);
+      if (Math.random() > 0.65) {
+        runTask(true);
+      }
+    }
+  }, 4200 + Math.random()*2800);
+  
+  agent.interval = interval;
+  analyzePattern();
+}
+
+function analyzePattern() {
+  observe('analyze_pattern', 'CORE');
+  const now = Date.now();
+  const windowMs = 30000;
+  const recent = effort.filter(e => now - e.ts < windowMs);
+  
+  const byNode = nodes.map(n => ({
+    node: n,
+    count: recent.filter(e => e.node === n).length
+  }));
+  
+  const total = recent.length;
+  const freq = (total / 30).toFixed(2);
+  
+  const bottleneck = byNode.reduce((max,c) => c.count > max.count ? c : max, byNode[0]);
+  const idle = byNode.reduce((min,c) => c.count < min.count ? c : min, byNode[0]);
+  
+  document.getElementById('cog-analysis').innerHTML = 
+    `Pattern frequency: <span class="text-white">${freq} evt/s</span><br>` +
+    `Total events (30s): <span class="text-white">${total}</span><br>` +
+    `Distribution: ${byNode.map(b=>`${b.node.split('-')[1]}:${b.count}`).join(' ')}`;
+  
+  const isImbalanced = bottleneck.count > idle.count * 1.8 && bottleneck.count > 3;
+  document.getElementById('cog-bottleneck').innerHTML = isImbalanced
+    ? `<span class="text-amber-400">Hotspot: ${bottleneck.node}</span><br><span class="text-white/50">${bottleneck.count} vs ${idle.count} events</span>`
+    : `<span class="text-emerald-400">Balanced load</span><br><span class="text-white/50">all nodes nominal</span>`;
+  
+  document.getElementById('cog-suggestion').innerHTML = isImbalanced
+    ? `Redistribute load from <span class="text-white">${bottleneck.node}</span> → <span class="text-white">${idle.node}</span><br>Suggest spawn agent`
+    : `System optimal.<br>Maintain 3-node consensus`;
+  
+  document.getElementById('cog-last').textContent = new Date().toLocaleTimeString('en-GB', {hour12:false});
+  document.getElementById('cog-status').className = 'w-1.5 h-1.5 rounded-full bg-emerald-400/80 animate-pulse';
+  setTimeout(() => {
+    document.getElementById('cog-status').className = 'w-1.5 h-1.5 rounded-full bg-emerald-400/80';
+  }, 800);
+}
+
+function simulateNodes() {
+  nodes.forEach((node, i) => {
+    setInterval(() => {
+      if (Math.random() > 0.5) {
+        const actions = ['heartbeat','sync_state','validate_shard','gossip','idle_check','effort_ping'];
+        const act = actions[Math.floor(Math.random()*actions.length)];
+        observe(act, node);
+      }
+    }, 2800 + i*650 + Math.random()*1200);
+  });
+}
+
+function drawGraph() {
+  const canvas = document.getElementById('effort-graph');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  
+  const w = rect.width;
+  const h = rect.height;
+  ctx.clearRect(0,0,w,h);
+  
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 1;
+  for(let i=1;i<4;i++){
+    const y = (h/4)*i;
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    ctx.lineTo(w,y);
+    ctx.stroke();
+  }
+  
+  const max = Math.max(4, ...graphData);
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(52,211,153,0.9)';
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = 'rgba(52,211,153,0.4)';
+  ctx.shadowBlur = 6;
+  
+  graphData.forEach((v,i) => {
+    const x = (i/(graphData.length-1)) * (w-6) + 3;
+    const y = h - 5 - (v/max)*(h-14);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  
+  ctx.lineTo(w-3, h-5);
+  ctx.lineTo(3, h-5);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(52,211,153,0.07)';
+  ctx.fill();
+}
+
+// init
+observe('system_boot', 'CORE');
+setTimeout(() => observe('effort_loop_init', 'NODE-1'), 180);
+setTimeout(() => observe('peer_discovery', 'NODE-2'), 340);
+setTimeout(() => observe('sync_ready', 'NODE-3'), 520);
+setTimeout(() => observe('awaiting_input', 'CORE'), 700);
+
+simulateNodes();
+
+setInterval(() => {
+  graphData.shift();
+  graphData.push(pendingEvents);
+  const avg = graphData.slice(-8).reduce((a,b)=>a+b,0)/8;
+  document.getElementById('graph-fps').textContent = avg.toFixed(1);
+  pendingEvents = 0;
+  drawGraph();
+}, 900);
+
+setInterval(analyzePattern, 14000);
+setTimeout(analyzePattern, 2200);
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB', { hour12: false });
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+window.addEventListener('resize', drawGraph);
+setTimeout(drawGraph, 300);
+</script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+</body>
+</html>
