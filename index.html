@@ -1,23 +1,305 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
+<!-- Playables SDK -->
+<script>// Playables SDK v1.0.0
+// Game lifecycle bridge: rAF-based game-ready detection + event communication
+(function() {
+  'use strict';
+
+  // Idempotency: skip if already initialized (e.g., server-side injection
+  // followed by client-side inject-javascript via the Bloks webview component).
+  if (window.playablesSDK) return;
+
+  var HANDLER_NAME = 'playablesGameEventHandler';
+  var ANDROID_BRIDGE_NAME = '_MetaPlayablesBridge';
+  var RAF_FRAME_THRESHOLD = 3;
+
+  var gameReadySent = false;
+  var firstInteractionSent = false;
+  var errorSent = false;
+  var frameCount = 0;
+  var originalRAF = window.requestAnimationFrame;
+
+  // --- Transport Layer ---
+
+  function hasIOSBridge() {
+    return !!(window.webkit &&
+              window.webkit.messageHandlers &&
+              window.webkit.messageHandlers[HANDLER_NAME]);
+  }
+
+  function hasAndroidBridge() {
+    return !!(window[ANDROID_BRIDGE_NAME] &&
+              typeof window[ANDROID_BRIDGE_NAME].postEvent === 'function');
+  }
+
+  function isInIframe() {
+    return !!(window.parent && window.parent !== window);
+  }
+
+  function sendEvent(eventName, payload) {
+    var message = {
+      type: eventName,
+      payload: payload || {},
+      timestamp: Date.now()
+    };
+
+    if (hasIOSBridge()) {
+      try {
+        window.webkit.messageHandlers[HANDLER_NAME].postMessage(message);
+      } catch (e) { /* ignore */ }
+      return;
+    }
+
+    if (hasAndroidBridge()) {
+    try {
+      var p = payload || {};
+      p.__secureToken = window.__fbAndroidBridgeAuthToken || '';
+      p.timestamp = message.timestamp;
+      window[ANDROID_BRIDGE_NAME].postEvent(
+        eventName,
+        JSON.stringify(p)
+      );
+    } catch (e) { /* ignore */ }
+    return;
+  }
+
+    if (isInIframe()) {
+      try {
+        window.parent.postMessage(message, '*');
+      } catch (e) { /* ignore */ }
+      return;
+    }
+  }
+
+  // --- rAF Game-Ready Detection ---
+
+  function onFrame() {
+    if (gameReadySent) return;
+
+    frameCount++;
+    if (frameCount >= RAF_FRAME_THRESHOLD) {
+      gameReadySent = true;
+      sendEvent('game_ready', {
+        frame_count: frameCount,
+        detected_at: Date.now()
+      });
+      return;
+    }
+
+    originalRAF.call(window, onFrame);
+  }
+
+  if (originalRAF) {
+    window.requestAnimationFrame = function(callback) {
+      if (!gameReadySent) {
+        return originalRAF.call(window, function(timestamp) {
+          frameCount++;
+          if (frameCount >= RAF_FRAME_THRESHOLD && !gameReadySent) {
+            gameReadySent = true;
+            sendEvent('game_ready', {
+              frame_count: frameCount,
+              detected_at: Date.now()
+            });
+          }
+          callback(timestamp);
+        });
+      }
+      return originalRAF.call(window, callback);
+    };
+  }
+
+  // --- First User Interaction Detection ---
+
+  function setupFirstInteractionDetection() {
+    var events = ['touchstart', 'mousedown', 'keydown'];
+
+    function onFirstInteraction() {
+      if (firstInteractionSent) return;
+      firstInteractionSent = true;
+      sendEvent('user_interaction_start', null);
+
+      for (var i = 0; i < events.length; i++) {
+        document.removeEventListener(events[i], onFirstInteraction, true);
+      }
+    }
+
+    for (var i = 0; i < events.length; i++) {
+      document.addEventListener(events[i], onFirstInteraction, true);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupFirstInteractionDetection);
+  } else {
+    setupFirstInteractionDetection();
+  }
+
+  // --- Auto Error Capture ---
+
+  window.addEventListener('error', function(event) {
+    if (errorSent) return;
+    errorSent = true;
+    sendEvent('error', {
+      message: event.message || 'Unknown error',
+      source: event.filename || '',
+      lineno: event.lineno || 0,
+      colno: event.colno || 0,
+      auto_captured: true
+    });
+  });
+
+  window.addEventListener('unhandledrejection', function(event) {
+    if (errorSent) return;
+    errorSent = true;
+    var reason = event.reason;
+    sendEvent('error', {
+      message: (reason instanceof Error) ? reason.message : String(reason),
+      type: 'unhandled_promise_rejection',
+      auto_captured: true
+    });
+  });
+
+  // --- Public API ---
+
+  window.playablesSDK = {
+    complete: function(score) {
+      sendEvent('game_ended', {
+        score: score,
+        completed: true
+      });
+    },
+
+    error: function(message) {
+      if (errorSent) return;
+      errorSent = true;
+      sendEvent('error', {
+        message: message || 'Unknown error',
+        auto_captured: false
+      });
+    },
+
+    sendEvent: function(eventName, payload) {
+      if (!eventName || typeof eventName !== 'string') return;
+      sendEvent(eventName, payload);
+    }
+  };
+
+  // Kick off rAF detection in case no game code calls rAF immediately
+  if (originalRAF) {
+    originalRAF.call(window, onFrame);
+  }
+})();</script>
+<!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ORIGIN Effort System — v1 to v13</title>
+<title>ORIGIN Effort System — v1 to v13 by Maew</title>
 <style>
-body{margin:0;background:#000;color:#fff;font-family:system-ui;display:flex;flex-direction:column;align-items:center;padding:30px}
-h1{color:#0ff;text-shadow:0 0 20px #0ff}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:1000px;width:100%;margin-top:20px}
-.card{background:#111;border:1px solid #0ff3;padding:18px;border-radius:12px;text-decoration:none;color:#fff;transition:.2s}
-.card:hover{transform:translateY(-3px);box-shadow:0 0 20px #0ff5}
-.ver{color:#0ff;font-size:.8rem}
-h2{margin:6px 0}
-p{opacity:.7;font-size:.9rem}
-footer{margin-top:30px;opacity:.5;font-size:.8rem}
+:root{
+  --cyan:#00e5ff;
+  --orange:#ff6a00;
+  --bg1:#0a0f1c;
+  --bg2:#000000;
+}
+body{
+  margin:0;
+  background: radial-gradient(1200px 600px at 50% -10%, #13203a 0%, var(--bg1) 40%, var(--bg2) 100%);
+  color:#fff;
+  font-family:system-ui, -apple-system, Segoe UI, Roboto;
+  display:flex;flex-direction:column;align-items:center;
+  padding:32px 20px 60px;
+  min-height:100vh;
+}
+h1{
+  font-size:2.2rem;
+  margin:0;
+  color:#fff;
+  letter-spacing:.5px;
+  text-shadow:0 0 18px var(--cyan), 0 0 32px rgba(0,229,255,.35);
+}
+.by{
+  margin-top:6px;
+  color:var(--orange);
+  font-weight:600;
+  letter-spacing:.3px;
+  text-shadow:0 0 10px rgba(255,106,0,.45);
+}
+.tag{
+  margin-top:8px;
+  opacity:.85;
+  font-size:.95rem;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+  max-width:1050px;
+  width:100%;
+  margin-top:26px;
+}
+.card{
+  background:rgba(17,17,17,.85);
+  border:1px solid rgba(0,229,255,.25);
+  padding:18px;
+  border-radius:14px;
+  text-decoration:none;
+  color:#fff;
+  transition:.22s ease;
+  backdrop-filter: blur(2px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+}
+.card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(0,229,255,.6);
+  box-shadow:0 6px 24px rgba(0,229,255,.18), 0 0 0 1px rgba(255,106,0,.25) inset;
+}
+.ver{color:var(--cyan);font-size:.8rem;letter-spacing:.4px}
+h2{margin:6px 0 4px;font-size:1.15rem}
+p{opacity:.78;font-size:.92rem;margin:0}
+footer{
+  margin-top:36px;
+  opacity:.6;
+  font-size:.82rem;
+  text-align:center;
+  line-height:1.5;
+}
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  border:1px solid rgba(0,229,255,.35);
+  background:rgba(0,229,255,.08);
+  color:#bffaff;
+  font-size:.75rem;
+  margin-top:10px;
+}
 </style>
 </head>
 <body>
 <h1>ORIGIN Effort System</h1>
-<p>Built on mobile • 13 versions • Self-evolving</p>
+<div class="by">by Maew</div>
+<p class="tag">Built on mobile • 13 versions • Self-evolving</p>
+<div class="badge">14% battery • 2026</div>
+
 <div class="grid">
 <a class="card" href="./v1-core/"><div class="ver">v1</div><h2>Core</h2><p>Observer เริ่มต้น</p></a>
 <a class="card" href="./v2-distributed/"><div class="ver">v2</div><h2>Distributed</h2><p>Agents กระจาย</p></a>
@@ -33,6 +315,9 @@ footer{margin-top:30px;opacity:.5;font-size:.8rem}
 <a class="card" href="./v12-genesis/"><div class="ver">v12</div><h2>Genesis</h2><p>Complete archive</p></a>
 <a class="card" href="./v13-infinite/"><div class="ver">v13</div><h2>The End</h2><p>Infinite loop back to v1</p></a>
 </div>
-<footer>omaew84-cpu.github.io • Lamduan 2026 • 13 versions built with 14% battery</footer>
+
+<footer>
+omaew84-cpu.github.io • Built on mobile • 14% battery • 2026 • by Maew
+</footer>
 </body>
 </html>
