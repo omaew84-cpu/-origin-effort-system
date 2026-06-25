@@ -8,32 +8,34 @@
 <style>
 :root{
   --cyan:#00e5ff;
-  --orange:#ff6a00;
-  --bg1:#0a0f1c;
+  --violet:#b084ff;
+  --magenta:#ff00ff;
+  --emerald:#00ff95;
+  --bg1:#050a1a;
   --bg2:#000000;
 }
 body{
   margin:0;
-  background: radial-gradient(1200px 600px at 50% -10%, #13203a 0%, var(--bg1) 40%, var(--bg2) 100%);
+  background: radial-gradient(1200px 600px at 50% -10%, #0a0f2a 0%, var(--bg1) 40%, var(--bg2) 100%);
   color:#fff;
-  font-family:system-ui, -apple-system, Segoe UI, Roboto;
+  font-family:'Orbitron',system-ui,-apple-system,Segoe UI,Roboto;
   display:flex;flex-direction:column;align-items:center;
   padding:32px 20px 60px;
   min-height:100vh;
 }
 h1{
-  font-size:2.2rem;
+  font-size:2.3rem;
   margin:0;
   color:#fff;
-  letter-spacing:.5px;
-  text-shadow:0 0 18px var(--cyan), 0 0 32px rgba(0,229,255,.35);
+  letter-spacing:.6px;
+  text-shadow:0 0 20px var(--cyan), 0 0 40px rgba(176,132,255,.45);
 }
 .by{
   margin-top:6px;
-  color:var(--orange);
+  color:var(--magenta);
   font-weight:600;
   letter-spacing:.3px;
-  text-shadow:0 0 10px rgba(255,106,0,.45);
+  text-shadow:0 0 10px rgba(255,0,255,.45);
 }
 .tag{
   margin-top:8px;
@@ -43,26 +45,26 @@ h1{
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:16px;
+  gap:18px;
   max-width:1050px;
   width:100%;
-  margin-top:26px;
+  margin-top:28px;
 }
 .card{
-  background:rgba(17,17,17,.85);
-  border:1px solid rgba(0,229,255,.25);
-  padding:18px;
-  border-radius:14px;
+  background:linear-gradient(135deg, rgba(10,15,30,.9) 0%, rgba(25,0,45,.9) 50%, rgba(0,40,60,.9) 100%);
+  border:1px solid rgba(0,229,255,.35);
+  padding:20px;
+  border-radius:16px;
   text-decoration:none;
   color:#fff;
-  transition:.22s ease;
-  backdrop-filter: blur(2px);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+  transition:.25s ease;
+  backdrop-filter: blur(3px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
 }
 .card:hover{
-  transform:translateY(-4px);
-  border-color:rgba(0,229,255,.6);
-  box-shadow:0 6px 24px rgba(0,229,255,.18), 0 0 0 1px rgba(255,106,0,.25) inset;
+  transform:translateY(-5px);
+  border-color:var(--magenta);
+  box-shadow:0 0 20px var(--violet), 0 0 40px var(--cyan);
 }
 .ver{
   color:var(--cyan);
@@ -70,33 +72,33 @@ h1{
   letter-spacing:.4px;
 }
 .ver.v14{
-  color:#ff00ff;
-  text-shadow:0 0 12px #00ffff;
+  color:var(--magenta);
+  text-shadow:0 0 14px var(--cyan);
 }
 .ver.v15{
-  color:#b084ff;
-  text-shadow:0 0 14px #00ffff,0 0 28px #b084ff;
+  color:var(--violet);
+  text-shadow:0 0 16px var(--cyan),0 0 32px var(--violet);
 }
 .ver.v16{
-  color:#00ff95;
-  text-shadow:0 0 14px #00ffcc,0 0 28px #00ff95;
+  color:var(--emerald);
+  text-shadow:0 0 16px var(--cyan),0 0 32px var(--emerald);
 }
 footer{
-  margin-top:36px;
-  opacity:.6;
+  margin-top:40px;
+  opacity:.65;
   font-size:.82rem;
   text-align:center;
   line-height:1.5;
 }
 .badge{
   display:inline-block;
-  padding:4px 10px;
+  padding:5px 12px;
   border-radius:999px;
-  border:1px solid rgba(0,229,255,.35);
-  background:rgba(0,229,255,.08);
+  border:1px solid rgba(0,229,255,.4);
+  background:linear-gradient(90deg, rgba(0,229,255,.15), rgba(176,132,255,.15));
   color:#bffaff;
   font-size:.75rem;
-  margin-top:10px;
+  margin-top:12px;
 }
 </style>
 </head>
@@ -135,7 +137,6 @@ footer{
     <p>Neural expansion layer — connects Rebirth to Behavior Fabric</p>
   </a>
 
-  <!-- 🌱 ใหม่ล่าสุด v16 -->
   <a class="card" href="./v16-behavior/">
     <div class="ver v16">v16</div>
     <h2>Behavior Fabric</h2>
