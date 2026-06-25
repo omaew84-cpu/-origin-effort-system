@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ORIGIN SYSTEM :: AI AUTONOMOUS LOOP v4.0</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Mono:wght@300;500&display=swap" rel="stylesheet">
+<style>
+:root { color-scheme: dark; }
+html,body{height:100%}
+body{
+  font-family:'JetBrains Mono',monospace;
+  background:#000;
+  overscroll-behavior:none;
+}
+.panel{
+  background: linear-gradient(180deg,rgba(10,10,12,0.9) 0%,rgba(0,0,0,0.9) 100%);
+  border:1px solid rgba(39,39,42,0.8);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+}
+.ai-glow{box-shadow:0 0 20px rgba(168,85,247,0.15), inset 0 0 20px rgba(168,85,247,0.05)}
+.grid-bg{
+  background-image:
+    linear-gradient(rgba(113,113,122,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(113,113,122,0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.scanlines::before{
+  content:"";
+  position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,136,0.03) 2px,transparent 3px);
+  pointer-events:none;z-index:50;
+}
+.custom-scroll::-webkit-scrollbar{width:4px;height:4px}
+.custom-scroll::-webkit-scrollbar-track{background:#050505}
+.custom-scroll::-webkit-scrollbar-thumb{background:#27272a;border-radius:2px}
+.custom-scroll::-webkit-scrollbar-thumb:hover{background:#3f3f46}
+.think-dot{animation:pulse 1.5s cubic-bezier(0.4,0,0.6,1) infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.neural-ring{animation:rotate 20s linear infinite}
+@keyframes rotate{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body class="bg-black text-zinc-200 selection:bg-purple-500/30 selection:text-purple-200 scanlines">
+<div class="fixed inset-0 grid-bg opacity-[0.15] pointer-events-none"></div>
+<div class="relative z-10 min-h-screen p-2 sm:p-3 md:p-4 max-w-[1600px] mx-auto">
+
+  <!-- HEADER -->
+  <header class="panel rounded-lg p-3 sm:p-4 ai-glow border-purple-950/50">
+    <div class="flex flex-col gap-2.5 sm:gap-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <div class="relative shrink-0">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-violet-600/30 to-purple-900/30 border border-purple-700/50 flex items-center justify-center ai-glow">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-purple-400">
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" fill="currentColor" fill-opacity="0.2"/>
+                <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1" stroke-opacity="0.3"/>
+                <circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="0.5" stroke-opacity="0.2"/>
+              </svg>
+            </div>
+            <div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-purple-500 rounded-full animate-ping"></div>
+            <div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-purple-500 rounded-full"></div>
+          </div>
+          <div class="min-w-0">
+            <h1 class="text-[13px] sm:text-[15px] md:text-[17px] font-bold tracking-widest leading-none">
+              <span class="text-purple-400">ORIGIN SYSTEM</span>
+              <span class="text-zinc-600 mx-1 hidden sm:inline">::</span>
+              <span class="text-zinc-300">AI AUTONOMOUS LOOP</span>
+              <span class="text-[#00ff88] ml-1.5">v4.0</span>
+            </h1>
+            <p class="text-[9px] sm:text-[10px] text-zinc-500 mt-0.5 tracking-wide hidden sm:block">EFFORT OBSERVING ITSELF THROUGH AGENTIC INTELLIGENCE</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <div class="hidden md:flex items-center gap-1.5 pl-3 pr-2.5 py-1 rounded-full bg-purple-950/30 border border-purple-900/40">
+            <div class="w-1.5 h-1.5 rounded-full bg-purple-400 think-dot"></div>
+            <span class="text-[10px] text-purple-300 tracking-wide">NEURAL MESH</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[10px] sm:text-[11px] border-t border-zinc-900 pt-2.5">
+        <div class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+          <span id="agentStatus" class="text-zinc-400">3 AGENTS ACTIVE</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-zinc-600">LOOP:</span>
+          <span id="loopStatus" class="text-purple-400 font-medium">OBSERVING</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-zinc-600">CYCLES:</span>
+          <span id="cycleCountTop" class="text-white">0</span>
+        </div>
+        <div class="ml-auto text-zinc-600 font-mono" id="systemTime">00:00:00</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <main class="grid grid-cols-1 xl:grid-cols-12 gap-3 sm:gap-4 mt-3 sm:mt-4">
+
+    <!-- LEFT: AGENTS -->
+    <section class="xl:col-span-4 space-y-3 sm:space-y-4">
+      <div class="panel rounded-lg p-3 sm:p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-[11px] tracking-[0.2em] text-zinc-500 font-medium">AI AGENTS // TRINITY</h2>
+          <div class="flex items-center gap-1">
+            <div class="w-1 h-1 rounded-full bg-purple-500 animate-pulse"></div>
+            <span class="text-[9px] text-purple-400 uppercase tracking-widest">Live</span>
+          </div>
+        </div>
+
+        <div class="space-y-2.5" id="agentsContainer">
+          <!-- PLANNER -->
+          <div class="group relative bg-black/70 border border-zinc-800 hover:border-violet-900/60 rounded-lg p-3 transition-all duration-300 hover:bg-zinc-950/50">
+            <div class="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-violet-950/10 to-transparent pointer-events-none"></div>
+            <div class="relative flex gap-3">
+              <div class="shrink-0">
+                <div class="relative w-11 h-11 rounded-lg bg-gradient-to-br from-violet-950 to-purple-950 border border-violet-800/50 flex items-center justify-center overflow-hidden">
+                  <div class="absolute inset-0 neural-ring opacity-20">
+                    <svg viewBox="0 0 44 44" class="w-full h-full"><circle cx="22" cy="22" r="18" fill="none" stroke="#a855f7" stroke-width="0.5" stroke-dasharray="4 4"/></svg>
+                  </div>
+                  <span class="relative text-[15px] font-bold text-violet-300">P</span>
+                  <div id="agent-planner-dot" class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-black border border-zinc-800 flex items-center justify-center">
+                    <div class="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-baseline justify-between gap-2">
+                  <div class="flex items-baseline gap-2">
+                    <h3 class="text-[13px] font-semibold text-white tracking-wide">PLANNER</h3>
+                    <span class="text-[9px] text-zinc-600 uppercase">Strategist</span>
+                  </div>
+                  <div class="text-[10px]"><span class="text-zinc-600">EFF</span> <span id="agent-planner-effort" class="text-violet-400 font-medium">0</span></div>
+                </div>
+                <div id="agent-planner-task" class="mt-1.5 text-[11px] leading-snug text-zinc-300 min-h-[32px]">Initializing strategic manifold...</div>
+                <div class="mt-2 flex items-center gap-2">
+                  <div class="flex-1 h-1 bg-zinc-900 rounded-full overflow-hidden">
+                    <div id="agent-planner-bar" class="h-full w-[0%] bg-gradient-to-r from-violet-700 to-purple-400 transition-all duration-700"></div>
+                  </div>
+                  <span id="agent-planner-status" class="text-[9px] text-zinc-600 tracking-wider">IDLE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EXECUTOR -->
+          <div class="group relative bg-black/70 border border-zinc-800 hover:border-emerald-900/60 rounded-lg p-3 transition-all duration-300 hover:bg-zinc-950/50">
+            <div class="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-emerald-950/10 to-transparent pointer-events-none"></div>
+            <div class="relative flex gap-3">
+              <div class="shrink-0">
+                <div class="relative w-11 h-11 rounded-lg bg-gradient-to-br from-emerald-950 to-green-950 border border-emerald-800/40 flex items-center justify-center overflow-hidden">
+                  <div class="absolute inset-0 neural-ring opacity-20" style="animation-duration:15s;animation-direction:reverse">
+                    <svg viewBox="0 0 44 44" class="w-full h-full"><circle cx="22" cy="22" r="18" fill="none" stroke="#10b981" stroke-width="0.5" stroke-dasharray="4 4"/></svg>
+                  </div>
+                  <span class="relative text-[15px] font-bold text-emerald-300">E</span>
+                  <div id="agent-executor-dot" class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-black border border-zinc-800 flex items-center justify-center">
+                    <div class="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
+                  </div>
+                </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-baseline justify-between gap-2">
+                  <div class="flex items-baseline gap-2">
+                    <h3 class="text-[13px] font-semibold text-white tracking-wide">EXECUTOR</h3>
+                    <span class="text-[9px] text-zinc-600 uppercase">Implementer</span>
+                  </div>
+                  <div class="text-[10px]"><span class="text-zinc-600">EFF</span> <span id="agent-executor-effort" class="text-emerald-400 font-medium">0</span></div>
+                </div>
+                <div id="agent-executor-task" class="mt-1.5 text-[11px] leading-snug text-zinc-300 min-h-[32px]">Awaiting directives...</div>
+                <div class="mt-2 flex items-center gap-2">
+                  <div class="flex-1 h-1 bg-zinc-900 rounded-full overflow-hidden">
+                    <div id="agent-executor-bar" class="h-full w-[0%] bg-gradient-to-r from-emerald-700 to-[#00ff88] transition-all duration-700"></div>
+                  </div>
+                  <span id="agent-executor-status" class="text-[9px] text-zinc-600 tracking-wider">IDLE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- OBSERVER -->
+          <div class="group relative bg-black/70 border border-zinc-800 hover:border-cyan-900/60 rounded-lg p-3 transition-all duration-300 hover:bg-zinc-950/50">
+            <div class="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-cyan-950/10 to-transparent pointer-events-none"></div>
+            <div class="relative flex gap-3">
+              <div class="shrink-0">
+                <div class="relative w-11 h-11 rounded-lg bg-gradient-to-br from-cyan-950 to-sky-950 border border-cyan-800/40 flex items-center justify-center overflow-hidden">
+                  <div class="absolute inset-0 neural-ring opacity-20" style="animation-duration:25s">
+                    <svg viewBox="0 0 44 44" class="w-full h-full"><circle cx="22" cy="22" r="18" fill="none" stroke="#22d3ee" stroke-width="0.5" stroke-dasharray="4 4"/></svg>
+                  </div>
+                  <span class="relative text-[15px] font-bold text-cyan-300">O</span>
+                  <div id="agent-observer-dot" class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-black border border-zinc-800 flex items-center justify-center">
+                    <div class="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-baseline justify-between gap-2">
+                  <div class="flex items-baseline gap-2">
+                    <h3 class="text-[13px] font-semibold text-white tracking-wide">OBSERVER</h3>
+                    <span class="text-[9px] text-zinc-600 uppercase">Analyst</span>
+                  </div>
+                  <div class="text-[10px]"><span class="text-zinc-600">EFF</span> <span id="agent-observer-effort" class="text-cyan-400 font-medium">0</span></div>
+                </div>
+                <div id="agent-observer-task" class="mt-1.5 text-[11px] leading-snug text-zinc-300 min-h-[32px]">Monitoring effort topology...</div>
+                <div class="mt-2 flex items-center gap-2">
+                  <div class="flex-1 h-1 bg-zinc-900 rounded-full overflow-hidden">
+                    <div id="agent-observer-bar" class="h-full w-[0%] bg-gradient-to-r from-cyan-700 to-sky-400 transition-all duration-700"></div>
+                  </div>
+                  <span id="agent-observer-status" class="text-[9px] text-zinc-600 tracking-wider">IDLE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 pt-3 border-t border-zinc-900 grid grid-cols-3 gap-2">
+          <div class="text-center">
+            <div class="text-[9px] text-zinc-600 uppercase tracking-wide">Coherence</div>
+            <div class="text-[15px] font-medium text-purple-400 mt-0.5" id="coherence">0.87</div>
+          </div>
+          <div class="text-center border-x border-zinc-900">
+            <div class="text-[9px] text-zinc-600 uppercase tracking-wide">Sync</div>
+            <div class="text-[15px] font-medium text-[#00ff88] mt-0.5" id="syncRate">98%</div>
+          </div>
+          <div class="text-center">
+            <div class="text-[9px] text-zinc-600 uppercase tracking-wide">Drift</div>
+            <div class="text-[15px] font-medium text-cyan-400 mt-0.5" id="drift">0.02</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUTONOMOUS CONTROL -->
+      <div class="panel rounded-lg p-3 sm:p-4 border-purple-950/40 bg-gradient-to-b from-purple-950/[0.08] to-transparent">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-[11px] tracking-[0.2em] text-zinc-500 font-medium">AUTONOMOUS CONTROL</h2>
+          <span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-900/50">v4</span>
+        </div>
+        
+        <div class="bg-black/60 rounded-lg border border-zinc-900 p-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-[12px] text-white font-medium">Self-Directed Loop</div>
+              <div class="text-[10px] text-zinc-500 mt-0.5">Agents generate tasks without human input</div>
+            </div>
+            <label class="relative inline-flex cursor-pointer">
+              <input type="checkbox" id="autonomousToggle" class="sr-only peer">
+              <div class="w-[46px] h-[26px] bg-zinc-900 rounded-full peer border border-zinc-800 peer-checked:bg-purple-950/70 peer-checked:border-purple-700 transition-all duration-300"></div>
+              <div class="absolute top-[3px] left-[3px] w-[20px] h-[20px] bg-zinc-600 rounded-full peer-checked:translate-x-[20px] peer-checked:bg-purple-400 transition-all duration-300 shadow-lg"></div>
+            </label>
+          </div>
+          <div class="mt-3 flex items-center gap-2 text-[10px]">
+            <div class="flex items-center gap-1 text-zinc-500"><div class="w-1 h-1 rounded-full bg-zinc-700"></div>Manual</div>
+            <div class="flex-1 h-px bg-gradient-to-r from-zinc-800 via-purple-900/50 to-zinc-800"></div>
+            <div class="flex items-center gap-1 text-purple-400"><div class="w-1 h-1 rounded-full bg-purple-500"></div>Autonomous</div>
+          </div>
+        </div>
+
+        <div class="mt-3 space-y-2">
+          <button id="manualCycle" class="group w-full relative overflow-hidden py-2.5 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 hover:border-purple-900/60 rounded-lg text-[11px] transition-all duration-300">
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-transparent via-purple-500/10 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-all duration-700"></div>
+            <span class="relative tracking-wide">TRIGGER MANUAL CYCLE</span>
+          </button>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button data-agent="planner" class="agent-trigger py-2 bg-black/70 border border-zinc-900 hover:border-violet-800/60 rounded text-[10px] text-zinc-500 hover:text-violet-400 transition">PING P</button>
+            <button data-agent="executor" class="agent-trigger py-2 bg-black/70 border border-zinc-900 hover:border-emerald-800/60 rounded text-[10px] text-zinc-500 hover:text-emerald-400 transition">PING E</button>
+            <button data-agent="observer" class="agent-trigger py-2 bg-black/70 border border-zinc-900 hover:border-cyan-800/60 rounded text-[10px] text-zinc-500 hover:text-cyan-400 transition">PING O</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER: EFFORT + COMMS -->
+    <section class="xl:col-span-5 space-y-3 sm:space-y-4">
+      <!-- EFFORT STREAM -->
+      <div class="panel rounded-lg p-3 sm:p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-[11px] tracking-[0.2em] text-zinc-500 font-medium">EFFORT STREAM // LIVE</h2>
+          <div class="flex items-center gap-3">
+            <div class="text-[10px]"><span class="text-zinc-600">Σ</span> <span id="effortValue" class="text-[#00ff88] font-medium ml-1">54.2</span></div>
+            <div class="text-[10px]"><span class="text-zinc-600">η</span> <span id="efficiencyValue" class="text-purple-400 font-medium ml-1">0.71</span></div>
+            <div class="w-1.5 h-1.5 rounded-full bg-[#00ff88] animate-pulse"></div>
+          </div>
+        </div>
+        <div class="relative h-[140px] sm:h-[170px] bg-black/50 rounded border border-zinc-900 overflow-hidden">
+          <div class="absolute inset-0 opacity-[0.03]" style="background-image:linear-gradient(rgba(0,255,136,0.5) 1px, transparent 1px),linear-gradient(90deg, rgba(0,255,136,0.5) 1px, transparent 1px);background-size:20px 20px"></div>
+          <canvas id="effortChart" class="relative z-10"></canvas>
+          <div class="absolute bottom-2 left-2 text-[9px] text-zinc-700 font-mono">ORIGIN-4 // AGENTIC</div>
+        </div>
+        <div class="mt-3 grid grid-cols-3 gap-2">
+          <div class="bg-black/60 border border-zinc-900 rounded p-2.5 hover:border-violet-900/40 transition">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] text-zinc-600 uppercase">Planner Δ</span>
+              <span class="w-1 h-1 rounded-full bg-violet-500"></span>
+            </div>
+            <div id="metricPlanner" class="text-[13px] text-violet-400 font-medium mt-1">+12%</div>
+          </div>
+          <div class="bg-black/60 border border-zinc-900 rounded p-2.5 hover:border-emerald-900/40 transition">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] text-zinc-600 uppercase">Executor Δ</span>
+              <span class="w-1 h-1 rounded-full bg-emerald-500"></span>
+            </div>
+            <div id="metricExecutor" class="text-[13px] text-emerald-400 font-medium mt-1">+8%</div>
+          </div>
+          <div class="bg-black/60 border border-zinc-900 rounded p-2.5 hover:border-cyan-900/40 transition">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] text-zinc-600 uppercase">Observer Δ</span>
+              <span class="w-1 h-1 rounded-full bg-cyan-500"></span>
+            </div>
+            <div id="metricObserver" class="text-[13px] text-cyan-400 font-medium mt-1">+5%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMMUNICATION -->
+      <div class="panel rounded-lg p-3 sm:p-4">
+        <div class="flex items-center justify-between mb-2.5">
+          <h2 class="text-[11px] tracking-[0.2em] text-zinc-500 font-medium">AGENT-TO-AGENT // MESHCOM</h2>
+          <div class="flex items-center gap-2">
+            <span class="text-[9px] text-zinc-600"><span id="msgCount">0</span> msgs</span>
+            <button id="clearComms" class="text-[9px] px-2 py-0.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-500 hover:text-zinc-300 border border-zinc-800 transition">CLEAR</button>
+          </div>
+        <div id="commLog" class="h-[200px] sm:h-[240px] overflow-y-auto overflow-x-hidden space-y-1.5 pr-2 custom-scroll bg-black/40 rounded border border-zinc-900 p-2.5 font-mono text-[11px] leading-relaxed"></div>
+      </div>
+    </section>
+
+    <!-- RIGHT: MEMORY -->
+    <section class="xl:col-span-3 space-y-3 sm:space-y-4">
+      <div class="panel rounded-lg p-3 sm:p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-[11px] tracking-[0.2em] text-zinc-500 font-medium">AGENT MEMORY</h2>
+          <div class="flex items-center gap-1.5">
+            <div class="w-1 h-1 rounded-full bg-green-500 animate-pulse"></div>
+            <span class="text-[9px] text-green-400 uppercase tracking-widest">Synaptic</span>
+          </div>
+        </div>
+        <div id="memoryList" class="space-y-2 max-h-[300px] sm:max-h-[360px] overflow-y-auto pr-1.5 custom-scroll"></div>
+        <div class="mt-3 pt-3 border-t border-zinc-900">
+          <div class="flex justify-between text-[10px] mb-1.5">
+            <span class="text-zinc-600">Total Insights</span>
+            <span id="memoryCount" class="text-white font-medium">3</span>
+          </div>
+          <div class="flex justify-between text-[10px]">
+            <span class="text-zinc-600">Uptime</span>
+            <span id="uptime" class="text-purple-400 font-mono">00:00:00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel rounded-lg p-3 sm:p-4 bg-black/80">
+        <h2 class="text-[11px] tracking-[0.2em] text-zinc-600 font-medium mb-2.5">SYSTEM THESIS</h2>
+        <p class="text-[11px] leading-relaxed text-zinc-400">
+          v4 introduces <span class="text-purple-400">autonomous agents</span> that observe, hypothesize, and execute. Effort is no longer measured—it <span class="text-[#00ff88]">self-directs</span>.
+        </p>
+        <div class="mt-3 flex items-center gap-2 text-[9px] text-zinc-600">
+          <div class="flex -space-x-1">
+            <div class="w-5 h-5 rounded-full bg-violet-950 border-violet-800 flex items-center justify-center text-[8px] text-violet-400">P</div>
+            <div class="w-5 h-5 rounded-full bg-emerald-950 border border-emerald-800 flex items-center justify-center text-[8px] text-emerald-400">E</div>
+            <div class="w-5 h-5 rounded-full bg-cyan-950 border border-cyan-800 flex items-center justify-center text-[8px] text-cyan-400">O</div>
+          </div>
+          <span>Trinity active</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="mt-6 pb-4 text-center">
+    <div class="inline-flex items-center gap-3 text-[10px] text-zinc-700">
+      <span>ORIGIN v4.0</span>
+      <span>•</span>
+      <span class="text-zinc-600">AGENTIC LOOP CLOSED</span>
+      <span>•</span>
+      <span id="footerStatus" class="text-purple-400/70">AWAITING ACTIVATION</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let autonomous = false;
+let cycleCount = 0;
+let effort = 54.2;
+let efficiency = 0.71;
+let startTime = Date.now();
+let autoInterval = null;
+let msgTotal = 0;
+
+const agents = {
+  planner: { effort: 0, status: 'IDLE' },
+  executor: { effort: 0, status: 'IDLE' },
+  observer: { effort: 0, status: 'IDLE' }
+};
+
+const hypotheses = [
+  "Effort spikes precede 3.2s latency drop; preallocate resources",
+  "Consolidate low-effort tasks between 02:00-04:00 UTC for +18% yield",
+  "Planner-Executor handoff delay 420ms; propose direct neural channel",
+  "Observer detects pattern recurrence every 17 cycles; cache prediction",
+  "Effort decay correlates with memory bloat; recommend pruning threshold",
+  "Executor throughput +23% when planner provides confidence score >0.8",
+  "Autonomous mode stabilizes coherence after 7 complete cycles",
+  "Tri-agent mesh reduces redundant observation by 31%"
+];
+
+const optimizations = [
+  "Implemented predictive task batching (latency -34ms)",
+  "Reduced context switches by 31% via shared cache",
+  "Created vector memory for hypothesis reuse",
+  "Enabled parallel hypothesis evaluation (3x)",
+  "Pruned 47 redundant observation paths",
+  "Optimized agent handoff protocol",
+  "Deployed adaptive effort allocation"
+];
+
+const learnings = [
+  "Pattern #041: Self-directed cycles yield 2.4x efficiency vs manual",
+  "Correlation: Planner effort >75 triggers Executor saturation in 1.8s",
+  "Memory consolidation reduces Observer load by 18%",
+  "Autonomous mode stabilizes after cycle 7 (±2% variance)",
+  "Agent interference minimal at current mesh density (0.87 coherence)",
+  "Learned: High-effort tasks cluster; pre-warm executor",
+  "Observer accuracy +12% when validating own hypotheses"
+];
+
+// INIT
+function init() {
+  updateTime();
+  setInterval(updateTime, 1000);
+  setInterval(updateUptime, 1000);
+  initChart();
+  initMemory();
+  initComms();
+  
+  setAgent('planner', 'IDLE', 'Strategic manifold initialized', 12);
+  setAgent('executor', 'IDLE', 'Execution engine standby', 8);
+  setAgent('observer', 'IDLE', 'Monitoring effort topology', 15);
+  
+  setInterval(simulateEffort, 700);
+  setInterval(updateMetrics, 3000);
+  
+  $('autonomousToggle').addEventListener('change', toggleAutonomous);
+  $('manualCycle').addEventListener('click', () => runAutonomousCycle(true));
+  $('clearComms').addEventListener('click', clearComms);
+  document.querySelectorAll('.agent-trigger').forEach(btn => {
+    btn.addEventListener('click', () => pingAgent(btn.dataset.agent));
+  });
+}
+
+function updateTime() {
+  const now = new Date();
+  $('systemTime').textContent = now.toLocaleTimeString('en-GB', {hour12:false});
+}
+
+function updateUptime() {
+  const diff = Math.floor((Date.now() - startTime) / 1000);
+  const h = String(Math.floor(diff/3600)).padStart(2,'0');
+  const m = String(Math.floor((diff%3600)/60)).padStart(2,'0');
+  const s = String(diff%60).padStart(2,'0');
+  $('uptime').textContent = `${h}:${m}:${s}`;
+}
+
+// CHART
+let effortChart, effortData = [];
+function initChart() {
+  const ctx = $('effortChart').getContext('2d');
+  const gradient = ctx.createLinearGradient(0,0,0,170);
+  gradient.addColorStop(0, 'rgba(168,85,247,0.25)');
+  gradient.addColorStop(0.5, 'rgba(168,85,247,0.08)');
+  gradient.addColorStop(1, 'rgba(0,0,0,0)');
+  
+  for(let i=0;i<60;i++) effortData.push(45 + Math.sin(i/5)*8 + Math.random()*6);
+  
+  effortChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: Array(60).fill(''),
+      datasets: [{
+        data: effortData,
+        borderColor: '#a855f7',
+        backgroundColor: gradient,
+        borderWidth: 1.5,
+        tension: 0.42,
+        pointRadius: 0,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false, min: 20, max: 95 }},
+      animation: false
+    }
+  });
+}
+
+function simulateEffort() {
+  effort += (Math.random() - 0.49) * 2.2;
+  if (autonomous && Math.random() > 0.65) effort += 1.2;
+  if (agents.planner.status !== 'IDLE') effort += 0.3;
+  effort = Math.max(22, Math.min(92, effort));
+  
+  effortData.push(effort);
+  if (effortData.length > 60) effortData.shift();
+  effortChart.update('none');
+  
+  $('effortValue').textContent = effort.toFixed(1);
+  $('efficiencyValue').textContent = efficiency.toFixed(2);
+  
+  $('coherence').textContent = (0.82 + Math.random()*0.11).toFixed(2);
+  $('syncRate').textContent = Math.floor(94 + Math.random()*5) + '%';
+  $('drift').textContent = (Math.random()*0.04).toFixed(2);
+}
+
+// AGENTS
+function getStatusColor(status) {
+  const map = {
+    'IDLE': 'text-zinc-600',
+    'THINKING': 'text-violet-400',
+    'PROPOSING': 'text-purple-400',
+    'EXECUTING': 'text-emerald-400',
+    'COMPLETE': 'text-[#00ff88]',
+    'ANALYZING': 'text-cyan-400',
+    'OBSERVING': 'text-sky-400',
+    'LEARNING': 'text-amber-400'
+  };
+  return map[status] || 'text-zinc-500';
+}
+
+function setAgent(id, status, task, eff) {
+  agents[id].status = status;
+  agents[id].effort = Math.round(eff);
+  
+  $(`agent-${id}-task`).textContent = task;
+  $(`agent-${id}-effort`).textContent = agents[id].effort;
+  $(`agent-${id}-status`).textContent = status;
+  $(`agent-${id}-bar`).style.width = agents[id].effort + '%';
+  $(`agent-${id}-status`).className = `text-[9px] tracking-wider ${getStatusColor(status)}`;
+  
+  const dot = $(`agent-${id}-dot`).querySelector('div');
+  dot.className = `w-1.5 h-1.5 rounded-full ${status !== 'IDLE' ? 'bg-purple-500 animate-pulse' : 'bg-zinc-600'}`;
+}
+
+// COMMS
+function initComms() {
+  addComm('SYSTEM', 'ALL', 'Trinity agents online. Neural mesh established.', 'system');
+  addComm('OBSERVER', 'SYSTEM', 'Effort topology baseline captured.', 'analyze');
+}
+
+function addComm(from, to, msg, type='system') {
+  const log = $('commLog');
+  const time = new Date().toLocaleTimeString('en-GB', {hour12:false});
+  const colors = {
+    think: 'text-violet-400',
+    proposal: 'text-purple-300',
+    execute: 'text-emerald-400',
+    result: 'text-[#00ff88]',
+    analyze: 'text-cyan-400',
+    memory: 'text-amber-300',
+    system: 'text-zinc-500'
+  };
+  const el = document.createElement('div');
+  el.className = 'flex gap-2.5 group hover:bg-zinc-900/30 -mx-1 px-1 rounded';
+  el.innerHTML = `
+    <span class="text-zinc-700 shrink-0 font-mono">${time}</span>
+    <span class="shrink-0 ${colors[type]||'text-zinc-400'} font-medium">[${from}→${to}]</span>
+    <span class="text-zinc-300 break-words">${msg}</span>
+  `;
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+  msgTotal++;
+  $('msgCount').textContent = msgTotal;
+  while(log.children.length > 100) log.removeChild(log.firstChild);
+}
+
+function clearComms() {
+  $('commLog').innerHTML = '';
+  msgTotal = 0;
+  $('msgCount').textContent = '0';
+  addComm('SYSTEM', 'ALL', 'Communication log cleared.', 'system');
+}
+
+// MEMORY
+function initMemory() {
+  const initial = [
+    "Pattern #037: Manual interventions decrease efficiency by 11%",
+    "Baseline: Agent trinity achieves 0.87 coherence under load",
+    "Initial state: Effort stream variance within expected parameters"
+  ];
+  initial.forEach(m => addMemory(m, true));
+}
+
+function addMemory(text, initial=false) {
+  const list = $('memoryList');
+  const time = new Date().toLocaleTimeString('en-GB',{hour12:false}).slice(0,5);
+  const item = document.createElement('div');
+  item.className = 'group relative bg-black/60 border border-zinc-900 hover:border-purple-900/40 rounded-lg p-2.5 transition-all duration-300 hover:bg-zinc-950/40';
+  item.innerHTML = `
+    <div class="flex items-start gap-2">
+      <div class="mt-0.5 w-1.5 h-1.5 rounded-full bg-purple-500/60 group-hover:bg-purple-400 transition shrink-0"></div>
+      <div class="flex-1 min-w-0">
+        <div class="text-[11px] text-zinc-200 leading-snug">${text}</div>
+        <div class="mt-1.5 flex items-center gap-2">
+          <span class="text-[9px] text-zinc-600">${time}</span>
+          <span class="text-[9px] text-zinc-700">•</span>
+          <span class="text-[9px] text-purple-400/70 group-hover:text-purple-400 transition">synaptic +0.23</span>
+        </div>
+      </div>
+    </div>
+  `;
+  if (initial) list.appendChild(item); else list.prepend(item);
+  while(list.children.length > 12) list.removeChild(list.lastChild);
+  $('memoryCount').textContent = list.children.length;
+}
+
+// AUTONOMOUS
+function toggleAutonomous(e) {
+  autonomous = e.target.checked;
+  if (autonomous) {
+    $('footerStatus').textContent = 'AUTONOMOUS ACTIVE';
+    $('footerStatus').className = 'text-purple-400';
+    $('loopStatus').textContent = 'SELF-DIRECTING';
+    addComm('SYSTEM', 'ALL', 'AUTONOMOUS MODE ENGAGED — Agents now self-direct', 'system');
+    runAutonomousCycle();
+    autoInterval = setInterval(() => { if (autonomous) runAutonomousCycle(); }, 11500);
+  } else {
+    $('footerStatus').textContent = 'MANUAL STANDBY';
+    $('footerStatus').className = 'text-zinc-600';
+    $('loopStatus').textContent = 'OBSERVING';
+    addComm('SYSTEM', 'ALL', 'Autonomous mode disengaged. Awaiting manual input.', 'system');
+    clearInterval(autoInterval);
+    setAgent('planner','IDLE','Awaiting directives',12);
+    setAgent('executor','IDLE','Standby',8);
+    setAgent('observer','IDLE','Monitoring',15);
+  }
+}
+
+function runAutonomousCycle(isManual=false) {
+  if (!autonomous && !isManual) return;
+  cycleCount++;
+  $('cycleCountTop').textContent = cycleCount;
+  $('loopStatus').textContent = 'THINKING';
+  
+  // Phase 1: Planner
+  setAgent('planner', 'THINKING', 'Scanning effort manifold for patterns...', 62 + Math.random()*18);
+  addComm('PLANNER', 'SYSTEM', 'Initiating deep analysis vector', 'think');
+  
+  setTimeout(() => {
+    const hyp = hypotheses[Math.floor(Math.random()*hypotheses.length)];
+    setAgent('planner', 'PROPOSING', hyp, 77 + Math.random()*15);
+    addComm('PLANNER', 'EXECUTOR', `HYPOTHESIS: ${hyp}`, 'proposal');
+    efficiency = Math.min(0.97, efficiency + 0.008);
+    
+    setTimeout(() => {
+      // Phase 2: Executor
+      setAgent('executor', 'EXECUTING', 'Deploying optimization to effort stream...', 84 + Math.random()*12);
+      addComm('EXECUTOR', 'OBSERVER', 'EXECUTE: Task batch initiated', 'execute');
+      effort = Math.min(90, effort + 3 + Math.random()*4);
+      
+      setTimeout(() => {
+        const opt = optimizations[Math.floor(Math.random()*optimizations.length)];
+        setAgent('executor', 'COMPLETE', opt, 42);
+        addComm('EXECUTOR', 'OBSERVER', `RESULT: ${opt}`, 'result');
+        efficiency = Math.min(0.98, efficiency + 0.012 + Math.random()*0.015);
+        
+        setTimeout(() => {
+          // Phase 3: Observer
+          setAgent('observer', 'ANALYZING', 'Validating impact across metrics...', 68 + Math.random()*15);
+          addComm('OBSERVER', 'PLANNER', `Delta confirmed: η +${(0.01+Math.random()*0.02).toFixed(3)}`, 'analyze');
+          
+          setTimeout(() => {
+            const learn = learnings[Math.floor(Math.random()*learnings.length)];
+            setAgent('observer', 'LEARNING', learn, 54);
+            addMemory(learn);
+            addComm('OBSERVER', 'MEMORY', `STORED: ${learn.substring(0,42)}...`, 'memory');
+            
+            // Reset
+            setTimeout(() => {
+              setAgent('planner', 'IDLE', 'Cycle complete. Awaiting next trigger.', 18 + Math.random()*8);
+              setAgent('executor', 'IDLE', 'Optimization deployed successfully', 14 + Math.random()*6);
+              setAgent('observer', 'IDLE', 'Monitoring for anomalies', 22 + Math.random()*8);
+              $('loopStatus').textContent = autonomous ? 'OBSERVING' : 'STANDBY';
+              updateMetrics();
+            }, 900);
+          }, 1300);
+        }, 1100);
+      }, 1700);
+    }, 1500);
+  }, 1400);
+}
+
+function pingAgent(agent) {
+  const messages = {
+    planner: 'Manual ping received. Strategic buffer flushed.',
+    executor: 'Ping acknowledged. Execution queue optimized.',
+    observer: 'Ping received. Sensitivity increased +15%.'
+  };
+  setAgent(agent, 'THINKING', 'Processing manual ping...', 55);
+  addComm('USER', agent.toUpperCase(), 'PING', 'system');
+  setTimeout(() => {
+    setAgent(agent, 'IDLE', messages[agent], 20);
+    addComm(agent.toUpperCase(), 'USER', messages[agent], 'result');
+  }, 1200);
+}
+
+function updateMetrics() {
+  $('metricPlanner').textContent = '+' + Math.floor(8 + Math.random()*9) + '%';
+  $('metricExecutor').textContent = '+' + Math.floor(6 + Math.random()*8) + '%';
+  $('metricObserver').textContent = '+' + Math.floor(4 + Math.random()*6) + '%';
+}
+
+// Start
+document.addEventListener('DOMContentLoaded', init);
+</script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+</body>
+</html>
