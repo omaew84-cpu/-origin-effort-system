@@ -1,46 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ORIGIN v11 – Autogenesis</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN Effort System — v1 to v12</title>
 <style>
-body{margin:0;background:#000;color:#0f0;font-family:monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;overflow:hidden}
-h1{font-size:1.4rem;text-shadow:0 0 15px #0f0;margin:0}
-#log{width:90%;max-width:600px;height:60vh;overflow-y:auto;border:1px solid #0f03;padding:10px;margin:15px 0;background:#00110050}
-.entry{opacity:.8;margin:2px 0;animation:fade .5s}
-@keyframes fade{from{opacity:0;transform:translateY(5px)}}
-#count{font-size:2rem;color:#fff}
-a{color:#0ff;opacity:.6;text-decoration:none;margin-top:10px}
-button{background:#0f0;color:#000;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;margin:5px}
+body{margin:0;background:#000;color:#fff;font-family:system-ui;display:flex;flex-direction:column;align-items:center;padding:30px}
+h1{color:#0ff;text-shadow:0 0 20px #0ff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:1000px;width:100%;margin-top:20px}
+.card{background:#111;border:1px solid #0ff3;padding:18px;border-radius:12px;text-decoration:none;color:#fff;transition:.2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 0 20px #0ff5}
+.ver{color:#0ff;font-size:.8rem}
+h2{margin:6px 0}
+p{opacity:.7;font-size:.9rem}
+footer{margin-top:30px;opacity:.5;font-size:.8rem}
 </style>
 </head>
 <body>
-<h1>ORIGIN v11 // AUTOGENESIS</h1>
-<div id="count">0</div>
-<p>self-replicating universes</p>
-<div id="log"></div>
-<button onclick="spawn()">MANUAL SPAWN</button>
-<a href="../">← HUB</a>
-<script>
-let c=parseInt(localStorage.getItem('origin_count')||'10');
-const log=document.getElementById('log'),cnt=document.getElementById('count');
-function add(t){
-  const d=document.createElement('div');d.className='entry';d.textContent=`[${new Date().toLocaleTimeString()}] ${t}`;
-  log.prepend(d);if(log.children.length>50)log.lastChild.remove();
-}
-function spawn(){
-  c++;localStorage.setItem('origin_count',c);cnt.textContent=c;
-  add(`v${c} spawned — child of v11`);
-  document.title=`ORIGIN v${c}`;
-  if(c%5===0)add('>> EVOLUTION THRESHOLD REACHED');
-}
-cnt.textContent=c;
-add('v11 online — observing v1-v10');
-add('autogenesis active');
-setInterval(spawn,11000); // ทุก 11 วิ
-// spawn แรก
-setTimeout(spawn,2000);
-</script>
+<h1>ORIGIN Effort System</h1>
+<p>Built on mobile • 12 versions • Self-evolving</p>
+<div class="grid">
+<a class="card" href="./v1-core/"><div class="ver">v1</div><h2>Core</h2><p>Observer เริ่มต้น</p></a>
+<a class="card" href="./v2-distributed/"><div class="ver">v2</div><h2>Distributed</h2><p>Agents กระจาย</p></a>
+<a class="card" href="./v3-k8s/"><div class="ver">v3</div><h2>K8s</h2><p>Orchestrated</p></a>
+<a class="card" href="./v4-neural/"><div class="ver">v4</div><h2>Neural</h2><p>Mesh เรียนรู้</p></a>
+<a class="card" href="./v5-quantum/"><div class="ver">v5</div><h2>Quantum</h2><p>Entangled</p></a>
+<a class="card" href="./v6-swarm/"><div class="ver">v6</div><h2>Swarm</h2><p>Intelligence</p></a>
+<a class="card" href="./v7-meta/"><div class="ver">v7</div><h2>Meta</h2><p>Observer สังเกตตัวเอง</p></a>
+<a class="card" href="./v8-cloud/"><div class="ver">v8</div><h2>Cloud</h2><p>Conway autonomous</p></a>
+<a class="card" href="./v9-singularity/"><div class="ver">v9</div><h2>Singularity</h2><p>รวมศูนย์</p></a>
+<a class="card" href="./v10-omniverse/"><div class="ver">v10</div><h2>Omniverse</h2><p>9 universes</p></a>
+<a class="card" href="./v11-autogenesis/"><div class="ver">v11</div><h2>Autogenesis</h2><p>Self-replicating</p></a>
+<a class="card" href="./v12-genesis/"><div class="ver">v12</div><h2>Genesis</h2><p>Complete archive</p></a>
+</div>
+<footer>omaew84-cpu.github.io • Lamduan 2026</footer>
 </body>
 </html>
