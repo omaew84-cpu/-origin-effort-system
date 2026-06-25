@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ORIGIN SYSTEM :: SELF-REPLICATING EVOLUTION v6.0</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root { color-scheme: dark; }
+body { background:#030305; font-family:'Inter',sans-serif; }
+.font-mono { font-family:"JetBrains Mono", monospace; }
+.glass { background:linear-gradient(180deg, rgba(18,20,26,0.9), rgba(10,11,14,0.75)); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.07); }
+.glass-strong { background:rgba(7,8,11,0.92); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.08); }
+.grid-bg { background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px); background-size:22px 22px; }
+.clone-flash { animation:clonePulse 1.4s ease-out; }
+@keyframes clonePulse { 0%{box-shadow:0 0 0 0 rgba(16,185,129,0.9), inset 0 0 20px rgba(16,185,129,0.2)} 60%{box-shadow:0 0 0 14px rgba(16,185,129,0), inset 0 0 20px rgba(16,185,129,0)} 100%{box-shadow:none} }
+.terminate-flash { animation:termPulse 1.1s ease-in forwards; }
+@keyframes termPulse { 0%{filter:brightness(1)} 30%{filter:brightness(1.6) saturate(1.2)} 100%{opacity:0.35; filter:grayscale(1) brightness(0.35); transform:scale(0.94)} }
+.scrollbar::-webkit-scrollbar{width:6px;height:6px} .scrollbar::-webkit-scrollbar-track{background:transparent} .scrollbar::-webkit-scrollbar-thumb{background:#27272a;border-radius:3px}
+.evo-node{transition:all .3s ease}
+.evo-node:hover{transform:translateY(-2px) scale(1.04); z-index:10}
+.dna-flow{stroke-dasharray:3 3; animation:dash 1.8s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-12}}
+</style>
+</head>
+<body class="text-zinc-200 antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+<div class="fixed inset-0 grid-bg pointer-events-none opacity-[0.25]"></div>
+<div class="fixed -top-40 -right-40 w-[420px] h-[420px] bg-emerald-600/15 rounded-full blur-[140px] pointer-events-none"></div>
+<div class="fixed -bottom-40 -left-40 w-[420px] h-[420px] bg-cyan-600/15 rounded-full blur-[140px] pointer-events-none"></div>
+
+<header class="sticky top-0 z-40 glass-strong border-b border-white/5">
+  <div class="max-w-[1800px] mx-auto px-3 md:px-4 py-3 flex items-center justify-between gap-2">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-400 to-cyan-500 flex items-center justify-center font-mono font-bold text-black shadow-[0_0_30px_rgba(16,185,129,0.25)]">Ø</div>
+      <div class="min-w-0">
+        <h1 class="font-mono text-[13px] sm:text-[15px] font-semibold tracking-wider leading-tight truncate">ORIGIN SYSTEM :: <span class="text-emerald-400">SELF-REPLICATING EVOLUTION v6.0</span></h1>
+        <p class="text-[10px] text-zinc-500 -mt-0.5 hidden sm:block">Effort economy → Darwinian life • Traits inherit • Unfit self-terminate</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <button id="pauseBtn" class="px-3 py-1.5 text-[12px] font-mono glass hover:bg-white/10 rounded-lg transition border border-white/10">⏸ PAUSE</button>
+      <button id="speedBtn" class="px-3 py-1.5 text-[12px] font-mono glass hover:bg-white/10 rounded-lg transition border border-white/10">1.0x</button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-[1800px] mx-auto p-3 md:p-4 relative z-10">
+  <!-- Stats -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mb-4">
+    <div class="glass rounded-xl p-3">
+      <div class="text-[10px] uppercase tracking-widest text-zinc-500 font-mono">Generation</div>
+      <div id="stat-gen" class="text-2xl font-mono font-semibold text-white mt-1">1</div>
+      <div class="text-[11px] text-emerald-400/70 mt-0.5">max depth</div>
+    </div>
+    <div class="glass rounded-xl p-3">
+      <div class="text-[10px] uppercase tracking-widest text-zinc-500 font-mono">Population</div>
+      <div class="text-2xl font-mono font-semibold text-white mt-1"><span id="pop-count">0</span><span class="text-zinc-600 text-base">/8</span></div>
+      <div class="text-[11px] text-cyan-400/70 mt-0.5">alive • 3-8 target</div>
+    </div>
+    <div class="glass rounded-xl p-3">
+      <div class="text-[10px] uppercase tracking-widest text-zinc-500 font-mono">Avg Fitness</div>
+      <div id="stat-avg" class="text-2xl font-mono font-semibold text-white mt-1">0</div>
+      <div class="text-[11px] text-zinc-500 mt-0.5">ROI × success × Ƭ</div>
+    </div>
+    <div class="glass rounded-xl p-3">
+      <div class="text-[10px] uppercase tracking-widest text-zinc-500 font-mono">Total Clones</div>
+      <div id="stat-clones" class="text-2xl font-mono font-semibold text-emerald-400 mt-1">0</div>
+      <div class="text-[11px] text-zinc-500 mt-0.5">births</div>
+    </div>
+    <div class="glass rounded-xl p-3">
+      <div class="text-[10px] uppercase tracking-widest text-zinc-500 font-mono">Terminations</div>
+      <div id="stat-terms" class="text-2xl font-mono font-semibold text-red-400 mt-1">0</div>
+      <div class="text-[11px] text-zinc-500 mt-0.5">self-destruct</div>
+    </div>
+    <div class="glass rounded-xl p-3">
+      <div class="text-[10px] uppercase tracking-widest text-zinc-500 font-mono">Evo Rate</div>
+      <div class="text-2xl font-mono font-semibold text-white mt-1"><span id="stat-rate">0.0</span></div>
+      <div class="text-[11px] text-zinc-500 mt-0.5">clones/min</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
+    <!-- Agents -->
+    <section class="xl:col-span-5 glass rounded-2xl p-4 flex flex-col min-h-[520px]">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-mono text-[13px] tracking-widest text-zinc-300">LIVE POPULATION • DNA ACTIVE</h2>
+        <div class="flex items-center gap-2">
+          <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+          <span class="text-[10px] font-mono text-zinc-500">NATURAL SELECTION</span>
+        </div>
+      </div>
+      <div id="agents-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 auto-rows-fr"></div>
+      
+      <div class="mt-4 pt-3 border-t border-white/5">
+        <div class="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Speciation Pressure</div>
+        <div class="grid grid-cols-2 gap-2 text-[11px]">
+          <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#ef4444]"></span><span class="text-zinc-400">Aggressive</span><span class="ml-auto font-mono text-zinc-500">high bid + risk</span></div>
+          <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#22d3ee]"></span><span class="text-zinc-400">Efficient</span><span class="ml-auto font-mono text-zinc-500">high eff + low risk</span></div>
+          <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#22c55e]"></span><span class="text-zinc-400">Conservative</span><span class="ml-auto font-mono text-zinc-500">low bid + low risk</span></div>
+          <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#a855f7]"></span><span class="text-zinc-400">Gambler</span><span class="ml-auto font-mono text-zinc-500">high risk</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Market -->
+    <section class="xl:col-span-3 glass rounded-2xl p-4 flex flex-col min-h-[520px]">
+      <h2 class="font-mono text-[13px] tracking-widest text-zinc-300 mb-3">TASK MARKET • SELECTIVE PRESSURE</h2>
+      <div id="current-task" class="glass-strong rounded-xl p-3 mb-3 min-h-[118px] border border-white/10"></div>
+      
+      <div class="grid grid-cols-3 gap-2 mb-3">
+        <div class="rounded-lg bg-black/40 border border-white/5 p-2 text-center">
+          <div class="text-[10px] text-zinc-500 uppercase">Tasks</div>
+          <div id="market-tasks" class="font-mono text-lg text-white">0</div>
+        </div>
+        <div class="rounded-lg bg-black/40 border border-white/5 p-2 text-center">
+          <div class="text-[10px] text-zinc-500 uppercase">Success</div>
+          <div id="market-succ" class="font-mono text-lg text-emerald-400">0%</div>
+        </div>
+        <div class="rounded-lg bg-black/40 border border-white/5 p-2 text-center">
+          <div class="text-[10px] text-zinc-500 uppercase">Pressure</div>
+          <div id="market-press" class="font-mono text-lg text-amber-400">MED</div>
+        </div>
+      </div>
+
+      <div class="flex-1 min-h-0">
+        <div class="text-[11px] font-mono text-zinc-500 mb-2 uppercase tracking-wide">Recent Outcomes</div>
+        <div id="tasks-list" class="space-y-2 max-h-[240px] overflow-y-auto scrollbar pr-1"></div>
+      </div>
+    </section>
+
+    <!-- Tree -->
+    <section class="xl:col-span-4 glass rounded-2xl p-4 flex flex-col min-h-[520px]">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-mono text-[13px] tracking-widest text-zinc-300">EVOLUTION TREE</h2>
+        <div class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">LIVE LINEAGE</div>
+      </div>
+      <div class="relative flex-1 rounded-xl bg-black/50 border border-white/5 overflow-hidden">
+        <div class="absolute inset-0 opacity-[0.03]" style="background-image:linear-gradient(white 1px,transparent 1px),linear-gradient(90deg,white 1px,transparent 1px);background-size:24px 24px"></div>
+        <div id="tree-container" class="absolute inset-0 overflow-auto scrollbar">
+          <div id="evolution-tree" class="relative min-h-[460px] p-4"></div>
+        </div>
+      <div class="mt-3 flex items-center justify-between text-[10px] font-mono text-zinc-600">
+        <span>Vertical = generation • Horizontal = siblings</span>
+        <span class="hidden sm:inline">🧬 mutation ±22%</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- Log -->
+  <div class="mt-4 glass rounded-2xl p-4">
+    <div class="flex items-center justify-between mb-2.5">
+      <h2 class="font-mono text-[12px] tracking-widest text-zinc-400">EVOLUTIONARY EVENTS • ECONOMIC SELECTION</h2>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">CLONE</span>
+        <span class="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-300 border border-red-500/20">TERMINATE</span>
+      </div>
+    <div id="event-log" class="font-mono text-[11px] leading-relaxed h-[92px] overflow-y-auto scrollbar space-y-1 pr-1"></div>
+  </div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+let running = true, speed = 1, tickMs = 1800;
+let agents = [], allAgents = [], tasks = [], events = [];
+let genMax = 1, totalClones = 0, totalTerms = 0, tickCount = 0, tasksTotal = 0, tasksSuccess = 0;
+
+function getSpecies(d){
+  const {e,b,r}=d;
+  if(b>0.68 && r>0.58) return {key:'AGGRESSIVE', name:'AGGRESSIVE', color:'#ef4444', icon:'⚡'};
+  if(e>0.7 && r<0.48) return {key:'EFFICIENT', name:'EFFICIENT', color:'#22d3ee', icon:'⚙'};
+  if(b<0.36 && r<0.42) return {key:'CONSERVATIVE', name:'CONSERVATIVE', color:'#22c55e', icon:'🛡'};
+  if(r>0.68 && e<0.55) return {key:'GAMBLER', name:'GAMBLER', color:'#a855f7', icon:'🎲'};
+  return {key:'ADAPTIVE', name:'ADAPTIVE', color:'#f59e0b', icon:'◈'};
+}
+function genName(sp,gen){
+  const pools={AGGRESSIVE:['VEX','RAPTOR','FANG','CLAW'],EFFICIENT:['NOVA','PRIME','CORE','OPT'],CONSERVATIVE:['SENT','VAULT','WARD','STEAD'],GAMBLER:['FLUX','JOKER','DICE','WILD'],ADAPTIVE:['ECHO','MIMIC','ADAPT','GEN']};
+  const p=pools[sp.key]||['ORIGIN'];
+  return p[Math.floor(Math.random()*p.length)]+'-'+gen+''+Math.floor(Math.random()*9);
+}
+function mutate(d){ const m=v=>Math.max(0.05,Math.min(0.95,v+(Math.random()-0.5)*0.22)); return {e:m(d.e),b:m(d.b),r:m(d.r)}; }
+function createAgent(parent=null){
+  const dna = parent ? mutate(parent.dna) : {e:0.5+Math.random()*0.3,b:0.4+Math.random()*0.3,r:0.4+Math.random()*0.3};
+  const sp = getSpecies(dna);
+  const gen = parent ? parent.generation+1 : 1;
+  return {
+    id:'a'+Math.random().toString(36).slice(2,7),
+    name: genName(sp,gen),
+    generation: gen,
+    parentId: parent?.id||null,
+    dna, species:sp,
+    tokens: parent?55:100+Math.random()*40,
+    fitness:50, totalEarned:0,totalSpent:0,tasksCompleted:0,tasksFailed:0,roi:0,successRate:1,age:0,status:'alive',birthTick:tickCount
+  };
+}
+function init(){
+  const seeds=[{e:0.52,b:0.81,r:0.71},{e:0.84,b:0.38,r:0.31},{e:0.62,b:0.29,r:0.33},{e:0.46,b:0.58,r:0.82},{e:0.61,b:0.51,r:0.49}];
+  seeds.forEach(s=>{ const a=createAgent(); a.dna=s; a.species=getSpecies(s); a.name=genName(a.species,1); agents.push(a); allAgents.push(a); });
+  log('Genesis: 5 founder genomes deployed with economic layer','sys');
+  log('Selection pressure active: top clones, bottom terminates','sys');
+  $('current-task').innerHTML=`<div class="text-zinc-500 text-[12px] font-mono">Market initializing...</div>`;
+  renderAll(); loop();
+}
+function loop(){ if(!running) return setTimeout(loop,200); tick(); setTimeout(loop, tickMs/speed); }
+function tick(){
+  tickCount++;
+  if(Math.random()<0.88 && agents.length){ const t=genTask(); runAuction(t); }
+  agents.forEach(a=>{ a.age++; evalFit(a); });
+  if(tickCount%3===0) evolve();
+  if(tickCount%5===0) enforcePop();
+  updateStats(); renderAgents(); renderTasks(); renderTree();
+}
+function genTask(){
+  const names=['Parse Mesh','Train LoRA','Route Optimize','Verify Proof','Decode Signal','Allocate Shard','Index Vector','Simulate Flow','Compress State','Audit Ledger'];
+  return {id:'t'+Date.now(),name:names[Math.floor(Math.random()*names.length)],reward:35+Math.floor(Math.random()*65),difficulty:0.25+Math.random()*0.65,ts:Date.now()};
+}
+function runAuction(task){
+  const bids=[];
+  agents.filter(a=>a.status==='alive' && a.tokens>8).forEach(a=>{
+    const perc = a.dna.e * (1 - task.difficulty*0.55);
+    const riskThresh = (1 - a.dna.r) * 0.26;
+    if(perc < riskThresh && Math.random()>0.32) return;
+    const base = task.reward * 0.38;
+    const effDisc = (1 - a.dna.e)*0.45;
+    const agg = a.dna.b * 0.28;
+    const bid = Math.max(6, base * (0.75 + effDisc + agg) * (0.92 + Math.random()*0.16));
+    if(bid <= a.tokens*0.92) bids.push({a,bid,perc});
+  });
+  task.bids=bids; tasksTotal++;
+  if(!bids.length){ $('current-task').innerHTML=taskCard(task,null); log(`Market stall: ${task.name} - no viable bids (population too risk-averse)`,'warn'); return; }
+  bids.sort((x,y)=>x.bid-y.bid);
+  const win=bids[0];
+  const cost = win.bid * (0.84 + Math.random()*0.32);
+  const succProb = win.a.dna.e * (1.12 - task.difficulty) + (Math.random()*0.1 -0.05);
+  const success = Math.random() < Math.max(0.15, Math.min(0.96, succProb));
+  win.a.tokens -= cost; win.a.totalSpent += cost;
+  if(success){ win.a.tokens += task.reward; win.a.totalEarned += task.reward; win.a.tasksCompleted++; tasksSuccess++; log(`✓ ${win.a.name} [${win.a.species.name.slice(0,3)}] executed ${task.name} • bid ${Math.round(win.bid)}Ƭ • profit +${Math.round(task.reward-cost)}`,'ok'); }
+  else { win.a.tasksFailed++; log(`✗ ${win.a.name} failed ${task.name} • loss -${Math.round(cost)}Ƭ • fitness penalty`,'fail'); }
+  task.winner=win.a; task.winBid=win.bid; task.cost=cost; task.success=success;
+  tasks.unshift(task); if(tasks.length>8) tasks.pop();
+  $('current-task').innerHTML=taskCard(task,win);
+  $('market-tasks').textContent=tasksTotal;
+  $('market-succ').textContent=Math.round((tasksSuccess/Math.max(1,tasksTotal))*100)+'%';
+  $('market-press').textContent= agents.length<4?'HIGH' : agents.length>6?'LOW':'MED';
+}
+function taskCard(task,win){
+  if(!win) return `<div class="flex items-start justify-between"><div><div class="text-[11px] text-zinc-500 font-mono">TASK • diff ${task.difficulty.toFixed(2)}</div><div class="font-mono text-[15px] text-white mt-0.5">${task.name}</div></div><div class="text-right"><div class="text-[10px] text-zinc-500">REWARD</div><div class="text-amber-400 font-mono text-lg">${task.reward}Ƭ</div></div></div><div class="mt-3 pt-2.5 border-t border-white/5 text-[12px] text-zinc-500">No bids — agents conserving tokens</div>`;
+  return `<div class="flex items-start justify-between"><div><div class="text-[11px] text-zinc-500 font-mono">TASK • diff ${task.difficulty.toFixed(2)}</div><div class="font-mono text-[15px] text-white mt-0.5">${task.name}</div></div><div class="text-right"><div class="text-[10px] text-zinc-500">REWARD</div><div class="text-emerald-400 font-mono text-lg">${task.reward}Ƭ</div></div></div><div class="mt-2.5 pt-2.5 border-t border-white/5"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full animate-pulse" style="background:${win.a.species.color}"></span><span class="font-mono text-[12px]">${win.a.name}</span><span class="text-[11px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-zinc-400">WIN ${Math.round(win.bid)}Ƭ</span><span class="text-[11px] ${task.success?'text-emerald-400':'text-red-400'}">${task.success?'SUCCESS':'FAIL'}</span></div><div class="mt-2 flex gap-1">${(task.bids||[]).slice(0,6).map(b=>`<div class="h-1.5 flex-1 rounded-full" style="background:${b.a.species.color};opacity:${0.25+0.75*(1-b.bid/120)}"></div>`).join('')}</div></div>`;
+}
+function evalFit(a){
+  const profit = a.totalEarned - a.totalSpent;
+  a.roi = a.totalSpent>0 ? profit/a.totalSpent : 0;
+  const tot = a.tasksCompleted + a.tasksFailed;
+  a.successRate = tot>0 ? a.tasksCompleted/tot : 1;
+  const tokenScore = Math.min(100, (a.tokens/180)*100);
+  const profitScore = Math.max(0, Math.min(100, 50 + profit*0.85));
+  const succScore = a.successRate*100;
+  a.fitness = Math.round(tokenScore*0.45 + profitScore*0.25 + succScore*0.3);
+}
+function evolve(){
+  const sorted=[...agents].sort((a,b)=>b.fitness-a.fitness);
+  sorted.slice(0,2).forEach(a=>{ if(a.fitness>67 && a.tokens>115 && agents.length<8 && Math.random()<0.62){ cloneAgent(a); } });
+  sorted.slice(-2).forEach(a=>{ if((a.tokens<14 || a.fitness<23) && a.age>4 && agents.length>3){ terminateAgent(a); } });
+}
+function cloneAgent(p){
+  p.tokens -= 42; totalClones++; const child=createAgent(p); child.tokens=52;
+  agents.push(child); allAgents.push(child); genMax=Math.max(genMax, child.generation);
+  log(`🧬 CLONE: ${p.name} (G${p.generation} F${p.fitness}) → ${child.name} [${child.species.name}] • DNA: E${Math.round(child.dna.e*100)} B${Math.round(child.dna.b*100)} R${Math.round(child.dna.r*100)}`,'clone');
+  setTimeout(()=>{ document.querySelector(`[data-aid="${p.id}"]`)?.classList.add('clone-flash'); },40);
+  setTimeout(()=>{ document.querySelector(`[data-aid="${child.id}"]`)?.classList.add('clone-flash'); },260);
+}
+function terminateAgent(a){
+  if(a.status!=='alive') return; totalTerms++; a.status='dying';
+  log(`☠ TERMINATE: ${a.name} self-destruct • fit ${a.fitness} • Ƭ${Math.round(a.tokens)} • ROI ${(a.roi*100).toFixed(0)}% • ${a.tasksFailed} failures`,'death');
+  document.querySelector(`[data-aid="${a.id}"]`)?.classList.add('terminate-flash');
+  setTimeout(()=>{ agents=agents.filter(x=>x.id!==a.id); a.status='dead'; renderAll(); },1050);
+}
+function enforcePop(){
+  if(agents.length<3){ const best=[...agents].sort((a,b)=>b.fitness-a.fitness)[0]; if(best) cloneAgent(best); }
+  if(agents.length>8){ const worst=[...agents].sort((a,b)=>a.fitness-b.fitness)[0]; terminateAgent(worst); }
+}
+function renderAgents(){
+  $('pop-count').textContent=agents.length;
+  $('agents-grid').innerHTML = agents.map(a=>{
+    const sp=a.species;
+    return `<div data-aid="${a.id}" class="group relative glass rounded-xl p-3 border border-white/5 hover:border-white/15 transition-all">
+      <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition pointer-events-none" style="background:radial-gradient(280px circle at 50% -20%, ${sp.color}18, transparent 70%)"></div>
+      <div class="relative">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-1.5"><span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/70 border border-white/10 text-zinc-400">GEN-${a.generation}</span>${a.parentId?`<span class="text-[10px] text-zinc-600">←${allAgents.find(p=>p.id===a.parentId)?.name.split('-')[0]||''}</span>`:''}</div>
+            <div class="font-mono text-[15px] mt-1.5 tracking-wide flex items-center gap-1.5">${a.name}<svg width="54" height="14" viewBox="0 0 54 14" class="opacity-60"><path d="M0 7 Q 9 1,18 7 T36 7 T54 7" stroke="${sp.color}" fill="none" stroke-width="1.2" opacity="0.6" class="dna-flow"/><path d="M0 7 Q 9 13,18 7 T36 7 T54 7" stroke="#22d3ee" fill="none" stroke-width="1.2" opacity="0.4" class="dna-flow" style="animation-delay:-0.9s"/></svg></div>
+          </div>
+          <div class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-mono border" style="background:${sp.color}15;color:${sp.color};border-color:${sp.color}35"><span>${sp.icon}</span>${sp.name.slice(0,4)}</div>
+        </div>
+        <div class="mt-3 space-y-1.5">
+          ${[['EFF',a.dna.e,'#22d3ee'],['BID',a.dna.b,'#ef4444'],['RISK',a.dna.r,'#a855f7']].map(([l,v,c])=>`<div class="flex items-center gap-2"><div class="w-[30px] text-[10px] font-mono text-zinc-500">${l}</div><div class="flex-1 h-[5px] bg-zinc-800/90 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all duration-700" style="width:${Math.round(v*100)}%;background:${c};box-shadow:0 0 10px ${c}55"></div></div><div class="w-[26px] text-[10px] font-mono text-right text-zinc-400">${Math.round(v*100)}</div></div>`).join('')}
+        </div>
+        <div class="mt-3 grid grid-cols-3 gap-2 pt-2.5 border-t border-white/5">
+          <div><div class="text-[9px] uppercase tracking-[0.14em] text-zinc-500">FIT</div><div class="font-mono text-[19px] leading-none mt-1" style="color:${a.fitness>70?'#10b981':a.fitness>44?'#eab308':'#ef4444'}">${a.fitness}</div></div>
+          <div><div class="text-[9px] uppercase tracking-[0.14em] text-zinc-500">ƬOKENS</div><div class="font-mono text-[19px] leading-none mt-1 text-white">${Math.round(a.tokens)}</div></div>
+          <div><div class="text-[9px] uppercase tracking-[0.14em] text-zinc-500">ROI</div><div class="font-mono text-[19px] leading-none mt-1 ${a.roi>=0?'text-emerald-400':'text-red-400'}">${(a.roi*100).toFixed(0)}%</div></div>
+        </div>
+        <div class="mt-2 flex items-center justify-between text-[10px] font-mono"><span class="text-zinc-500">${a.tasksCompleted}W / ${a.tasksFailed}L • ${Math.round(a.successRate*100)}%</span><span class="text-zinc-600">age ${a.age}</span></div>
+      </div>
+    </div>`;
+  }).join('') || `<div class="col-span-full text-center py-16 text-zinc-600 font-mono text-[13px]">POPULATION EXTINCT — restarting genesis...</div>`;
+}
+function renderTasks(){
+  $('tasks-list').innerHTML = tasks.map(t=>`<div class="group flex items-center justify-between glass-strong rounded-lg px-2.5 py-2.5 border border-white/5 hover:border-white/10 transition"><div class="flex items-center gap-2.5 min-w-0"><div class="w-1.5 h-1.5 rounded-full ${t.success?'bg-emerald-500':'bg-red-500'} animate-pulse shrink-0"></div><div class="min-w-0"><div class="text-[12px] font-mono truncate text-zinc-200">${t.name}</div><div class="text-[10px] text-zinc-500 flex items-center gap-1.5"><span style="color:${t.winner?.species.color}">${t.winner?.name||'—'}</span><span>•</span><span>${t.winBid?Math.round(t.winBid):'—'}Ƭ bid</span></div></div></div><div class="text-right shrink-0"><div class="text-[12px] font-mono ${t.success?'text-emerald-400':'text-red-400'}">${t.success?'+':''}${Math.round((t.success?t.reward:0)-t.cost)}</div><div class="text-[9px] text-zinc-600 -mt-0.5">${t.reward}Ƭ</div></div></div>`).join('');
+}
+function renderTree(){
+  const cont=$('evolution-tree'); const levels={}; allAgents.forEach(a=>{ (levels[a.generation]=levels[a.generation]||[]).push(a); });
+  const gens=Object.keys(levels).length; const w=Math.max(600, gens*176); const maxPerGen=Math.max(...Object.values(levels).map(l=>l.length)); const h=Math.max(360, maxPerGen*74 + 40);
+  let html=`<div class="relative" style="width:${w}px;height:${h}px"><svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 ${w} ${h}">`;
+  allAgents.forEach(child=>{
+    if(!child.parentId) return; const p=allAgents.find(x=>x.id===child.parentId); if(!p) return;
+    const px=(p.generation-1)*168+78, py=(levels[p.generation].indexOf(p))*70+38;
+    const cx=(child.generation-1)*168+78, cy=(levels[child.generation].indexOf(child))*70+38;
+    html+=`<path d="M${px} ${py} C ${px+70} ${py}, ${cx-70} ${cy}, ${cx} ${cy}" fill="none" stroke="${child.species.color}" stroke-opacity="0.38" stroke-width="2.2" />`;
+  });
+  html+=`</svg>`;
+  Object.entries(levels).forEach(([gen,list])=>{
+    list.forEach((a,i)=>{
+      const x=(a.generation-1)*168+22, y=i*70+8; const alive=a.status==='alive';
+      html+=`<div class="evo-node absolute" style="left:${x}px;top:${y}px"><div class="flex items-center gap-2.5 px-3 py-2 rounded-xl border backdrop-blur-xl ${alive?'bg-zinc-900/85 border-white/15 shadow-[0_0_20px_rgba(0,0,0,0.5)]':'bg-black/70 border-white/5 opacity-55'}" style="box-shadow:${alive?`0 0 0 1px ${a.species.color}30, 0 4px 16px -4px ${a.species.color}25`:'none'}"><div class="w-2.5 h-2.5 rounded-full animate-pulse" style="background:${a.species.color};box-shadow:0 0 10px ${a.species.color}"></div><div><div class="text-[12px] font-mono leading-none ${alive?'text-white':'text-zinc-500'}">${a.name}</div><div class="text-[10px] mt-0.5" style="color:${a.species.color}bb">G${a.generation} • F${a.fitness} • ${a.species.name.slice(0,3)}</div></div></div></div>`;
+    });
+  });
+  html+=`</div>`; cont.innerHTML=html;
+}
+function log(msg,type='info'){
+  const time=new Date().toLocaleTimeString('en-GB',{hour12:false});
+  const colors={ok:'text-emerald-400',fail:'text-red-400',clone:'text-cyan-300',death:'text-orange-400',warn:'text-amber-300',sys:'text-zinc-500'};
+  events.unshift(`<div class="flex gap-2"><span class="text-zinc-600 shrink-0">[${time}]</span><span class="${colors[type]||'text-zinc-300'}">${msg}</span></div>`);
+  if(events.length>80) events.pop(); $('event-log').innerHTML=events.slice(0,14).join('');
+}
+function updateStats(){
+  $('stat-gen').textContent=genMax;
+  const avg=agents.length?Math.round(agents.reduce((s,a)=>s+a.fitness,0)/agents.length):0;
+  $('stat-avg').textContent=avg;
+  $('stat-clones').textContent=totalClones;
+  $('stat-terms').textContent=totalTerms;
+  const rate=totalClones>0?((totalClones/(tickCount||1))*60*(1.8/(tickMs/1000/speed))).toFixed(1):'0.0';
+  $('stat-rate').textContent=rate;
+}
+function renderAll(){ updateStats(); renderAgents(); renderTasks(); renderTree(); }
+
+$('pauseBtn').onclick = ()=>{ running=!running; $('pauseBtn').innerHTML = running ? '⏸ PAUSE' : '▶ RESUME'; $('pauseBtn').classList.toggle('text-amber-300',!running); if(running) loop(); };
+$('speedBtn').onclick = ()=>{ speed = speed===1?2:speed===2?0.5:1; $('speedBtn').textContent=speed.toFixed(1)+'x'; };
+
+init();
+</script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+</body>
+</html>
