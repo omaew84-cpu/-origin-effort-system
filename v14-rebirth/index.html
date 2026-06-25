@@ -1,36 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>ORIGIN v14 // REBIRTH PROTOCOL</title>
-  <style>
-    body {
-      background-color: #000;
-      color: #00ffff;
-      font-family: 'Orbitron', sans-serif;
-      text-align: center;
-      margin-top: 20%;
-    }
-    h1 { color: #b084ff; text-shadow: 0 0 20px #00ffff; }
-    button {
-      background: #00ffff; border: none; color: #000;
-      padding: 10px 20px; font-weight: bold; cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN v14 // REBIRTH</title>
+
+<style>
+body{
+  margin:0;
+  background: radial-gradient(circle at center, #15001f 0%, #070010 40%, #000000 100%);
+  color:#fff;
+  font-family:'Orbitron',system-ui,sans-serif;
+  text-align:center;
+  min-height:100vh;
+  overflow:hidden;
+  animation:bgPulse 6s ease-in-out infinite alternate;
+}
+
+@keyframes bgPulse{
+  0%{ filter:brightness(1); }
+  100%{ filter:brightness(1.25); }
+}
+
+h1{
+  margin-top:80px;
+  font-size:2.4rem;
+  color:#ff00ff;
+  text-shadow:0 0 20px #ff00ff,0 0 40px #00ffff;
+  animation:titleGlow 3s infinite alternate;
+}
+
+@keyframes titleGlow{
+  0%{ text-shadow:0 0 12px #ff00ff; }
+  100%{ text-shadow:0 0 32px #00ffff; }
+}
+
+p{
+  max-width:420px;
+  margin:10px auto;
+  opacity:.85;
+  line-height:1.5;
+}
+
+/* PARTICLES */
+.particles{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.15) 2px, transparent 2px),
+    radial-gradient(circle, rgba(255,255,255,.1) 1px, transparent 1px);
+  background-size:140px 140px, 90px 90px;
+  animation: drift 22s linear infinite;
+}
+
+@keyframes drift{
+  from{ transform:translateY(0); }
+  to{ transform:translateY(-240px); }
+}
+
+/* BUTTON */
+button{
+  margin-top:26px;
+  background:rgba(255,0,255,.15);
+  border:1px solid rgba(0,255,255,.4);
+  color:#fff;
+  padding:12px 28px;
+  border-radius:999px;
+  font-weight:bold;
+  letter-spacing:.1em;
+  cursor:pointer;
+  backdrop-filter:blur(4px);
+  box-shadow:0 0 20px #ff00ff;
+  animation:holoBtn 2.5s infinite alternate;
+}
+
+@keyframes holoBtn{
+  0%{ box-shadow:0 0 12px #ff00ff; }
+  100%{ box-shadow:0 0 28px #00ffff; }
+}
+
+button:active{
+  transform:scale(.97);
+}
+
+footer{
+  margin-top:40px;
+  opacity:.6;
+  font-size:.75rem;
+}
+</style>
 </head>
+
 <body>
-  <h1>ORIGIN v14 // REBIRTH PROTOCOL</h1>
-  <p>Cycle restarted • Self‑Evolving Quantum Fabric</p>
-  <button onclick="alert('v15 spawned — child of v14')">SPAWN v15</button>
-  <footer>Built entirely on mobile • Lamduan, Surin • 2026 • by Maew</footer>
+
+<div class="particles"></div>
+
+<h1>ORIGIN v14 // REBIRTH</h1>
+<p>Quantum Reconstruction Cycle — the universe rebuilds itself from all previous versions.</p>
+<p>Cycle II begins here.</p>
+
+<button onclick="alert('v15 SYNAPS is spawning...')">
+  SPAWN v15 SYNAPS
+</button>
+
+<footer>
+Lamduan • Surin • Built on mobile • 2026 • by Maew
+</footer>
+
 </body>
 </html>
-h1 {
-  color: #b084ff;
-  text-shadow: 0 0 20px #00ffff, 0 0 40px #b084ff;
-  animation: pulse 3s infinite alternate;
-}
-@keyframes pulse {
-  from { text-shadow: 0 0 10px #00ffff; }
-  to { text-shadow: 0 0 30px #b084ff; }
-}
