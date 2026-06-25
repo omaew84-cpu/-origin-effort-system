@@ -1,9 +1,3 @@
-# ORIGIN Effort System
-
-Effort observing itself — v1 to v12, built entirely on mobile
-
-Live: https://omaew84-cpu.github.io/-origin-effort-system/
-
 ## Versions
 1. **v1-core** – Core Observer
 2. **v2-distributed** – Distributed Agents
@@ -17,3 +11,4 @@ Live: https://omaew84-cpu.github.io/-origin-effort-system/
 10. **v10-omniverse** – Omniverse
 11. **v11-autogenesis** – Autogenesis
 12. **v12-genesis** – Genesis Archive
+13. **v13-infinite** – The End (infinite loop)
