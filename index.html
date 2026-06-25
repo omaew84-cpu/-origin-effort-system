@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>ORIGIN SYSTEM — Kubernetes Cognitive Runtime v3</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  * { font-variant-ligatures: none; }
+  html, body { background: #000; }
+  body { overscroll-behavior: none; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(96,165,250,0.25); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(96,165,250,0.4); }
+  .grid-bg {
+    background-image: 
+      linear-gradient(rgba(96,165,250,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(96,165,250,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .blink { animation: blink 1.2s steps(2, start) infinite; }
+  @keyframes blink { to { visibility: hidden; } }
+  .k8s-glow { box-shadow: 0 0 20px rgba(50,108,229,0.15), inset 0 1px 0 rgba(255,255,255,0.03); }
+</style>
+</head>
+<body class="bg-black text-white font-mono antialiased selection:bg-[#326CE5]/30 selection:text-white">
+  <div class="min-h-screen flex flex-col relative">
+    <div class="pointer-events-none absolute inset-0 grid-bg opacity-[0.25]"></div>
+    <div class="pointer-events-none absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-[#326CE5]/[0.08] to-transparent"></div>
+    
+    <header class="relative z-20 border-b border-[#326CE5]/20 backdrop-blur-xl bg-black/70">
+      <div class="max-w-[1600px] mx-auto px-4 md:px-6 h-[60px] md:h-[68px] flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-[26px] h-[26px] border border-[#326CE5]/40 flex items-center justify-center bg-[#326CE5]/10 k8s-glow shrink-0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#60A5FA" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="min-w-0">
+            <h1 class="text-[11px] sm:text-xs md:text-[13px] tracking-[0.18em] font-medium truncate">ORIGIN SYSTEM :: KUBERNETES COGNITIVE RUNTIME <span class="text-[#60A5FA]">v3.0</span></h1>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="text-[9px] uppercase tracking-widest text-white/30">autonomous saas engine</span>
+              <span class="hidden sm:inline w-px h-2.5 bg-white/10"></span>
+              <span class="hidden sm:inline text-[9px] text-emerald-400/70">self-healing</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 md:gap-5 shrink-0">
+          <div class="hidden lg:flex items-center gap-4">
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse"></span>
+              <span class="text-[10px] tracking-widest text-white/70">CLUSTER</span>
+              <span id="cluster-health" class="text-[9px] text-emerald-400/80">HEALTHY</span>
+            </div>
+            <div class="text-[10px] text-white/50">PODS <span id="header-pods" class="text-[#60A5FA] tabular-nums">0</span></div>
+            <div class="text-[10px] text-white/50">NODES <span class="text-white/80 tabular-nums">5/5</span></div>
+          </div>
+          <div class="w-px h-5 bg-white/10 hidden lg:block"></div>
+          <div class="flex items-center gap-3 md:gap-4">
+            <div class="text-right">
+              <div class="text-[9px] text-white/40 leading-none">CPU</div>
+              <div id="header-cpu" class="text-[13px] md:text-[15px] leading-none text-[#60A5FA] tabular-nums font-medium">0%</div>
+            </div>
+            <div class="text-right">
+              <div class="text-[9px] text-white/40 leading-none">MEM</div>
+              <div id="header-mem" class="text-[13px] md:text-[15px] leading-none text-[#60A5FA] tabular-nums font-medium">0/0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="relative z-10 flex-1 w-full max-w-[1600px] mx-auto px-4 md:px-6 py-5 md:py-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 auto-rows-fr">
+        
+        <!-- 1 CLUSTER OVERVIEW -->
+        <section class="group border border-[#326CE5]/20 bg-black/70 backdrop-blur-xl rounded-[12px] overflow-hidden k8s-glow">
+          <div class="border-b border-[#326CE5]/15 px-4 py-3 flex items-center justify-between bg-[#326CE5]/[0.03]">
+            <div class="flex items-center gap-2.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="text-[#60A5FA]"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-opacity="0.9" stroke-width="1.5" fill="none"/></svg>
+              <h2 class="text-[11px] uppercase tracking-[0.2em] text-white/70">CLUSTER OVERVIEW</h2>
+            </div>
+            <span class="text-[10px] text-[#60A5FA]/70 font-medium">k3s v1.30.2</span>
+          </div>
+          <div class="p-4">
+            <div class="grid grid-cols-4 gap-2 mb-4">
+              <div class="border border-white/5 rounded-lg p-2.5 bg-white/[0.01]"><div class="text-[9px] text-white/40 uppercase tracking-wide">Nodes</div><div id="stat-nodes" class="text-[16px] text-white/90 font-medium tabular-nums">5</div></div>
+              <div class="border border-white/5 rounded-lg p-2.5 bg-white/[0.01]"><div class="text-[9px] text-white/40 uppercase tracking-wide">Pods</div><div id="stat-pods" class="text-[16px] text-emerald-400/90 font-medium tabular-nums">0</div></div>
+              <div class="border border-white/5 rounded-lg p-2.5 bg-white/[0.01]"><div class="text-[9px] text-white/40 uppercase tracking-wide">Services</div><div id="stat-svc" class="text-[16px] text-[#60A5FA]/90 font-medium tabular-nums">3</div></div>
+              <div class="border border-white/5 rounded-lg p-2.5 bg-white/[0.01]"><div class="text-[9px] text-white/40 uppercase tracking-wide">Deploy</div><div id="stat-deploy" class="text-[16px] text-white/90 font-medium tabular-nums">3</div></div>
+            </div>
+            
+            <div class="mb-3.5">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] uppercase tracking-widest text-white/40">Nodes • us-east-1 / us-west-1</span>
+                <span class="text-[9px] text-emerald-400/60">ALL READY</span>
+              </div>
+              <div id="node-list" class="space-y-1.5 max-h-[148px] overflow-auto pr-1"></div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] uppercase tracking-widest text-white/40">Cluster CPU</span>
+                <span class="text-[10px] text-white/40 tabular-nums"><span id="cpu-avg">0</span>% avg • <span id="mem-avg">0</span>% mem</span>
+              </div>
+              <div class="h-[44px] bg-[#050507] border border-[#326CE5]/15 rounded overflow-hidden relative">
+                <canvas id="cpu-graph" class="w-full h-full"></canvas>
+                <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#326CE5]/10 to-transparent"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2 EFFORT STREAM -->
+        <section class="group border border-white/10 bg-black/70 backdrop-blur-xl rounded-[12px] overflow-hidden">
+          <div class="border-b border-white/10 px-4 py-3 flex items-center justify-between bg-white/[0.01]">
+            <div class="flex items-center gap-2.5">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="text-white/50"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-opacity="0.6"/></svg>
+              <h2 class="text-[11px] uppercase tracking-[0.2em] text-white/60">EFFORT STREAM</h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="effort-count" class="text-[10px] text-white/40 font-medium">0 events</span>
+              <span class="w-1 h-1 rounded-full bg-[#60A5FA] animate-pulse"></span>
+            </div>
+          </div>
+          <div class="relative">
+            <div id="effort-log" class="h-[290px] overflow-y-auto px-4 py-3 text-[11px] leading-[18px] font-mono tracking-wide"></div>
+            <div class="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-black to-transparent"></div>
+          </div>
+          <div class="border-t border-white/5 px-4 py-2 bg-white/[0.005] flex items-center justify-between">
+            <span class="text-[10px] text-white/30 uppercase tracking-widest">pod • timestamp • action</span>
+            <span class="text-[10px] text-[#60A5FA]/60">live tail</span>
+          </div>
+        </section>
+
+        <!-- 3 EXECUTION CORE -->
+        <section class="group border border-white/10 bg-black/70 backdrop-blur-xl rounded-[12px] overflow-hidden">
+          <div class="border-b border-white/10 px-4 py-3 flex items-center justify-between bg-white/[0.01]">
+            <div class="flex items-center gap-2.5">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="text-white/50"><rect x="2.5" y="2.5" width="9" height="9" stroke="currentColor" stroke-opacity="0.6"/></svg>
+              <h2 class="text-[11px] uppercase tracking-[0.2em] text-white/60">EXECUTION CORE</h2>
+            </div>
+            <span class="text-[10px] text-white/35">runtime: k8s</span>
+          </div>
+          
+          <div class="p-4">
+            <div class="flex flex-wrap gap-2">
+              <button id="run-btn" onclick="runTask()" class="relative inline-flex items-center justify-center gap-2 px-4 h-9 border border-[#326CE5]/40 bg-[#326CE5]/15 hover:bg-[#326CE5]/25 hover:border-[#326CE5]/60 transition-all duration-200 rounded-[8px] text-[11px] tracking-[0.14em] uppercase font-medium text-[#93C5FD] focus:outline-none focus:ring-1 focus:ring-[#326CE5]/50 disabled:opacity-40">
+                <span class="w-1.5 h-1.5 bg-[#60A5FA] animate-pulse"></span>
+                RUN TASK
+              </button>
+              <button id="spawn-btn" onclick="spawnAgent()" class="inline-flex items-center justify-center px-3.5 h-9 border border-white/10 bg-transparent hover:bg-white/[0.06] hover:border-white/20 transition-all rounded-[8px] text-[11px] tracking-[0.12em] uppercase text-white/70 hover:text-white/90 disabled:opacity-40">SPAWN AGENT</button>
+              <button id="scale-btn" onclick="scaleCluster()" class="inline-flex items-center justify-center px-3.5 h-9 border border-white/10 bg-transparent hover:bg-white/[0.06] hover:border-white/20 transition-all rounded-[8px] text-[11px] tracking-[0.12em] uppercase text-white/70 hover:text-white/90 disabled:opacity-40">SCALE CLUSTER</button>
+            </div>
+
+            <div class="mt-3.5">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">OUTPUT</span>
+                <span id="output-status" class="text-[10px] text-white/40">idle</span>
+              </div>
+              <div class="relative border border-white/10 rounded-[8px] bg-[#050507] overflow-hidden">
+                <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#326CE5]/30 to-transparent"></div>
+                <pre id="output" class="h-[170px] overflow-auto p-3 text-[11px] leading-[16px] text-white/60 whitespace-pre-wrap break-all">// awaiting execution
+// distributed across origin-agent pods</pre>
+              </div>
+            </div>
+
+            <div class="mt-3 grid grid-cols-3 gap-2">
+              <div class="border border-white/5 rounded-lg p-2.5 bg-white/[0.01]"><div class="text-[9px] text-white/40 uppercase">Status</div><div id="metric-status" class="text-[12px] text-white/80 mt-0.5">READY</div></div>
+              <div class="border border-white/5 rounded-lg p-2.5 bg-white/[0.01]"><div class="text-[9px] text-white/40 uppercase">Compute</div><div id="metric-compute" class="text-[12px] text-white/80 mt-0.5">—</div></div>
+              <div class="border border-white/5 rounded-lg p-2.5 bg-white/[0.01]"><div class="text-[9px] text-white/40 uppercase">Cycles</div><div id="metric-cycles" class="text-[12px] text-white/80 mt-0.5">0</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4 COGNITIVE AI -->
+        <section class="group border border-white/10 bg-black/70 backdrop-blur-xl rounded-[12px] overflow-hidden md:col-span-1 xl:col-span-1">
+          <div class="border-b border-white/10 px-4 py-3 flex items-center justify-between bg-white/[0.01]">
+            <div class="flex items-center gap-2.5">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="text-white/50"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-opacity="0.6"/><circle cx="7" cy="7" r="1.5" fill="currentColor" fill-opacity="0.6"/></svg>
+              <h2 class="text-[11px] uppercase tracking-[0.2em] text-white/60">COGNITIVE AI</h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] text-white/40">self-analysis</span>
+              <span id="cog-status" class="w-1.5 h-1.5 rounded-full bg-emerald-400/80"></span>
+            </div>
+          </div>
+          
+          <div class="p-4">
+            <div class="space-y-2.5">
+              <div class="border border-white/5 rounded-lg p-3 bg-white/[0.01]">
+                <div class="text-[9px] uppercase tracking-widest text-white/40 mb-1.5">Analysis</div>
+                <div id="cog-analysis" class="text-[11px] leading-5 text-white/70 font-mono">initializing k8s pattern recognition...</div>
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div class="border border-white/5 rounded-lg p-3 bg-white/[0.01]">
+                  <div class="text-[9px] uppercase tracking-widest text-white/40 mb-1.5">Bottleneck</div>
+                  <div id="cog-bottleneck" class="text-[11px] leading-4 text-white/70 font-mono">—</div>
+                </div>
+                <div class="border border-white/5 rounded-lg p-3 bg-white/[0.01]">
+                  <div class="text-[9px] uppercase tracking-widest text-white/40 mb-1.5">Auto-Scale</div>
+                  <div id="cog-autoscale" class="text-[11px] leading-4 text-white/70 font-mono">—</div>
+                </div>
+              </div>
+              <div class="border border-white/5 rounded-lg p-3 bg-[#050507]">
+                <div class="flex items-center justify-between mb-1.5">
+                  <div class="text-[9px] uppercase tracking-widest text-white/40">Effort Rate</div>
+                  <div class="text-[10px] text-white/40"><span id="graph-fps" class="text-[#60A5FA]">0.0</span> evt/s</div>
+                </div>
+                <div class="relative h-[72px]"><canvas id="effort-graph" class="w-full h-full"></canvas></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5 ZK PROOF VAULT -->
+        <section class="group border border-white/10 bg-black/70 backdrop-blur-xl rounded-[12px] overflow-hidden">
+          <div class="border-b border-white/10 px-4 py-3 flex items-center justify-between bg-white/[0.01]">
+            <div class="flex items-center gap-2.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="text-amber-400/70"><path d="M12 1l3 5 6 1-4 5 1 6-6-3-6 3 1-6-4-5 6-1 3-5z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+              <h2 class="text-[11px] uppercase tracking-[0.2em] text-white/60">ZK PROOF VAULT</h2>
+            </div>
+            <span class="text-[10px] text-amber-400/70">verified</span>
+          </div>
+          
+          <div class="p-4">
+            <div class="grid grid-cols-3 gap-2 mb-3">
+              <div class="border border-white/5 rounded p-2 bg-white/[0.01] text-center"><div class="text-[9px] text-white/40">Stored</div><div id="zk-count" class="text-[14px] text-white/90">0</div></div>
+              <div class="border border-white/5 rounded p-2 bg-white/[0.01] text-center"><div class="text-[9px] text-white/40">Verified</div><div id="zk-verified" class="text-[14px] text-emerald-400/80">0</div></div>
+              <div class="border border-white/5 rounded p-2 bg-white/[0.01] text-center"><div class="text-[9px] text-white/40">Size</div><div class="text-[14px] text-white/70">2.4kb</div></div>
+            </div>
+
+            <div class="mb-3">
+              <div class="text-[10px] uppercase tracking-widest text-white/40 mb-1.5">Latest Proof</div>
+              <div class="border border-amber-500/20 rounded-[8px] bg-[#050507] overflow-hidden">
+                <pre id="zk-proof" class="h-[92px] overflow-auto p-2.5 text-[10px] leading-[14px] text-white/50 whitespace-pre-wrap">// awaiting task</pre>
+              </div>
+            </div>
+
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-white/40 mb-1.5">Recent</div>
+              <div id="proof-list" class="space-y-1 max-h-[84px] overflow-auto pr-1 text-[10px] font-mono"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6 DEPLOYMENT PIPELINE -->
+        <section class="group border border-[#326CE5]/20 bg-black/70 backdrop-blur-xl rounded-[12px] overflow-hidden k8s-glow">
+          <div class="border-b border-[#326CE5]/15 px-4 py-3 flex items-center justify-between bg-[#326CE5]/[0.03]">
+            <div class="flex items-center gap-2.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="text-[#60A5FA]"><path d="M4 17v2a2 2 0 002 2h12M4 7v2m0-2h16M4 13h16M9 3v16" stroke="currentColor" stroke-opacity="0.8" stroke-width="1.3"/></svg>
+              <h2 class="text-[11px] uppercase tracking-[0.2em] text-white/70">DEPLOYMENT PIPELINE</h2>
+            </div>
+            <span id="rollout-status" class="text-[10px] text-white/40">idle</span>
+          </div>
+          
+          <div class="p-4">
+            <div class="space-y-2.5 mb-3.5">
+              <div class="flex items-center justify-between py-1.5 px-2.5 rounded border border-white/5 bg-white/[0.01]">
+                <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span class="text-[11px] text-white/80">docker-compose.yml</span></div>
+                <span id="file-compose" class="text-[10px] text-emerald-400/70">SYNCED</span>
+              </div>
+              <div class="flex items-center justify-between py-1.5 px-2.5 rounded border border-white/5 bg-white/[0.01]">
+                <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span class="text-[11px] text-white/80">k8s.yaml</span></div>
+                <span id="file-k8s" class="text-[10px] text-emerald-400/70">APPLIED</span>
+              </div>
+              <div class="flex items-center justify-between py-1.5 px-2.5 rounded border border-white/5 bg-white/[0.01]">
+                <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#60A5FA]"></span><span class="text-[11px] text-white/80">vercel.json</span></div>
+                <span id="file-vercel" class="text-[10px] text-[#60A5FA]/70">DEPLOYED</span>
+              </div>
+            </div>
+
+            <div class="mb-3.5">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] uppercase tracking-widest text-white/40">Pipeline</span>
+                <span class="text-[9px] text-white/30">argo-cd • gitops</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="flex-1">
+                  <div class="flex items-center gap-1.5 mb-1">
+                    <span id="stage-build" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span class="text-[10px] text-white/60">Build</span>
+                  </div>
+                  <div class="h-[3px] bg-white/10 rounded"><div class="h-full w-full bg-emerald-400/60 rounded"></div></div>
+                </div>
+                <div class="flex-1">
+                  <div class="flex items-center gap-1.5 mb-1">
+                    <span id="stage-test" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span class="text-[10px] text-white/60">Test</span>
+                  </div>
+                  <div class="h-[3px] bg-white/10 rounded"><div class="h-full w-full bg-emerald-400/60 rounded"></div></div>
+                </div>
+                <div class="flex-1">
+                  <div class="flex items-center gap-1.5 mb-1">
+                    <span id="stage-deploy" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span class="text-[10px] text-white/60">Deploy</span>
+                  </div>
+                  <div class="h-[3px] bg-white/10 rounded"><div class="h-full w-full bg-emerald-400/60 rounded"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] uppercase tracking-widest text-white/40">Rolling Update</span>
+                <span class="text-[10px] text-white/40">origin-agent</span>
+              </div>
+              <div class="h-[6px] bg-[#050507] border border-white/10 rounded-full overflow-hidden">
+                <div id="rollout-bar" class="h-full w-[100%] bg-gradient-to-r from-[#326CE5] to-[#60A5FA] transition-all duration-500"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-white/40 mb-1.5">Deployments</div>
+              <div id="deploy-list" class="space-y-1"></div>
+            </div>
+
+            <div class="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
+              <span class="text-[10px] text-white/40">Ingress</span>
+              <span id="ingress-status" class="text-[10px] text-emerald-400/70">origin.system • Active</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="relative z-10 border-t border-[#326CE5]/10 mt-auto bg-black/60 backdrop-blur">
+      <div class="max-w-[1600px] mx-auto px-4 md:px-6 h-10 flex items-center justify-between text-[10px] text-white/30">
+        <span class="uppercase tracking-widest">origin v3.0 • kubernetes-native • cognitive runtime</span>
+        <span id="clock" class="tabular-nums text-white/40">00:00:00</span>
+      </div>
+    </footer>
+  </div>
+
+<script>
+const k8sNodes = Array.from({length:5}, (_,i)=>({
+  name:`k8s-node-${i+1}`,
+  status:'Ready',
+  cpu: 18 + Math.random()*22,
+  mem: 28 + Math.random()*18,
+  pods:0,
+  zone: i<3?'us-east-1a':'us-west-1a'
+}));
+
+const deployments = [
+  {name:'origin-agent', replicas:0, desired:3, ready:0, image:'origin/agent:v3.0.1', min:2, max:12},
+  {name:'origin-cognitive', replicas:0, desired:2, ready:0, image:'origin/cognitive:v3.0.1', min:1, max:4},
+  {name:'origin-zk', replicas:0, desired:1, ready:0, image:'origin/zk:v3.0.0', min:1, max:2},
+];
+
+const services = [
+  {name:'origin-api', type:'ClusterIP'},
+  {name:'origin-cognitive', type:'ClusterIP'},
+  {name:'origin-zk', type:'ClusterIP'},
+];
+
+let pods = [];
+let effort = [];
+let pendingEvents = 0;
+let cycleCount = 0;
+let isRunning = false;
+let zkVault = [];
+let cpuHistory = Array(60).fill(20);
+let graphData = Array(90).fill(0);
+
+function randomId(){ return Math.random().toString(36).slice(2,7); }
+
+function observe(action, source='system') {
+  const now = new Date();
+  const time = now.toLocaleTimeString('en-GB', { hour12: false });
+  effort.push({ action, time, source, ts: Date.now() });
+  if (effort.length > 800) effort.shift();
+  pendingEvents++;
+  updateLog();
+}
+
+function updateLog() {
+  const log = document.getElementById('effort-log');
+  const items = effort.slice(-180);
+  const html = items.map(e => {
+    const s = e.source;
+    let color = 'text-white/60';
+    if (s.includes('origin-agent')) color = 'text-cyan-300/80';
+    else if (s.includes('cognitive')) color = 'text-violet-300/80';
+    else if (s.includes('zk')) color = 'text-amber-300/80';
+    else if (s.startsWith('kube')) color = 'text-[#60A5FA]/80';
+    else if (s === 'origin-api' || s === 'system') color = 'text-emerald-300/70';
+    else if (s.startsWith('pod/')) color = 'text-white/50';
+    const src = s.length > 22 ? s.slice(0,22)+'…' : s;
+    return `<div class="flex gap-2"><span class="text-white/25 w-[54px] tabular-nums shrink-0">${e.time}</span><span class="${color} w-[138px] shrink-0 truncate">${src}</span><span class="text-white/75 truncate">${e.action}</span></div>`;
+  }).join('');
+  log.innerHTML = html + '<div class="mt-1"><span class="blink text-[#60A5FA]/70">_</span></div>';
+  log.scrollTop = log.scrollHeight;
+  document.getElementById('effort-count').textContent = `${effort.length} events`;
+}
+
+function createPod(deploymentName) {
+  const dep = deployments.find(d=>d.name===deploymentName);
+  if(!dep) return;
+  const node = [...k8sNodes].sort((a,b)=>a.pods-b.pods)[0];
+  const podName = `${deploymentName}-${randomId()}`;
+  const pod = {
+    name: podName,
+    deployment: deploymentName,
+    node: node.name,
+    status: 'Pending',
+    cpu: 0,
+    mem: 80 + Math.floor(Math.random()*120),
+    age: 0,
+  };
+  pods.push(pod);
+  node.pods++;
+  dep.replicas++;
+  observe(`pod/${podName} scheduled → ${node.name}`, 'kube-scheduler');
+  setTimeout(()=>{ pod.status='ContainerCreating'; observe(`pod/${podName} pulling image`, 'kubelet'); }, 300+Math.random()*400);
+  setTimeout(()=>{ 
+    pod.status='Running'; 
+    pod.cpu = 4 + Math.random()*12;
+    dep.ready = Math.min(dep.ready+1, dep.desired);
+    observe(`pod/${podName} Ready`, podName);
+    updateAll();
+  }, 1100+Math.random()*700);
+  updateAll();
+}
+
+function deletePod(podName) {
+  const idx = pods.findIndex(p=>p.name===podName);
+  if(idx===-1) return;
+  const pod = pods[idx];
+  const dep = deployments.find(d=>d.name===pod.deployment);
+  const node = k8sNodes.find(n=>n.name===pod.node);
+  pod.status='Terminating';
+  observe(`pod/${podName} Terminating`, 'kubelet');
+  setTimeout(()=>{
+    pods.splice(idx,1);
+    if(node) node.pods = Math.max(0, node.pods-1);
+    if(dep){ dep.replicas=Math.max(0,dep.replicas-1); dep.ready=Math.max(0,dep.ready-1); }
+    observe(`pod/${podName} deleted`, 'kubelet');
+    updateAll();
+  }, 700);
+}
+
+function initCluster() {
+  deployments.forEach(d=>{ for(let i=0;i<d.desired;i++) setTimeout(()=>createPod(d.name), i*180); });
+}
+
+function scaleDeployment(name, delta) {
+  const dep = deployments.find(d=>d.name===name);
+  if(!dep) return;
+  const newDesired = Math.max(dep.min, Math.min(dep.max, dep.desired + delta));
+  const diff = newDesired - dep.desired;
+  if(diff===0) return;
+  dep.desired = newDesired;
+  observe(`hpa scale ${name} ${newDesired-diff}→${newDesired}`, 'kube-hpa');
+  triggerRollout(name);
+  if(diff>0){ for(let i=0;i<diff;i++) setTimeout(()=>createPod(name), i*280); }
+  else { const victims = pods.filter(p=>p.deployment===name && p.status==='Running').slice(0, -diff); victims.forEach((p,i)=>setTimeout(()=>deletePod(p.name), i*220)); }
+  updateAll();
+}
+
+function triggerRollout(name) {
+  const status = document.getElementById('rollout-status');
+  const bar = document.getElementById('rollout-bar');
+  if(!status||!bar) return;
+  status.textContent = 'progressing';
+  status.className = 'text-[10px] text-amber-400/80';
+  bar.style.width = '12%';
+  let w = 12;
+  const iv = setInterval(()=>{
+    w += Math.random()*16;
+    if(w>=100){ w=100; clearInterval(iv); status.textContent='complete'; status.className='text-[10px] text-emerald-400/80'; setTimeout(()=>{status.textContent='idle'; status.className='text-[10px] text-white/40';},1800); }
+    bar.style.width = w+'%';
+  }, 260);
+  observe(`rollout/${name} started`, 'argo-cd');
+}
+
+function updateAll() {
+  const runningPods = pods.filter(p=>p.status==='Running').length;
+  document.getElementById('header-pods').textContent = runningPods;
+  document.getElementById('stat-pods').textContent = pods.length;
+  document.getElementById('stat-nodes').textContent = k8sNodes.filter(n=>n.status==='Ready').length;
+  document.getElementById('stat-svc').textContent = services.length;
+  document.getElementById('stat-deploy').textContent = deployments.length;
+
+  const avgCpu = k8sNodes.reduce((a,n)=>a+n.cpu,0)/k8sNodes.length;
+  const avgMem = k8sNodes.reduce((a,n)=>a+n.mem,0)/k8sNodes.length;
+  document.getElementById('header-cpu').textContent = Math.round(avgCpu)+'%';
+  document.getElementById('header-mem').textContent = `${(k8sNodes.reduce((a,n)=>a+n.mem,0)/100).toFixed(1)}/${k8sNodes.length*4}GB`;
+  document.getElementById('cpu-avg').textContent = Math.round(avgCpu);
+  document.getElementById('mem-avg').textContent = Math.round(avgMem);
+
+  const nl = document.getElementById('node-list');
+  nl.innerHTML = k8sNodes.map(n=>{
+    const cpuColor = n.cpu>75?'text-red-400/80':n.cpu>55?'text-amber-400/80':'text-emerald-400/70';
+    return `<div class="flex items-center gap-2 py-1.5 px-2.5 rounded bg-white/[0.02] border border-white/5">
+      <span class="w-1.5 h-1.5 rounded-full ${n.status==='Ready'?'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.5)]':'bg-red-400'} animate-pulse"></span>
+      <span class="text-[11px] text-white/75 w-[92px] truncate">${n.name}</span>
+      <span class="text-[9px] text-white/35 w-[62px]">${n.zone}</span>
+      <span class="text-[10px] text-white/40 w-[38px]">${n.pods}p</span>
+      <div class="flex-1 h-[4px] bg-white/10 rounded overflow-hidden"><div class="h-full bg-[#60A5FA]/80 transition-all" style="width:${n.cpu}%"></div></div>
+      <span class="text-[10px] ${cpuColor} w-[30px] text-right tabular-nums">${Math.round(n.cpu)}</span>
+    </div>`;
+  }).join('');
+
+  updateDeployList();
+}
+
+function updateDeployList() {
+  const el = document.getElementById('deploy-list');
+  if(!el) return;
+  el.innerHTML = deployments.map(d=>{
+    const readyColor = d.ready===d.desired?'text-emerald-400/80':d.ready<d.desired?'text-amber-400/80':'text-red-400/80';
+    const pct = Math.round((d.ready/Math.max(1,d.desired))*100);
+    return `<div class="py-1.5">
+      <div class="flex items-center justify-between">
+        <div class="text-[11px] text-white/80">${d.name}</div>
+        <div class="text-[10px] ${readyColor} tabular-nums">${d.ready}/${d.desired}</div>
+      </div>
+      <div class="h-[3px] bg-white/10 rounded mt-1 overflow-hidden"><div class="h-full bg-[#60A5FA]/70 transition-all" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function generateZKProof(result) {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  const hash = Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join('');
+  return {
+    id: 'zk_'+hash.slice(0,8),
+    task: result.task_id,
+    hash: '0x'+hash,
+    short: '0x'+hash.slice(0,16)+'…'+hash.slice(-6),
+    time: new Date().toISOString(),
+    verified: true
+  };
+}
+
+function runTask(autonomous=false) {
+  if(isRunning) return;
+  isRunning = true;
+  ['run-btn','spawn-btn','scale-btn'].forEach(id=>document.getElementById(id).disabled=true);
+  
+  observe(autonomous?'cognitive_trigger':'api_request POST /task', 'origin-api');
+  
+  const output = document.getElementById('output');
+  const statusEl = document.getElementById('output-status');
+  document.getElementById('metric-status').textContent = 'RUNNING';
+  document.getElementById('metric-status').className = 'text-[12px] text-amber-400/80 mt-0.5';
+  statusEl.textContent = 'scheduling';
+  statusEl.className = 'text-[10px] text-amber-400/70';
+  
+  output.textContent = '{\n  "status": "SCHEDULING",\n  "scheduler": "kube-scheduler",\n  "pods": []\n}';
+  output.className = 'h-[170px] overflow-auto p-3 text-[11px] leading-[16px] whitespace-pre-wrap break-all text-white/50';
+
+  const agentPods = pods.filter(p=>p.deployment==='origin-agent' && p.status==='Running');
+  const selected = agentPods.sort(()=>0.5-Math.random()).slice(0, Math.min(3, agentPods.length));
+
+  const taskId = 't_'+randomId();
+  let completed = 0;
+  const results = [];
+
+  selected.forEach((pod,i)=>{
+    setTimeout(()=>{
+      observe(`exec shard-${i+1}`, pod.name);
+      pod.cpu = Math.min(95, pod.cpu + 15 + Math.random()*10);
+      const compute = Number((Math.random()*0.38 + 0.07).toFixed(6));
+      results.push({pod: pod.name, node: pod.node, compute, status:'ok'});
+      completed++;
+      output.textContent = JSON.stringify({task_id:taskId, phase:'executing', progress:`${completed}/${selected.length}`, pods:results}, null, 2);
+      if(completed===selected.length) setTimeout(finalize, 220);
+    }, 380 + i*260 + Math.random()*180);
+  });
+
+  if(selected.length===0){ setTimeout(finalize, 600); }
+
+  function finalize() {
+    const totalCompute = results.reduce((a,b)=>a+b.compute,0);
+    cycleCount++;
+    const result = {status:'SUCCESS', task_id:taskId, distributed:true, pods:results, total_compute:Number(totalCompute.toFixed(6)), timestamp:new Date().toISOString()};
+    
+    output.textContent = JSON.stringify(result, null, 2);
+    output.className = 'h-[170px] overflow-auto p-3 text-[11px] leading-[16px] whitespace-pre-wrap break-all text-emerald-300/80';
+    
+    const proof = generateZKProof(result);
+    zkVault.unshift(proof);
+    if(zkVault.length>50) zkVault.pop();
+    
+    document.getElementById('zk-proof').textContent = `zk-proof {\n  circuit: "k8s_effort_v3",\n  task: "${proof.task}",\n  commitment: "${proof.short}",\n  proof: "${proof.hash}",\n  verified: true,\n  timestamp: "${proof.time}"\n}`;
+    document.getElementById('zk-count').textContent = zkVault.length;
+    document.getElementById('zk-verified').textContent = zkVault.filter(z=>z.verified).length;
+    
+    const pl = document.getElementById('proof-list');
+    pl.innerHTML = zkVault.slice(0,6).map(z=>`<div class="flex items-center justify-between py-0.5"><span class="text-emerald-400/70">${z.id}</span><span class="text-white/40 truncate mx-2">${z.task}</span><span class="text-white/30">${new Date(z.time).toLocaleTimeString('en-GB',{hour12:false})}</span></div>`).join('');
+    
+    document.getElementById('metric-status').textContent = 'SUCCESS';
+    document.getElementById('metric-status').className = 'text-[12px] text-emerald-400/80 mt-0.5';
+    document.getElementById('metric-compute').textContent = totalCompute.toFixed(3);
+    document.getElementById('metric-cycles').textContent = cycleCount;
+    statusEl.textContent = 'complete';
+    statusEl.className = 'text-[10px] text-emerald-400/70';
+    
+    observe(`task/${taskId} completed`, 'origin-api');
+    selected.forEach(p=> setTimeout(()=>{ p.cpu = Math.max(5, p.cpu - 12); }, 800+Math.random()*600));
+    
+    setTimeout(()=>{
+      document.getElementById('metric-status').textContent = 'READY';
+      document.getElementById('metric-status').className = 'text-[12px] text-white/80 mt-0.5';
+      statusEl.textContent = 'idle';
+      statusEl.className = 'text-[10px] text-white/40';
+      isRunning = false;
+      ['run-btn','spawn-btn','scale-btn'].forEach(id=>document.getElementById(id).disabled=false);
+    }, 2000);
+  }
+}
+
+function spawnAgent() {
+  scaleDeployment('origin-agent', 1);
+  const btn = document.getElementById('spawn-btn');
+  const orig = btn.textContent;
+  btn.textContent = 'SCALING';
+  setTimeout(()=>btn.textContent=orig, 1200);
+  analyzeCognitive();
+}
+
+function scaleCluster() {
+  observe('manual scale cluster', 'system');
+  scaleDeployment('origin-agent', 2);
+  scaleDeployment('origin-cognitive', 1);
+  const btn = document.getElementById('scale-btn');
+  const orig = btn.textContent;
+  btn.textContent = 'SCALING';
+  setTimeout(()=>btn.textContent=orig, 1500);
+}
+
+function analyzeCognitive() {
+  observe('analyze cluster state', 'origin-cognitive');
+  const now = Date.now();
+  const recent = effort.filter(e=>now-e.ts<30000);
+  const byPod = {};
+  recent.forEach(e=>{ if(e.source.includes('origin-agent')) byPod[e.source]=(byPod[e.source]||0)+1; });
+  const total = recent.length;
+  const freq = (total/30).toFixed(2);
+  
+  const hotNode = [...k8sNodes].sort((a,b)=>b.cpu-a.cpu)[0];
+  const coldNode = [...k8sNodes].sort((a,b)=>a.cpu-b.cpu)[0];
+  const agentDep = deployments.find(d=>d.name==='origin-agent');
+  const pendingPods = pods.filter(p=>p.status!=='Running').length;
+  
+  document.getElementById('cog-analysis').innerHTML = `Effort rate: <span class="text-white">${freq} evt/s</span> • Pods: <span class="text-[#60A5FA]">${agentDep.ready}/${agentDep.desired}</span><br>Hot node: <span class="text-white">${hotNode.name}</span> (${Math.round(hotNode.cpu)}% CPU)`;
+  
+  const isHot = hotNode.cpu > 68;
+  document.getElementById('cog-bottleneck').innerHTML = isHot 
+    ? `<span class="text-amber-400">CPU pressure</span><br><span class="text-white/50">${hotNode.name}</span>`
+    : `<span class="text-emerald-400">Balanced</span><br><span class="text-white/50">all nodes &lt;60%</span>`;
+  
+  const shouldScale = freq > 3.2 && agentDep.desired < agentDep.max;
+  const shouldDown = freq < 0.9 && agentDep.desired > agentDep.min;
+  
+  let autoscaleText = 'Hold — optimal';
+  if(shouldScale) autoscaleText = `<span class="text-[#60A5FA]">Scale up +1</span><br><span class="text-white/50">load ${freq}>3.2</span>`;
+  if(shouldDown) autoscaleText = `<span class="text-amber-400">Scale down -1</span><br><span class="text-white/50">load ${freq}<0.9</span>`;
+  if(pendingPods>0) autoscaleText = `<span class="text-amber-400">Waiting</span><br><span class="text-white/50">${pendingPods} pods pending</span>`;
+  
+  document.getElementById('cog-autoscale').innerHTML = autoscaleText;
+  document.getElementById('cog-status').className = 'w-1.5 h-1.5 rounded-full bg-emerald-400/80 animate-pulse';
+  setTimeout(()=>{document.getElementById('cog-status').className='w-1.5 h-1.5 rounded-full bg-emerald-400/80';},700);
+  
+  // Auto-scale
+  if(shouldScale) setTimeout(()=>scaleDeployment('origin-agent',1), 800);
+  if(shouldDown) setTimeout(()=>scaleDeployment('origin-agent',-1), 1200);
+}
+
+function simulateWorkload() {
+  // Random pod logs
+  const running = pods.filter(p=>p.status==='Running');
+  if(running.length===0) return;
+  const sample = running.sort(()=>0.5-Math.random()).slice(0, Math.min(3, running.length));
+  const actions = ['heartbeat','process_shard','sync_state','validate','gossip','effort_ping','checkpoint'];
+  sample.forEach(p=>{
+    if(Math.random()>0.4){
+      observe(actions[Math.floor(Math.random()*actions.length)], p.name);
+      p.cpu = Math.max(3, Math.min(92, p.cpu + (Math.random()-0.48)*8));
+      // update node cpu
+      const node = k8sNodes.find(n=>n.name===p.node);
+      if(node){ node.cpu = Math.max(10, Math.min(88, node.cpu + (Math.random()-0.5)*3)); node.mem = Math.max(20, Math.min(85, node.mem + (Math.random()-0.5)*2)); }
+    }
+  });
+}
+
+function drawGraph(canvasId, data, color) {
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio||1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width*dpr;
+  canvas.height = rect.height*dpr;
+  ctx.scale(dpr,dpr);
+  const w=rect.width, h=rect.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 6;
+  const max = Math.max(5, ...data);
+  data.forEach((v,i)=>{
+    const x = (i/(data.length-1))*(w-4)+2;
+    const y = h-3 - (v/max)*(h-8);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  ctx.shadowBlur=0;
+  ctx.lineTo(w-2,h-2); ctx.lineTo(2,h-2); ctx.closePath();
+  ctx.fillStyle = color.replace(')',',0.08)').replace('rgb','rgba').replace('#60A5FA','rgba(96,165,250,0.08)').replace('#326CE5','rgba(50,108,229,0.08)');
+  try{ ctx.fill(); }catch(e){}
+}
+
+// Init
+observe('cluster bootstrap', 'kube-apiserver');
+setTimeout(()=>observe('coredns ready', 'kube-system'), 200);
+setTimeout(()=>observe('ingress-nginx ready', 'kube-system'), 400);
+initCluster();
+setTimeout(()=>{observe('origin-agent deployment ready', 'origin-agent');}, 1800);
+setTimeout(()=>observe('cognitive runtime online', 'origin-cognitive'), 2200);
+
+setInterval(simulateWorkload, 2100);
+
+setInterval(()=>{
+  cpuHistory.shift();
+  const avg = k8sNodes.reduce((a,n)=>a+n.cpu,0)/k8sNodes.length;
+  cpuHistory.push(avg);
+  drawGraph('cpu-graph', cpuHistory, '#60A5FA');
+  
+  graphData.shift();
+  graphData.push(pendingEvents);
+  const avgE = graphData.slice(-8).reduce((a,b)=>a+b,0)/8;
+  document.getElementById('graph-fps').textContent = avgE.toFixed(1);
+  pendingEvents = 0;
+  drawGraph('effort-graph', graphData, '#10b981');
+}, 950);
+
+setInterval(analyzeCognitive, 11000);
+setTimeout(analyzeCognitive, 3200);
+
+setInterval(updateAll, 3000);
+
+function updateClock(){
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-GB',{hour12:false});
+}
+updateClock(); setInterval(updateClock,1000);
+
+window.addEventListener('resize', ()=>{ drawGraph('cpu-graph', cpuHistory, '#60A5FA'); drawGraph('effort-graph', graphData, '#10b981'); });
+setTimeout(()=>{ drawGraph('cpu-graph', cpuHistory, '#60A5FA'); drawGraph('effort-graph', graphData, '#10b981'); }, 400);
+</script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+</body>
+</html>
