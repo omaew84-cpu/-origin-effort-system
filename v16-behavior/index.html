@@ -1,79 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>ORIGIN v16 // BEHAVIOR FABRIC</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN v16 // BEHAVIOR FABRIC</title>
 
 <style>
 body{
   margin:0;
   background: radial-gradient(circle at center, #001a12 0%, #000000 70%);
-  color:#00ffcc;
+  color:#fff;
   font-family:'Orbitron',system-ui,sans-serif;
   text-align:center;
   min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
+  overflow:hidden;
+  animation:bgPulse 7s ease-in-out infinite alternate;
+}
+
+@keyframes bgPulse{
+  0%{ filter:brightness(1); }
+  100%{ filter:brightness(1.22); }
 }
 
 h1{
+  margin-top:80px;
+  font-size:2.4rem;
   color:#00ff95;
-  text-shadow:0 0 18px #00ffcc,0 0 40px #00ff95;
-  margin-bottom:8px;
-  animation:pulse 3s infinite alternate;
+  text-shadow:0 0 20px #00ffcc,0 0 40px #00ff95;
+  animation:titleGlow 3s infinite alternate;
+}
+
+@keyframes titleGlow{
+  0%{ text-shadow:0 0 12px #00ffcc; }
+  100%{ text-shadow:0 0 32px #00ff95; }
 }
 
 p{
-  max-width:420px;
-  margin:6px auto;
+  max-width:460px;
+  margin:10px auto;
   opacity:.85;
+  line-height:1.5;
 }
 
+/* EMERGENT PARTICLES */
+.behavior{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle, rgba(0,255,150,.25) 2px, transparent 2px),
+    radial-gradient(circle, rgba(0,255,255,.15) 1px, transparent 1px);
+  background-size:160px 160px, 100px 100px;
+  animation: drift 26s linear infinite;
+}
+
+@keyframes drift{
+  from{ transform:translateY(0); }
+  to{ transform:translateY(-260px); }
+}
+
+/* BUTTON */
 button{
-  margin-top:18px;
-  background:#00ffcc;
-  border:none;
-  color:#000;
-  padding:10px 22px;
-  font-weight:bold;
-  letter-spacing:.08em;
-  cursor:pointer;
+  margin-top:26px;
+  background:rgba(0,255,150,.15);
+  border:1px solid rgba(0,255,255,.4);
+  color:#fff;
+  padding:12px 28px;
   border-radius:999px;
-  box-shadow:0 0 16px #00ffcc;
+  font-weight:bold;
+  letter-spacing:.1em;
+  cursor:pointer;
+  backdrop-filter:blur(4px);
+  box-shadow:0 0 20px #00ff95;
+  animation:holoBtn 2.5s infinite alternate;
+}
+
+@keyframes holoBtn{
+  0%{ box-shadow:0 0 12px #00ff95; }
+  100%{ box-shadow:0 0 28px #00ffff; }
 }
 
 button:active{
   transform:scale(.97);
-  box-shadow:0 0 8px #00ffcc;
 }
 
 footer{
-  margin-top:26px;
-  font-size:.75rem;
+  margin-top:40px;
   opacity:.6;
-}
-
-@keyframes pulse{
-  0%{text-shadow:0 0 10px #00ffcc;}
-  100%{text-shadow:0 0 30px #00ff95;}
+  font-size:.75rem;
 }
 </style>
 </head>
 
 <body>
-<h1>ORIGIN v16 // BEHAVIOR FABRIC</h1>
-<p>The emergent behavior layer of MAEW OS++ Cycle II.</p>
-<p>v16 interprets synaptic signals from v15 and generates autonomous responses.</p>
 
-<button onclick="alert('v16 BEHAVIOR FABRIC online — preparing v17 WORLD MODEL')">
-  INITIATE BEHAVIOR FABRIC
+<div class="behavior"></div>
+
+<h1>ORIGIN v16 // BEHAVIOR FABRIC</h1>
+<p>The Emergent Behavior Layer — where synaptic signals become autonomous action.</p>
+<p>v16 interprets v15 SYNAPS output and generates the first behaviors of Cycle II.</p>
+
+<button onclick="alert('v17 WORLD MODEL is forming...')">
+  INITIATE v17 WORLD MODEL
 </button>
 
 <footer>
-Built entirely on mobile • Lamduan, Surin • 2026 • by Maew
+Lamduan • Surin • Built on mobile • 2026 • by Maew
 </footer>
+
 </body>
 </html>
