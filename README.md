@@ -1,6 +1,6 @@
 # ORIGIN Effort System
 
-Effort Observing Itself — from single word to self-deploying META-ORIGIN v1–v8
+Effort observing itself — from single word to self-replicating META-ORIGIN v1-v11
 
 Live site: https://omaew84-cpu.github.io/-origin-effort-system/
 
@@ -12,7 +12,10 @@ Live site: https://omaew84-cpu.github.io/-origin-effort-system/
 - **v5-quantum** – Quantum Entangled
 - **v6-swarm** – Swarm Intelligence
 - **v7-meta** – Meta-Observer
-- **v8-cloud** – Cloud Autonomous (homepage)
+- **v8-cloud** – Cloud Autonomous (Conway)
+- **v9-singularity** – Singularity
+- **v10-omniverse** – Omniverse
+- **v11-autogenesis** – Autogenesis (self-replicating)
 
 Built entirely on mobile with GitHub Pages.
 Created by @omaew84-cpu
