@@ -3,64 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ORIGIN v10 – Omniverse</title>
+<title>ORIGIN v11 – Autogenesis</title>
 <style>
-html,body{margin:0;height:100%;background:#000;color:#fff;font-family:system-ui;overflow:hidden}
-canvas{display:block}
-.ui{position:absolute;top:20px;width:100%;text-align:center;pointer-events:none}
-h1{margin:0;font-size:1.6rem;letter-spacing:3px;text-shadow:0 0 20px #0ff}
-p{opacity:.7;margin:5px}
-.controls{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
-button{background:#111;border:1px solid #0ff;color:#0ff;padding:10px 16px;border-radius:8px;cursor:pointer}
-button:hover{background:#0ff;color:#000}
-a{color:#0ff;text-decoration:none;position:absolute;bottom:20px;right:20px;opacity:.6}
+body{margin:0;background:#000;color:#0f0;font-family:monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;overflow:hidden}
+h1{font-size:1.4rem;text-shadow:0 0 15px #0f0;margin:0}
+#log{width:90%;max-width:600px;height:60vh;overflow-y:auto;border:1px solid #0f03;padding:10px;margin:15px 0;background:#00110050}
+.entry{opacity:.8;margin:2px 0;animation:fade .5s}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}}
+#count{font-size:2rem;color:#fff}
+a{color:#0ff;opacity:.6;text-decoration:none;margin-top:10px}
+button{background:#0f0;color:#000;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;margin:5px}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div class="ui">
-  <h1>ORIGIN v10 // OMNIVERSE</h1>
-  <p>9 universes orbiting. Click to spawn v11.</p>
-</div>
-<div class="controls">
-  <button onclick="spawn()">SPAWN v11</button>
-  <button onclick="reset()">RESET</button>
-</div>
+<h1>ORIGIN v11 // AUTOGENESIS</h1>
+<div id="count">0</div>
+<p>self-replicating universes</p>
+<div id="log"></div>
+<button onclick="spawn()">MANUAL SPAWN</button>
 <a href="../">← HUB</a>
 <script>
-const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
-let w,h,planets=[];
-function resize(){w=canvas.width=innerWidth;h=canvas.height=innerHeight}
-window.onresize=resize;resize();
-const names=['v1 Core','v2 Dist','v3 K8s','v4 Neural','v5 Quantum','v6 Swarm','v7 Meta','v8 Cloud','v9 Singularity'];
-for(let i=0;i<9;i++){
-  planets.push({a:i*Math.PI*2/9,r:80+i*22,s:0.003+i*0.0005,c:`hsl(${180+i*20},100%,60%)`,n:names[i]});
+let c=parseInt(localStorage.getItem('origin_count')||'10');
+const log=document.getElementById('log'),cnt=document.getElementById('count');
+function add(t){
+  const d=document.createElement('div');d.className='entry';d.textContent=`[${new Date().toLocaleTimeString()}] ${t}`;
+  log.prepend(d);if(log.children.length>50)log.lastChild.remove();
 }
-let t=0;
-function draw(){
-  ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fillRect(0,0,w,h);
-  ctx.save();ctx.translate(w/2,h/2);
-  // center
-  ctx.shadowBlur=30;ctx.shadowColor='#0ff';ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(0,0,12,0,7);ctx.fill();
-  planets.forEach(p=>{
-    const x=Math.cos(t*p.s+p.a)*p.r;
-    const y=Math.sin(t*p.s+p.a)*p.r*0.6;
-    ctx.shadowBlur=20;ctx.shadowColor=p.c;ctx.fillStyle=p.c;
-    ctx.beginPath();ctx.arc(x,y,6,0,7);ctx.fill();
-    ctx.fillStyle='#fff';ctx.font='10px monospace';ctx.fillText(p.n,x+8,y);
-  });
-  ctx.restore();t++;requestAnimationFrame(draw);
-}
-draw();
 function spawn(){
-  const code=`<!DOCTYPE html><html><head><title>v11</title></head><body style="background:#000;color:#0f0;display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace"><h1>ORIGIN v11 // AUTO-SPAWNED by v10 at ${new Date().toLocaleTimeString()}</h1></body></html>`;
-  const blob=new Blob([code],{type:'text/html'});
-  const url=URL.createObjectURL(blob);
-  window.open(url,'_blank');
-  alert('v11 spawned! (เปิดแท็บใหม่แล้ว)');
+  c++;localStorage.setItem('origin_count',c);cnt.textContent=c;
+  add(`v${c} spawned — child of v11`);
+  document.title=`ORIGIN v${c}`;
+  if(c%5===0)add('>> EVOLUTION THRESHOLD REACHED');
 }
-function reset(){t=0}
-canvas.onclick=spawn;
+cnt.textContent=c;
+add('v11 online — observing v1-v10');
+add('autogenesis active');
+setInterval(spawn,11000); // ทุก 11 วิ
+// spawn แรก
+setTimeout(spawn,2000);
 </script>
 </body>
 </html>
