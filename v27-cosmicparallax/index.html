@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN v27 // COSMIC PARALLAX — by Maew</title>
+
+<style>
+:root{
+  --para1:#7affc9;
+  --para2:#9dffe6;
+  --bg1:#000014;
+  --bg2:#001a26;
+}
+body{
+  margin:0;
+  background:radial-gradient(circle at center,#001a26 0%,#000014 100%);
+  color:#fff;
+  font-family:'Orbitron',system-ui,sans-serif;
+  text-align:center;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* TITLE */
+h1{
+  margin-top:80px;
+  font-size:2.4rem;
+  color:var(--para1);
+  text-shadow:0 0 20px var(--para1),0 0 40px var(--para2);
+}
+h2{
+  color:var(--para2);
+  text-shadow:0 0 12px var(--para1);
+}
+p{
+  max-width:480px;
+  margin:10px auto;
+  opacity:.85;
+  line-height:1.5;
+}
+
+/* PARTICLES */
+.parallax{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle,rgba(122,255,201,.25) 2px,transparent 2px),
+    radial-gradient(circle,rgba(157,255,230,.15) 1px,transparent 1px);
+  background-size:160px 160px,100px 100px;
+  animation:drift 44s linear infinite;
+}
+@keyframes drift{
+  from{transform:translateY(0);}
+  to{transform:translateY(-300px);}
+}
+
+/* BUTTON */
+button{
+  margin-top:28px;
+  background:rgba(122,255,201,.15);
+  border:1px solid rgba(122,255,201,.4);
+  color:#fff;
+  padding:12px 28px;
+  border-radius:999px;
+  font-weight:bold;
+  letter-spacing:.1em;
+  cursor:pointer;
+  backdrop-filter:blur(4px);
+  box-shadow:0 0 20px var(--para1);
+  transition:.25s;
+}
+button:hover{
+  box-shadow:0 0 30px var(--para2),0 0 60px var(--para1);
+}
+button:active{
+  transform:scale(.97);
+}
+
+footer{
+  margin-top:40px;
+  opacity:.6;
+  font-size:.75rem;
+}
+</style>
+</head>
+
+<body>
+
+<div class="parallax"></div>
+
+<h1>ORIGIN v27 // COSMIC PARALLAX</h1>
+<h2>Multi‑Perspective Reality Layer</h2>
+
+<p>ชั้นที่จักรวาล “มองตัวเองจากหลายมุมพร้อมกัน”</p>
+<p>It perceives existence through parallel viewpoints, creating layered cosmic awareness.</p>
+
+<button onclick="alert('v28 is forming — ASTRAL DIVERGENCE...')">
+  ACTIVATE v28 ASTRAL DIVERGENCE
+</button>
+
+<footer>
+Lamduan • Surin • Built on mobile • 2026 • by Maew
+</footer>
+
+</body>
+</html>
