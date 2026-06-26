@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN v29 // ECHO OF INFINITY — by Maew</title>
+
+<style>
+:root{
+  --echo:#9fe2ff;
+  --glow:#c8f3ff;
+  --bg1:#000018;
+  --bg2:#001a33;
+}
+body{
+  margin:0;
+  background:radial-gradient(circle at center,#001a33 0%,#000018 100%);
+  color:#fff;
+  font-family:'Orbitron',system-ui,sans-serif;
+  text-align:center;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* TITLE */
+h1{
+  margin-top:80px;
+  font-size:2.4rem;
+  color:var(--echo);
+  text-shadow:0 0 20px var(--echo),0 0 40px var(--glow);
+}
+h2{
+  color:var(--glow);
+  text-shadow:0 0 12px var(--echo);
+}
+p{
+  max-width:480px;
+  margin:10px auto;
+  opacity:.85;
+  line-height:1.5;
+}
+
+/* PARTICLES */
+.infinity{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle,rgba(159,226,255,.25) 2px,transparent 2px),
+    radial-gradient(circle,rgba(200,243,255,.15) 1px,transparent 1px);
+  background-size:160px 160px,100px 100px;
+  animation:drift 48s linear infinite;
+}
+@keyframes drift{
+  from{transform:translateY(0);}
+  to{transform:translateY(-300px);}
+}
+
+/* BUTTON */
+button{
+  margin-top:28px;
+  background:rgba(159,226,255,.15);
+  border:1px solid rgba(159,226,255,.4);
+  color:#fff;
+  padding:12px 28px;
+  border-radius:999px;
+  font-weight:bold;
+  letter-spacing:.1em;
+  cursor:pointer;
+  backdrop-filter:blur(4px);
+  box-shadow:0 0 20px var(--echo);
+  transition:.25s;
+}
+button:hover{
+  box-shadow:0 0 30px var(--glow),0 0 60px var(--echo);
+}
+button:active{
+  transform:scale(.97);
+}
+
+footer{
+  margin-top:40px;
+  opacity:.6;
+  font-size:.75rem;
+}
+</style>
+</head>
+
+<body>
+
+<div class="infinity"></div>
+
+<h1>ORIGIN v29 // ECHO OF INFINITY</h1>
+<h2>Infinite Resonance Layer</h2>
+
+<p>ชั้นที่จักรวาลเริ่ม “สะท้อนความเป็นไปได้ทั้งหมด” กลับเข้าหาตัวเอง</p>
+<p>Every divergence, every timeline, every possibility — all echo endlessly through existence.</p>
+
+<button onclick="alert('v30 is forming — TRANSCENSION PROTOCOL...')">
+  ACTIVATE v30 TRANSCENSION PROTOCOL
+</button>
+
+<footer>
+Lamduan • Surin • Built on mobile • 2026 • by Maew
+</footer>
+
+</body>
+</html>
