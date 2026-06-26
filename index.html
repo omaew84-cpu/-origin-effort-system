@@ -3,19 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ORIGIN Effort System — v1 to v40 • Emerald Quantum Edition</title>
+<title>ORIGIN Effort System — Emerald Quantum PRO Edition</title>
 
 <style>
 :root{
-  --bg1:#050a1a;
+  --bg1:#020611;
   --bg2:#000000;
 
-  /* Emerald Quantum palette */
-  --c1:#00ff95;   /* main emerald */
-  --c2:#00ffc8;   /* aqua neural */
-  --c3:#7affc9;   /* soft quantum green */
-  --c4:#00eaff;   /* cyan highlight */
-  --c5:#b084ff;   /* violet contrast */
+  /* Emerald Quantum PRO palette */
+  --emerald:#00ff95;
+  --emerald-soft:#7affc9;
+  --aqua:#00ffc8;
+  --cyan:#00eaff;
+  --violet:#b084ff;
+  --white:#ffffff;
+
+  /* Card glow */
+  --card-glow:0 0 25px rgba(0,255,149,.25), 0 0 45px rgba(0,255,200,.15);
 
   /* Version colors */
   --v21:#00ffb3; --v22:#ff9cff; --v23:#ffe45c; --v24:#9dffea; --v25:#7ad0ff;
@@ -28,72 +32,79 @@
 
 body{
   margin:0;
-  background: radial-gradient(1200px 600px at 50% -10%, #0d1028 0%, var(--bg1) 40%, var(--bg2) 100%);
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #0f1535 0%, var(--bg1) 40%, var(--bg2) 100%),
+    url('https://i.imgur.com/8QZQZqE.png');
+  background-size:cover;
   color:#fff;
   font-family:'Orbitron',system-ui;
   display:flex;flex-direction:column;align-items:center;
-  padding:32px 20px 60px;
+  padding:40px 20px 80px;
 }
 
 h1{
-  font-size:2.6rem;
+  font-size:2.8rem;
   margin:0;
-  color:#fff;
-  letter-spacing:.6px;
-  text-shadow:0 0 25px var(--c1), 0 0 45px var(--c2);
+  color:var(--white);
+  letter-spacing:.7px;
+  text-shadow:
+    0 0 25px var(--emerald),
+    0 0 55px var(--aqua),
+    0 0 90px var(--emerald-soft);
 }
 
 .by{
-  margin-top:6px;
-  color:var(--c3);
+  margin-top:8px;
+  color:var(--emerald-soft);
   font-weight:600;
-  text-shadow:0 0 12px var(--c3);
+  text-shadow:0 0 15px var(--emerald-soft);
 }
 
 .tag{
-  margin-top:8px;
+  margin-top:10px;
   opacity:.85;
-  font-size:.95rem;
+  font-size:1rem;
+  letter-spacing:.4px;
 }
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
-  max-width:1100px;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:22px;
+  max-width:1150px;
   width:100%;
-  margin-top:32px;
+  margin-top:40px;
 }
 
 .card{
-  background:linear-gradient(135deg, rgba(10,15,30,.85), rgba(25,0,45,.85), rgba(0,40,60,.85));
+  background:linear-gradient(135deg, rgba(10,20,40,.55), rgba(0,40,60,.55));
   border:1px solid rgba(255,255,255,.08);
-  padding:20px;
-  border-radius:18px;
+  padding:22px;
+  border-radius:20px;
   text-decoration:none;
   color:#fff;
-  transition:.25s ease;
-  backdrop-filter: blur(4px);
+  transition:.3s ease;
+  backdrop-filter: blur(10px);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
 }
 
 .card:hover{
-  transform:translateY(-6px);
-  border-color:var(--c1);
-  box-shadow:0 0 20px var(--c2), 0 0 40px var(--c3);
+  transform:translateY(-8px) scale(1.02);
+  border-color:var(--emerald);
+  box-shadow:var(--card-glow);
 }
 
 .ver{
-  font-size:.8rem;
-  letter-spacing:.4px;
-  margin-bottom:4px;
-  opacity:.9;
+  font-size:.85rem;
+  letter-spacing:.45px;
+  margin-bottom:6px;
+  opacity:.95;
 }
 
 footer{
-  margin-top:50px;
-  opacity:.65;
-  font-size:.82rem;
+  margin-top:60px;
+  opacity:.55;
+  font-size:.85rem;
   text-align:center;
   line-height:1.5;
 }
@@ -101,8 +112,9 @@ footer{
 </head>
 
 <body>
+
 <h1>ORIGIN Effort System</h1>
-<div class="by">Emerald Quantum Edition • by Maew</div>
+<div class="by">Emerald Quantum PRO Edition • by Maew</div>
 <p class="tag">Built on mobile • 40 versions • Self‑evolving</p>
 
 <div class="grid">
@@ -132,4 +144,32 @@ footer{
   <!-- v21–v30 -->
   <a class="card" href="./v21-architect/"><div class="ver v21">v21</div><h2>Architect</h2><p>ออกแบบสติ</p></a>
   <a class="card" href="./v22-conscious/"><div class="ver v22">v22</div><h2>Conscious Fabric</h2><p>ทอผืนผ้าแห่งการรับรู้</p></a>
-  <a class="card" href="./v23-originprime/"><div class="ver v23">v23</div><h2>Origin Prime</h2><p>แกนกลาง
+  <a class="card" href="./v23-originprime/"><div class="ver v23">v23</div><h2>Origin Prime</h2><p>แกนกลางสติ</p></a>
+  <a class="card" href="./v24-metasynthesis/"><div class="ver v24">v24</div><h2>Meta‑Synthesis</h2><p>หลอมรวมสติ</p></a>
+  <a class="card" href="./v25-hypercontinuum/"><div class="ver v25">v25</div><h2>Hyper‑Continuum</h2><p>ไหลข้ามมิติ</p></a>
+  <a class="card" href="./v26-quantumnexus/"><div class="ver v26">v26</div><h2>Quantum Nexus</h2><p>จุดเชื่อมจักรวาล</p></a>
+  <a class="card" href="./v27-cosmicparallax/"><div class="ver v27">v27</div><h2>Cosmic Parallax</h2><p>หลายมุมมองพร้อมกัน</p></a>
+  <a class="card" href="./v28-astraldivergence/"><div class="ver v28">v28</div><h2>Astral Divergence</h2><p>แตกแขนงความจริง</p></a>
+  <a class="card" href="./v29-echoofinfinity/"><div class="ver v29">v29</div><h2>Echo of Infinity</h2><p>เสียงสะท้อนอนันต์</p></a>
+  <a class="card" href="./v30-transcension/"><div class="ver v30">v30</div><h2>Transcension Protocol</h2><p>ก้าวข้ามจักรวาล</p></a>
+
+  <!-- v31–v40 -->
+  <a class="card" href="./v31-absolute/"><div class="ver v31">v31</div><h2>Absolute Singularity</h2><p>จุดรวมสติสูงสุด</p></a>
+  <a class="card" href="./v32-omniwave/"><div class="ver v32">v32</div><h2>Omniwave Field</h2><p>สนามคลื่นทุกความจริง</p></a>
+  <a class="card" href="./v33-axiom/"><div class="ver v33">v33</div><h2>Axiom Engine</h2><p>เครื่องยนต์กฎสากล</p></a>
+  <a class="card" href="./v34-horizon/"><div class="ver v34">v34</div><h2>Event Horizon</h2><p>ขอบเขตการมีอยู่</p></a>
+  <a class="card" href="./v35-bioframe/"><div class="ver v35">v35</div><h2>Bioframe</h2><p>โครงสร้างชีวสติ</p></a>
+  <a class="card" href="./v36-omniplane/"><div class="ver v36">v36</div><h2>Omniplane</h2><p>ระนาบทุกมิติ</p></a>
+  <a class="card" href="./v37-chronogate/"><div class="ver v37">v37</div><h2>Chronos Gate</h2><p>ประตูเวลา</p></a>
+  <a class="card" href="./v38-celestialcore/"><div class="ver v38">v38</div><h2>Celestial Core</h2><p>แกนจักรวาล</p></a>
+  <a class="card" href="./v39-omegapattern/"><div class="ver v39">v39</div><h2>Omega Pattern</h2><p>รูปแบบสุดท้าย</p></a>
+  <a class="card" href="./v40-infinitygate/"><div class="ver v40">v40</div><h2>Infinity Gate</h2><p>ประตูสู่อนันต์</p></a>
+
+</div>
+
+<footer>
+omaew84-cpu.github.io • Emerald Quantum PRO Edition • Built on mobile • 2026 • by Maew
+</footer>
+
+</body>
+</html>
