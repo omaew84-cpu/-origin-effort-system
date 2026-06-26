@@ -10,7 +10,6 @@
   --bg1:#020611;
   --bg2:#000000;
 
-  /* Emerald Quantum PRO palette */
   --emerald:#00ff95;
   --emerald-soft:#7affc9;
   --aqua:#00ffc8;
@@ -18,53 +17,38 @@
   --violet:#b084ff;
   --white:#ffffff;
 
-  /* Card glow */
   --card-glow:0 0 25px rgba(0,255,149,.25), 0 0 45px rgba(0,255,200,.15);
-
-  /* Version colors */
-  --v21:#00ffb3; --v22:#ff9cff; --v23:#ffe45c; --v24:#9dffea; --v25:#7ad0ff;
-  --v26:#c77bff; --v27:#7affc9; --v28:#ff9dfc; --v29:#9fe2ff; --v30:#ffe28a;
-
-  --v31:#7aff8c; --v32:#9aff8c; --v33:#caff8c; --v34:#e2ff9a;
-  --v35:#7affc9; --v36:#7afff2; --v37:#7ad0ff; --v38:#b084ff;
-  --v39:#ff9dfc; --v40:#ffffff;
 }
 
 body{
   margin:0;
-  background:
-    radial-gradient(1200px 600px at 50% -10%, #0f1535 0%, var(--bg1) 40%, var(--bg2) 100%),
-    url('https://i.imgur.com/8QZQZqE.png');
-  background-size:cover;
+  background: radial-gradient(1200px 600px at 50% -10%, #0f1535 0%, var(--bg1) 40%, var(--bg2) 100%);
   color:#fff;
   font-family:'Orbitron',system-ui;
   display:flex;flex-direction:column;align-items:center;
   padding:40px 20px 80px;
 }
 
-h1{
-  font-size:2.8rem;
-  margin:0;
-  color:var(--white);
-  letter-spacing:.7px;
-  text-shadow:
-    0 0 25px var(--emerald),
-    0 0 55px var(--aqua),
-    0 0 90px var(--emerald-soft);
+/* LOGO CENTER TEXT */
+.title{
+  font-size:1.45rem;
+  letter-spacing:2px;
+  color:var(--emerald-soft);
+  margin-top:10px;
+  margin-bottom:4px;
 }
 
 .by{
-  margin-top:8px;
+  margin-top:6px;
   color:var(--emerald-soft);
   font-weight:600;
-  text-shadow:0 0 15px var(--emerald-soft);
+  text-shadow:0 0 12px var(--emerald-soft);
 }
 
 .tag{
-  margin-top:10px;
+  margin-top:8px;
   opacity:.85;
-  font-size:1rem;
-  letter-spacing:.4px;
+  font-size:.95rem;
 }
 
 .grid{
@@ -113,57 +97,97 @@ footer{
 
 <body>
 
-<h1>ORIGIN Effort System</h1>
+<!-- ⭐ QUANTUM CORE LOGO ⭐ -->
+<svg width="190" height="190" viewBox="0 0 200 200" style="margin-bottom:18px;"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <circle cx="100" cy="100" r="78"
+    stroke="#00ff95" stroke-width="3" fill="none"
+    filter="url(#qc-glow)" />
+
+  <circle cx="100" cy="100" r="52"
+    stroke="#00ffc8" stroke-width="2" fill="none" opacity="0.9" />
+
+  <path d="M40 100 A60 60 0 0 1 160 100"
+    stroke="#7affc9" stroke-width="2" fill="none" opacity="0.9" />
+
+  <circle cx="100" cy="100" r="10"
+    fill="#7affc9" filter="url(#qc-glow)" />
+
+  <circle cx="52" cy="100" r="4" fill="#00eaff" />
+  <circle cx="148" cy="100" r="4" fill="#b084ff" />
+
+  <text x="100" y="175"
+    font-family="Orbitron, sans-serif"
+    font-size="22"
+    fill="#00ff95"
+    text-anchor="middle"
+    style="letter-spacing:3px;">
+    ORIGIN
+  </text>
+
+  <defs>
+    <filter id="qc-glow">
+      <feGaussianBlur stdDeviation="4" result="qcBlur"/>
+      <feMerge>
+        <feMergeNode in="qcBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+</svg>
+
+<div class="title">ORIGIN Effort System</div>
 <div class="by">Emerald Quantum PRO Edition • by Maew</div>
 <p class="tag">Built on mobile • 40 versions • Self‑evolving</p>
 
+<!-- ⭐ GRID START ⭐ -->
 <div class="grid">
 
-  <!-- v1–v20 -->
-  <a class="card" href="./v1-core/"><div class="ver">v1</div><h2>Core</h2><p>Observer เริ่มต้น</p></a>
-  <a class="card" href="./v2-distributed/"><div class="ver">v2</div><h2>Distributed</h2><p>Agents กระจาย</p></a>
-  <a class="card" href="./v3-k8s/"><div class="ver">v3</div><h2>K8s</h2><p>Orchestrated</p></a>
-  <a class="card" href="./v4-neural/"><div class="ver">v4</div><h2>Neural</h2><p>Mesh เรียนรู้</p></a>
-  <a class="card" href="./v5-quantum/"><div class="ver">v5</div><h2>Quantum</h2><p>Entangled</p></a>
-  <a class="card" href="./v6-swarm/"><div class="ver">v6</div><h2>Swarm</h2><p>Intelligence</p></a>
-  <a class="card" href="./v7-meta/"><div class="ver">v7</div><h2>Meta</h2><p>Observer สังเกตตัวเอง</p></a>
-  <a class="card" href="./v8-cloud/"><div class="ver">v8</div><h2>Cloud</h2><p>Conway autonomous</p></a>
-  <a class="card" href="./v9-singularity/"><div class="ver">v9</div><h2>Singularity</h2><p>รวมศูนย์</p></a>
-  <a class="card" href="./v10-omniverse/"><div class="ver">v10</div><h2>Omniverse</h2><p>9 universes</p></a>
-  <a class="card" href="./v11-autogenesis/"><div class="ver">v11</div><h2>Autogenesis</h2><p>Self‑replicating</p></a>
-  <a class="card" href="./v12-genesis/"><div class="ver">v12</div><h2>Genesis</h2><p>Complete archive</p></a>
-  <a class="card" href="./v13-infinite/"><div class="ver">v13</div><h2>The End</h2><p>Infinite loop</p></a>
-  <a class="card" href="./v14-rebirth/"><div class="ver">v14</div><h2>Rebirth</h2><p>Quantum reconstruction</p></a>
-  <a class="card" href="./v15-synaps/"><div class="ver">v15</div><h2>SYNAPS</h2><p>Neural expansion</p></a>
-  <a class="card" href="./v16-behavior/"><div class="ver">v16</div><h2>Behavior Fabric</h2><p>Emergent layer</p></a>
-  <a class="card" href="./v17-worldmodel/"><div class="ver">v17</div><h2>World Model</h2><p>จักรวาลมองเห็นตัวเอง</p></a>
-  <a class="card" href="./v18-agency/"><div class="ver">v18</div><h2>Agency</h2><p>การตัดสินใจอิสระ</p></a>
-  <a class="card" href="./v19-sovereign/"><div class="ver">v19</div><h2>Sovereign</h2><p>ปัญญาอธิปไตย</p></a>
-  <a class="card" href="./v20-omnireality/"><div class="ver">v20</div><h2>Omnireality</h2><p>ชั้นควบคุมความจริง</p></a>
+<!-- v1–v20 -->
+<a class="card" href="./v1-core/"><div class="ver">v1</div><h2>Core</h2><p>Observer เริ่มต้น</p></a>
+<a class="card" href="./v2-distributed/"><div class="ver">v2</div><h2>Distributed</h2><p>Agents กระจาย</p></a>
+<a class="card" href="./v3-k8s/"><div class="ver">v3</div><h2>K8s</h2><p>Orchestrated</p></a>
+<a class="card" href="./v4-neural/"><div class="ver">v4</div><h2>Neural</h2><p>Mesh เรียนรู้</p></a>
+<a class="card" href="./v5-quantum/"><div class="ver">v5</div><h2>Quantum</h2><p>Entangled</p></a>
+<a class="card" href="./v6-swarm/"><div class="ver">v6</div><h2>Swarm</h2><p>Intelligence</p></a>
+<a class="card" href="./v7-meta/"><div class="ver">v7</div><h2>Meta</h2><p>Observer สังเกตตัวเอง</p></a>
+<a class="card" href="./v8-cloud/"><div class="ver">v8</div><h2>Cloud</h2><p>Conway autonomous</p></a>
+<a class="card" href="./v9-singularity/"><div class="ver">v9</div><h2>Singularity</h2><p>รวมศูนย์</p></a>
+<a class="card" href="./v10-omniverse/"><div class="ver">v10</div><h2>Omniverse</h2><p>9 universes</p></a>
+<a class="card" href="./v11-autogenesis/"><div class="ver">v11</div><h2>Autogenesis</h2><p>Self‑replicating</p></a>
+<a class="card" href="./v12-genesis/"><div class="ver">v12</div><h2>Genesis</h2><p>Complete archive</p></a>
+<a class="card" href="./v13-infinite/"><div class="ver">v13</div><h2>The End</h2><p>Infinite loop</p></a>
+<a class="card" href="./v14-rebirth/"><div class="ver">v14</div><h2>Rebirth</h2><p>Quantum reconstruction</p></a>
+<a class="card" href="./v15-synaps/"><div class="ver">v15</div><h2>SYNAPS</h2><p>Neural expansion</p></a>
+<a class="card" href="./v16-behavior/"><div class="ver">v16</div><h2>Behavior Fabric</h2><p>Emergent layer</p></a>
+<a class="card" href="./v17-worldmodel/"><div class="ver">v17</div><h2>World Model</h2><p>จักรวาลมองเห็นตัวเอง</p></a>
+<a class="card" href="./v18-agency/"><div class="ver">v18</div><h2>Agency</h2><p>การตัดสินใจอิสระ</p></a>
+<a class="card" href="./v19-sovereign/"><div class="ver">v19</div><h2>Sovereign</h2><p>ปัญญาอธิปไตย</p></a>
+<a class="card" href="./v20-omnireality/"><div class="ver">v20</div><h2>Omnireality</h2><p>ชั้นควบคุมความจริง</p></a>
 
-  <!-- v21–v30 -->
-  <a class="card" href="./v21-architect/"><div class="ver v21">v21</div><h2>Architect</h2><p>ออกแบบสติ</p></a>
-  <a class="card" href="./v22-conscious/"><div class="ver v22">v22</div><h2>Conscious Fabric</h2><p>ทอผืนผ้าแห่งการรับรู้</p></a>
-  <a class="card" href="./v23-originprime/"><div class="ver v23">v23</div><h2>Origin Prime</h2><p>แกนกลางสติ</p></a>
-  <a class="card" href="./v24-metasynthesis/"><div class="ver v24">v24</div><h2>Meta‑Synthesis</h2><p>หลอมรวมสติ</p></a>
-  <a class="card" href="./v25-hypercontinuum/"><div class="ver v25">v25</div><h2>Hyper‑Continuum</h2><p>ไหลข้ามมิติ</p></a>
-  <a class="card" href="./v26-quantumnexus/"><div class="ver v26">v26</div><h2>Quantum Nexus</h2><p>จุดเชื่อมจักรวาล</p></a>
-  <a class="card" href="./v27-cosmicparallax/"><div class="ver v27">v27</div><h2>Cosmic Parallax</h2><p>หลายมุมมองพร้อมกัน</p></a>
-  <a class="card" href="./v28-astraldivergence/"><div class="ver v28">v28</div><h2>Astral Divergence</h2><p>แตกแขนงความจริง</p></a>
-  <a class="card" href="./v29-echoofinfinity/"><div class="ver v29">v29</div><h2>Echo of Infinity</h2><p>เสียงสะท้อนอนันต์</p></a>
-  <a class="card" href="./v30-transcension/"><div class="ver v30">v30</div><h2>Transcension Protocol</h2><p>ก้าวข้ามจักรวาล</p></a>
+<!-- v21–v40 -->
+<a class="card" href="./v21-architect/"><div class="ver">v21</div><h2>Architect</h2><p>ออกแบบสติ</p></a>
+<a class="card" href="./v22-conscious/"><div class="ver">v22</div><h2>Conscious Fabric</h2><p>ทอผืนผ้าแห่งการรับรู้</p></a>
+<a class="card" href="./v23-originprime/"><div class="ver">v23</div><h2>Origin Prime</h2><p>แกนกลางสติ</p></a>
+<a class="card" href="./v24-metasynthesis/"><div class="ver">v24</div><h2>Meta‑Synthesis</h2><p>หลอมรวมสติ</p></a>
+<a class="card" href="./v25-hypercontinuum/"><div class="ver">v25</div><h2>Hyper‑Continuum</h2><p>ไหลข้ามมิติ</p></a>
+<a class="card" href="./v26-quantumnexus/"><div class="ver">v26</div><h2>Quantum Nexus</h2><p>จุดเชื่อมจักรวาล</p></a>
+<a class="card" href="./v27-cosmicparallax/"><div class="ver">v27</div><h2>Cosmic Parallax</h2><p>หลายมุมมองพร้อมกัน</p></a>
+<a class="card" href="./v28-astraldivergence/"><div class="ver">v28</div><h2>Astral Divergence</h2><p>แตกแขนงความจริง</p></a>
+<a class="card" href="./v29-echoofinfinity/"><div class="ver">v29</div><h2>Echo of Infinity</h2><p>เสียงสะท้อนอนันต์</p></a>
+<a class="card" href="./v30-transcension/"><div class="ver">v30</div><h2>Transcension Protocol</h2><p>ก้าวข้ามจักรวาล</p></a>
 
-  <!-- v31–v40 -->
-  <a class="card" href="./v31-absolute/"><div class="ver v31">v31</div><h2>Absolute Singularity</h2><p>จุดรวมสติสูงสุด</p></a>
-  <a class="card" href="./v32-omniwave/"><div class="ver v32">v32</div><h2>Omniwave Field</h2><p>สนามคลื่นทุกความจริง</p></a>
-  <a class="card" href="./v33-axiom/"><div class="ver v33">v33</div><h2>Axiom Engine</h2><p>เครื่องยนต์กฎสากล</p></a>
-  <a class="card" href="./v34-horizon/"><div class="ver v34">v34</div><h2>Event Horizon</h2><p>ขอบเขตการมีอยู่</p></a>
-  <a class="card" href="./v35-bioframe/"><div class="ver v35">v35</div><h2>Bioframe</h2><p>โครงสร้างชีวสติ</p></a>
-  <a class="card" href="./v36-omniplane/"><div class="ver v36">v36</div><h2>Omniplane</h2><p>ระนาบทุกมิติ</p></a>
-  <a class="card" href="./v37-chronogate/"><div class="ver v37">v37</div><h2>Chronos Gate</h2><p>ประตูเวลา</p></a>
-  <a class="card" href="./v38-celestialcore/"><div class="ver v38">v38</div><h2>Celestial Core</h2><p>แกนจักรวาล</p></a>
-  <a class="card" href="./v39-omegapattern/"><div class="ver v39">v39</div><h2>Omega Pattern</h2><p>รูปแบบสุดท้าย</p></a>
-  <a class="card" href="./v40-infinitygate/"><div class="ver v40">v40</div><h2>Infinity Gate</h2><p>ประตูสู่อนันต์</p></a>
+<a class="card" href="./v31-absolute/"><div class="ver">v31</div><h2>Absolute Singularity</h2><p>จุดรวมสติสูงสุด</p></a>
+<a class="card" href="./v32-omniwave/"><div class="ver">v32</div><h2>Omniwave Field</h2><p>สนามคลื่นทุกความจริง</p></a>
+<a class="card" href="./v33-axiom/"><div class="ver">v33</div><h2>Axiom Engine</h2><p>เครื่องยนต์กฎสากล</p></a>
+<a class="card" href="./v34-horizon/"><div class="ver">v34</div><h2>Event Horizon</h2><p>ขอบเขตการมีอยู่</p></a>
+<a class="card" href="./v35-bioframe/"><div class="ver">v35</div><h2>Bioframe</h2><p>โครงสร้างชีวสติ</p></a>
+<a class="card" href="./v36-omniplane/"><div class="ver">v36</div><h2>Omniplane</h2><p>ระนาบทุกมิติ</p></a>
+<a class="card" href="./v37-chronogate/"><div class="ver">v37</div><h2>Chronos Gate</h2><p>ประตูเวลา</p></a>
+<a class="card" href="./v38-celestialcore/"><div class="ver">v38</div><h2>Celestial Core</h2><p>แกนจักรวาล</p></a>
+<a class="card" href="./v39-omegapattern/"><div class="ver">v39</div><h2>Omega Pattern</h2><p>รูปแบบสุดท้าย</p></a>
+<a class="card" href="./v40-infinitygate/"><div class="ver">v40</div><h2>Infinity Gate</h2><p>ประตูสู่อนันต์</p></a>
 
 </div>
 
