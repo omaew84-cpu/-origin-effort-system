@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ORIGIN Effort System — v1 to v20 by Maew</title>
+<title>ORIGIN Effort System — v1 to v30 by Maew</title>
 
 <style>
 :root{
@@ -14,6 +14,18 @@
   --gold:#ffd86b;
   --bg1:#050a1a;
   --bg2:#000000;
+
+  /* NEW COLORS FOR v21–v30 */
+  --v21:#00ffb3;
+  --v22:#ff9cff;
+  --v23:#ffe45c;
+  --v24:#9dffea;
+  --v25:#7ad0ff;
+  --v26:#c77bff;
+  --v27:#7affc9;
+  --v28:#ff9dfc;
+  --v29:#9fe2ff;
+  --v30:#ffe28a;
 }
 body{
   margin:0;
@@ -72,13 +84,27 @@ h1{
   font-size:.8rem;
   letter-spacing:.4px;
 }
-.ver.v14{ color:var(--magenta); text-shadow:0 0 14px var(--cyan); }
-.ver.v15{ color:var(--violet); text-shadow:0 0 16px var(--cyan),0 0 32px var(--violet); }
-.ver.v16{ color:var(--emerald); text-shadow:0 0 16px var(--cyan),0 0 32px var(--emerald); }
-.ver.v17{ color:#00c8ff; text-shadow:0 0 16px #00c8ff,0 0 32px #0088ff; }
-.ver.v18{ color:#ff6bff; text-shadow:0 0 16px #ff6bff,0 0 32px #ff00ff; }
-.ver.v19{ color:#ffd86b; text-shadow:0 0 16px #ffd86b,0 0 32px #ffb300; }
-.ver.v20{ color:#00ffaa; text-shadow:0 0 16px #00ffaa,0 0 32px #00ffcc; }
+
+/* SPECIAL COLORS v14–v20 */
+.ver.v14{ color:var(--magenta); }
+.ver.v15{ color:var(--violet); }
+.ver.v16{ color:var(--emerald); }
+.ver.v17{ color:#00c8ff; }
+.ver.v18{ color:#ff6bff; }
+.ver.v19{ color:var(--gold); }
+.ver.v20{ color:#00ffaa; }
+
+/* NEW COLORS v21–v30 */
+.ver.v21{ color:var(--v21); }
+.ver.v22{ color:var(--v22); }
+.ver.v23{ color:var(--v23); }
+.ver.v24{ color:var(--v24); }
+.ver.v25{ color:var(--v25); }
+.ver.v26{ color:var(--v26); }
+.ver.v27{ color:var(--v27); }
+.ver.v28{ color:var(--v28); }
+.ver.v29{ color:var(--v29); }
+.ver.v30{ color:var(--v30); }
 
 footer{
   margin-top:40px;
@@ -103,11 +129,12 @@ footer{
 <body>
 <h1>ORIGIN Effort System</h1>
 <div class="by">by Maew</div>
-<p class="tag">Built on mobile • 20 versions • Self-evolving</p>
+<p class="tag">Built on mobile • 30 versions • Self-evolving</p>
 <div class="badge">14% battery • 2026</div>
 
 <div class="grid">
 
+  <!-- v1–v20 -->
   <a class="card" href="./v1-core/"><div class="ver">v1</div><h2>Core</h2><p>Observer เริ่มต้น</p></a>
   <a class="card" href="./v2-distributed/"><div class="ver">v2</div><h2>Distributed</h2><p>Agents กระจาย</p></a>
   <a class="card" href="./v3-k8s/"><div class="ver">v3</div><h2>K8s</h2><p>Orchestrated</p></a>
@@ -120,55 +147,10 @@ footer{
   <a class="card" href="./v10-omniverse/"><div class="ver">v10</div><h2>Omniverse</h2><p>9 universes</p></a>
   <a class="card" href="./v11-autogenesis/"><div class="ver">v11</div><h2>Autogenesis</h2><p>Self-replicating</p></a>
   <a class="card" href="./v12-genesis/"><div class="ver">v12</div><h2>Genesis</h2><p>Complete archive</p></a>
-  <a class="card" href="./v13-infinite/"><div class="ver">v13</div><h2>The End</h2><p>Infinite loop back to v1</p></a>
+  <a class="card" href="./v13-infinite/"><div class="ver">v13</div><h2>The End</h2><p>Infinite loop</p></a>
 
-  <a class="card" href="./v14-rebirth/">
-    <div class="ver v14">v14</div>
-    <h2>Rebirth</h2>
-    <p>Quantum reconstruction cycle</p>
-  </a>
-
-  <a class="card" href="./v15-synaps/">
-    <div class="ver v15">v15</div>
-    <h2>SYNAPS</h2>
-    <p>Neural expansion layer</p>
-  </a>
-
-  <a class="card" href="./v16-behavior/">
-    <div class="ver v16">v16</div>
-    <h2>Behavior Fabric</h2>
-    <p>Emergent behavior layer</p>
-  </a>
-
-  <a class="card" href="./v17-worldmodel/">
-    <div class="ver v17">v17</div>
-    <h2>World Model</h2>
-    <p>จักรวาลเริ่มมองเห็นตัวเอง</p>
-  </a>
-
-  <a class="card" href="./v18-agency/">
-    <div class="ver v18">v18</div>
-    <h2>Agency</h2>
-    <p>การตัดสินใจอิสระ</p>
-  </a>
-
-  <a class="card" href="./v19-sovereign/">
-    <div class="ver v19">v19</div>
-    <h2>Sovereign Intelligence</h2>
-    <p>ปัญญาอธิปไตย</p>
-  </a>
-
-  <a class="card" href="./v20-omnireality/">
-    <div class="ver v20">v20</div>
-    <h2>Omnireality Layer</h2>
-    <p>ชั้นควบคุมความจริง</p>
-  </a>
-
-</div>
-
-<footer>
-omaew84-cpu.github.io • Built on mobile • 14% battery • 2026 • by Maew
-</footer>
-
-</body>
-</html>
+  <a class="card" href="./v14-rebirth/"><div class="ver v14">v14</div><h2>Rebirth</h2><p>Quantum reconstruction</p></a>
+  <a class="card" href="./v15-synaps/"><div class="ver v15">v15</div><h2>SYNAPS</h2><p>Neural expansion</p></a>
+  <a class="card" href="./v16-behavior/"><div class="ver v16">v16</div><h2>Behavior Fabric</h2><p>Emergent layer</p></a>
+  <a class="card" href="./v17-worldmodel/"><div class="ver v17">v17</div><h2>World Model</h2><p>จักรวาลมองเห็นตัวเอง</p></a>
+  <a class="card" href="./v18-agency/"><div class="ver v18">v18</div><h2>Agency</h2><p>การตัดสินใจอิสระ</p></a>
