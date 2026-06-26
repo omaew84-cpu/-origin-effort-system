@@ -1,0 +1,28 @@
+name: Auto Bridge Redirect
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate redirects for v1-v40
+        run: |
+          mkdir -p .github
+          for dir in v1-* v2-* v3-* v4-* v5-* v6-* v7-* v8-* v9-* v10-* v11-* v12-* v13-* v14-* v15-* v16-* v17-* v18-* v19-* v20-* v21-* v22-* v23-* v24-* v25-* v26-* v27-* v28-* v29-* v30-* v31-* v32-* v33-* v34-* v35-* v36-* v37-* v38-* v39-* v40-*; do
+            if [ -d "$dir" ]; then
+              cat > "$dir/index.html" << 'EOF'
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Redirecting to HRS Bridge</title><script>const src=location.pathname.split('/').filter(Boolean).pop();location.replace('/-origin-effort-system/?bridge=1&source='+encodeURIComponent(src)+'&auto=1');</script></head><body style="background:#000;color:#0f0;font-family:monospace;padding:40px">Syncing to ORIGIN-HRS...</body></html>
+EOF
+            fi
+          done
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "auto: redirect all v1-v40 to HRS bridge"
