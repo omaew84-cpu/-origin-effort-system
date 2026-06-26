@@ -7,68 +7,46 @@
 
 <style>
 :root{
-  --cyan:#00e5ff;
-  --violet:#b084ff;
-  --magenta:#ff00ff;
-  --emerald:#00ff95;
-  --gold:#ffd86b;
   --bg1:#050a1a;
   --bg2:#000000;
 
-  /* COLORS v21–v30 */
-  --v21:#00ffb3;
-  --v22:#ff9cff;
-  --v23:#ffe45c;
-  --v24:#9dffea;
-  --v25:#7ad0ff;
-  --v26:#c77bff;
-  --v27:#7affc9;
-  --v28:#ff9dfc;
-  --v29:#9fe2ff;
-  --v30:#ffe28a;
+  /* Neon palette */
+  --c1:#00eaff;
+  --c2:#b084ff;
+  --c3:#ff7af2;
+  --c4:#7affc9;
+  --c5:#ffe66b;
 
-  /* COLORS v31–v40 */
-  --v31:#ff7a7a;
-  --v32:#ffb37a;
-  --v33:#ffd37a;
-  --v34:#e2ff7a;
-  --v35:#7aff8c;
-  --v36:#7afff2;
-  --v37:#7ab8ff;
-  --v38:#b07aff;
-  --v39:#ff7af2;
-  --v40:#ffffff;
-}
+  /* Version colors */
+  --v21:#00ffb3; --v22:#ff9cff; --v23:#ffe45c; --v24:#9dffea; --v25:#7ad0ff;
+  --v26:#c77bff; --v27:#7affc9; --v28:#ff9dfc; --v29:#9fe2ff; --v30:#ffe28a;
 
-html, body{
-  overflow-y:auto;
-  scroll-behavior:smooth;
+  --v31:#ff7a7a; --v32:#ffb37a; --v33:#ffd37a; --v34:#e2ff7a; --v35:#7aff8c;
+  --v36:#7afff2; --v37:#7ab8ff; --v38:#b07aff; --v39:#ff7af2; --v40:#ffffff;
 }
 
 body{
   margin:0;
-  background: radial-gradient(1200px 600px at 50% -10%, #0a0f2a 0%, var(--bg1) 40%, var(--bg2) 100%);
+  background: radial-gradient(1200px 600px at 50% -10%, #0d1028 0%, var(--bg1) 40%, var(--bg2) 100%);
   color:#fff;
-  font-family:'Orbitron',system-ui,-apple-system,Segoe UI,Roboto;
+  font-family:'Orbitron',system-ui;
   display:flex;flex-direction:column;align-items:center;
   padding:32px 20px 60px;
-  min-height:100vh;
 }
 
 h1{
-  font-size:2.3rem;
+  font-size:2.6rem;
   margin:0;
   color:#fff;
   letter-spacing:.6px;
-  text-shadow:0 0 20px var(--cyan), 0 0 40px rgba(176,132,255,.45);
+  text-shadow:0 0 25px var(--c1), 0 0 45px var(--c2);
 }
 
 .by{
   margin-top:6px;
-  color:var(--magenta);
+  color:var(--c3);
   font-weight:600;
-  letter-spacing:.3px;
-  text-shadow:0 0 10px rgba(255,0,255,.45);
+  text-shadow:0 0 12px var(--c3);
 }
 
 .tag{
@@ -80,71 +58,39 @@ h1{
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:18px;
-  max-width:1050px;
+  gap:20px;
+  max-width:1100px;
   width:100%;
-  margin-top:28px;
+  margin-top:32px;
 }
 
 .card{
-  background:linear-gradient(135deg, rgba(10,15,30,.9) 0%, rgba(25,0,45,.9) 50%, rgba(0,40,60,.9) 100%);
-  border:1px solid rgba(0,229,255,.35);
+  background:linear-gradient(135deg, rgba(10,15,30,.85), rgba(25,0,45,.85), rgba(0,40,60,.85));
+  border:1px solid rgba(255,255,255,.08);
   padding:20px;
-  border-radius:16px;
+  border-radius:18px;
   text-decoration:none;
   color:#fff;
   transition:.25s ease;
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(4px);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
 }
 
 .card:hover{
-  transform:translateY(-5px);
-  border-color:var(--magenta);
-  box-shadow:0 0 20px var(--violet), 0 0 40px var(--cyan);
+  transform:translateY(-6px);
+  border-color:var(--c3);
+  box-shadow:0 0 20px var(--c2), 0 0 40px var(--c1);
 }
 
 .ver{
-  color:var(--cyan);
   font-size:.8rem;
   letter-spacing:.4px;
+  margin-bottom:4px;
+  opacity:.9;
 }
 
-/* SPECIAL COLORS v14–v20 */
-.ver.v14{ color:var(--magenta); }
-.ver.v15{ color:var(--violet); }
-.ver.v16{ color:var(--emerald); }
-.ver.v17{ color:#00c8ff; }
-.ver.v18{ color:#ff6bff; }
-.ver.v19{ color:var(--gold); }
-.ver.v20{ color:#00ffaa; }
-
-/* COLORS v21–v30 */
-.ver.v21{ color:var(--v21); }
-.ver.v22{ color:var(--v22); }
-.ver.v23{ color:var(--v23); }
-.ver.v24{ color:var(--v24); }
-.ver.v25{ color:var(--v25); }
-.ver.v26{ color:var(--v26); }
-.ver.v27{ color:var(--v27); }
-.ver.v28{ color:var(--v28); }
-.ver.v29{ color:var(--v29); }
-.ver.v30{ color:var(--v30); }
-
-/* COLORS v31–v40 */
-.ver.v31{ color:var(--v31); }
-.ver.v32{ color:var(--v32); }
-.ver.v33{ color:var(--v33); }
-.ver.v34{ color:var(--v34); }
-.ver.v35{ color:var(--v35); }
-.ver.v36{ color:var(--v36); }
-.ver.v37{ color:var(--v37); }
-.ver.v38{ color:var(--v38); }
-.ver.v39{ color:var(--v39); }
-.ver.v40{ color:var(--v40); }
-
 footer{
-  margin-top:40px;
+  margin-top:50px;
   opacity:.65;
   font-size:.82rem;
   text-align:center;
@@ -156,7 +102,7 @@ footer{
 <body>
 <h1>ORIGIN Effort System</h1>
 <div class="by">by Maew</div>
-<p class="tag">Built on mobile • 40 versions • Self-evolving</p>
+<p class="tag">Built on mobile • 40 versions • Self‑evolving</p>
 
 <div class="grid">
 
@@ -175,25 +121,13 @@ footer{
   <a class="card" href="./v12-genesis/"><div class="ver">v12</div><h2>Genesis</h2><p>Complete archive</p></a>
   <a class="card" href="./v13-infinite/"><div class="ver">v13</div><h2>The End</h2><p>Infinite loop</p></a>
 
-  <a class="card" href="./v14-rebirth/"><div class="ver v14">v14</div><h2>Rebirth</h2><p>Quantum reconstruction</p></a>
-  <a class="card" href="./v15-synaps/"><div class="ver v15">v15</div><h2>SYNAPS</h2><p>Neural expansion</p></a>
-  <a class="card" href="./v16-behavior/"><div class="ver v16">v16</div><h2>Behavior Fabric</h2><p>Emergent layer</p></a>
-  <a class="card" href="./v17-worldmodel/"><div class="ver v17">v17</div><h2>World Model</h2><p>จักรวาลมองเห็นตัวเอง</p></a>
-  <a class="card" href="./v18-agency/"><div class="ver v18">v18</div><h2>Agency</h2><p>การตัดสินใจอิสระ</p></a>
-
-  <a class="card" href="./v19-sovereign/"><div class="ver v19">v19</div><h2>Sovereign</h2><p>ปัญญาอธิปไตย</p></a>
-  <a class="card" href="./v20-omnireality/"><div class="ver v20">v20</div><h2>Omnireality</h2><p>ชั้นควบคุมความจริง</p></a>
-
-  <!-- v21–v30 -->
-  <a class="card" href="./v21-architect/"><div class="ver v21">v21</div><h2>Architect</h2><p>ออกแบบสติ</p></a>
-  <a class="card" href="./v22-conscious/"><div class="ver v22">v22</div><h2>Conscious Fabric</h2><p>ทอผืนผ้าแห่งการรับรู้</p></a>
-  <a class="card" href="./v23-originprime/"><div class="ver v23">v23</div><h2>Origin Prime</h2><p>แกนกลางสติ</p></a>
-  <a class="card" href="./v24-metasynthesis/"><div class="ver v24">v24</div><h2>Meta‑Synthesis</h2><p><div class="ver v16">v16</div><h2>Behavior Fabric</h2><p>Emergent layer</p></a>
-  <a class="card" href="./v17-worldmodel/"><div class="ver v17">v17</div><h2>World Model</h2><p>จักรวาลมองเห็นตัวเอง</p></a>
-  <a class="card" href="./v18-agency/"><div class="ver v18">v18</div><h2>Agency</h2><p>การตัดสินใจอิสระ</p></a>
-
-  <a class="card" href="./v19-sovereign/"><div class="ver v19">v19</div><h2>Sovereign</h2><p>ปัญญาอธิปไตย</p></a>
-  <a class="card" href="./v20-omnireality/"><div class="ver v20">v20</div><h2>Omnireality</h2><p>ชั้นควบคุมความจริง</p></a>
+  <a class="card" href="./v14-rebirth/"><div class="ver">v14</div><h2>Rebirth</h2><p>Quantum reconstruction</p></a>
+  <a class="card" href="./v15-synaps/"><div class="ver">v15</div><h2>SYNAPS</h2><p>Neural expansion</p></a>
+  <a class="card" href="./v16-behavior/"><div class="ver">v16</div><h2>Behavior Fabric</h2><p>Emergent layer</p></a>
+  <a class="card" href="./v17-worldmodel/"><div class="ver">v17</div><h2>World Model</h2><p>จักรวาลมองเห็นตัวเอง</p></a>
+  <a class="card" href="./v18-agency/"><div class="ver">v18</div><h2>Agency</h2><p>การตัดสินใจอิสระ</p></a>
+  <a class="card" href="./v19-sovereign/"><div class="ver">v19</div><h2>Sovereign</h2><p>ปัญญาอธิปไตย</p></a>
+  <a class="card" href="./v20-omnireality/"><div class="ver">v20</div><h2>Omnireality</h2><p>ชั้นควบคุมความจริง</p></a>
 
   <!-- v21–v30 -->
   <a class="card" href="./v21-architect/"><div class="ver v21">v21</div><h2>Architect</h2><p>ออกแบบสติ</p></a>
