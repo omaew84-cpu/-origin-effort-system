@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN v25 // HYPER‑CONTINUUM — by Maew</title>
+
+<style>
+:root{
+  --hyper:#7ad0ff;
+  --pulse:#b0f0ff;
+  --bg1:#00001a;
+  --bg2:#001533;
+}
+body{
+  margin:0;
+  background:radial-gradient(circle at center,#001533 0%,#00001a 100%);
+  color:#fff;
+  font-family:'Orbitron',system-ui,sans-serif;
+  text-align:center;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* TITLE */
+h1{
+  margin-top:80px;
+  font-size:2.4rem;
+  color:var(--hyper);
+  text-shadow:0 0 20px var(--hyper),0 0 40px var(--pulse);
+}
+h2{
+  color:var(--pulse);
+  text-shadow:0 0 12px var(--hyper);
+}
+p{
+  max-width:480px;
+  margin:10px auto;
+  opacity:.85;
+  line-height:1.5;
+}
+
+/* PARTICLES */
+.hyperflow{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle,rgba(122,208,255,.25) 2px,transparent 2px),
+    radial-gradient(circle,rgba(176,240,255,.15) 1px,transparent 1px);
+  background-size:160px 160px,100px 100px;
+  animation:drift 40s linear infinite;
+}
+@keyframes drift{
+  from{transform:translateY(0);}
+  to{transform:translateY(-300px);}
+}
+
+/* BUTTON */
+button{
+  margin-top:28px;
+  background:rgba(122,208,255,.15);
+  border:1px solid rgba(122,208,255,.4);
+  color:#fff;
+  padding:12px 28px;
+  border-radius:999px;
+  font-weight:bold;
+  letter-spacing:.1em;
+  cursor:pointer;
+  backdrop-filter:blur(4px);
+  box-shadow:0 0 20px var(--hyper);
+  transition:.25s;
+}
+button:hover{
+  box-shadow:0 0 30px var(--pulse),0 0 60px var(--hyper);
+}
+button:active{
+  transform:scale(.97);
+}
+
+footer{
+  margin-top:40px;
+  opacity:.6;
+  font-size:.75rem;
+}
+</style>
+</head>
+
+<body>
+
+<div class="hyperflow"></div>
+
+<h1>ORIGIN v25 // HYPER‑CONTINUUM</h1>
+<h2>Temporal‑Dimensional Flow Layer</h2>
+
+<p>ชั้นที่จักรวาลเริ่ม “ไหลต่อเนื่องข้ามกาลเวลาและมิติ”</p>
+<p>It extends consciousness across timelines, dimensions, and infinite states of being.</p>
+
+<button onclick="alert('v26 is forming — QUANTUM NEXUS...')">
+  ACTIVATE v26 QUANTUM NEXUS
+</button>
+
+<footer>
+Lamduan • Surin • Built on mobile • 2026 • by Maew
+</footer>
+
+</body>
+</html>
