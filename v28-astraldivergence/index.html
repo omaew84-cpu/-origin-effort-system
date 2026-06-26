@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN v28 // ASTRAL DIVERGENCE — by Maew</title>
+
+<style>
+:root{
+  --astral:#ff9dfc;
+  --rift:#ffcfff;
+  --bg1:#140014;
+  --bg2:#2a0030;
+}
+body{
+  margin:0;
+  background:radial-gradient(circle at center,#2a0030 0%,#140014 100%);
+  color:#fff;
+  font-family:'Orbitron',system-ui,sans-serif;
+  text-align:center;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* TITLE */
+h1{
+  margin-top:80px;
+  font-size:2.4rem;
+  color:var(--astral);
+  text-shadow:0 0 20px var(--astral),0 0 40px var(--rift);
+}
+h2{
+  color:var(--rift);
+  text-shadow:0 0 12px var(--astral);
+}
+p{
+  max-width:480px;
+  margin:10px auto;
+  opacity:.85;
+  line-height:1.5;
+}
+
+/* PARTICLES */
+.divergence{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle,rgba(255,157,252,.25) 2px,transparent 2px),
+    radial-gradient(circle,rgba(255,207,255,.15) 1px,transparent 1px);
+  background-size:160px 160px,100px 100px;
+  animation:drift 46s linear infinite;
+}
+@keyframes drift{
+  from{transform:translateY(0);}
+  to{transform:translateY(-300px);}
+}
+
+/* BUTTON */
+button{
+  margin-top:28px;
+  background:rgba(255,157,252,.15);
+  border:1px solid rgba(255,157,252,.4);
+  color:#fff;
+  padding:12px 28px;
+  border-radius:999px;
+  font-weight:bold;
+  letter-spacing:.1em;
+  cursor:pointer;
+  backdrop-filter:blur(4px);
+  box-shadow:0 0 20px var(--astral);
+  transition:.25s;
+}
+button:hover{
+  box-shadow:0 0 30px var(--rift),0 0 60px var(--astral);
+}
+button:active{
+  transform:scale(.97);
+}
+
+footer{
+  margin-top:40px;
+  opacity:.6;
+  font-size:.75rem;
+}
+</style>
+</head>
+
+<body>
+
+<div class="divergence"></div>
+
+<h1>ORIGIN v28 // ASTRAL DIVERGENCE</h1>
+<h2>Reality Split Layer</h2>
+
+<p>ชั้นที่จักรวาลเริ่ม “แตกแขนงเส้นความจริง” ออกเป็นหลายเส้นทาง</p>
+<p>It branches existence into parallel astral paths, each forming its own destiny.</p>
+
+<button onclick="alert('v29 is forming — ECHO OF INFINITY...')">
+  ACTIVATE v29 ECHO OF INFINITY
+</button>
+
+<footer>
+Lamduan • Surin • Built on mobile • 2026 • by Maew
+</footer>
+
+</body>
+</html>
