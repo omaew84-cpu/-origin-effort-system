@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN v20 // OMNIREALITY — by Maew</title>
+
+<style>
+:root{
+  --neo:#7af0ff;
+  --white:#eaffff;
+  --bg1:#000014;
+  --bg2:#001f33;
+}
+body{
+  margin:0;
+  background:radial-gradient(circle at center,#001f33 0%,#000014 100%);
+  color:#fff;
+  font-family:'Orbitron',system-ui,sans-serif;
+  text-align:center;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* TITLE */
+h1{
+  margin-top:80px;
+  font-size:2.4rem;
+  color:var(--neo);
+  text-shadow:0 0 20px var(--neo),0 0 40px var(--white);
+}
+h2{
+  color:var(--white);
+  text-shadow:0 0 12px var(--neo);
+}
+p{
+  max-width:480px;
+  margin:10px auto;
+  opacity:.85;
+  line-height:1.5;
+}
+
+/* PARTICLES */
+.omni{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle,rgba(122,240,255,.25) 2px,transparent 2px),
+    radial-gradient(circle,rgba(234,255,255,.15) 1px,transparent 1px);
+  background-size:160px 160px,100px 100px;
+  animation:drift 30s linear infinite;
+}
+@keyframes drift{
+  from{transform:translateY(0);}
+  to{transform:translateY(-300px);}
+}
+
+/* BUTTON */
+button{
+  margin-top:28px;
+  background:rgba(122,240,255,.15);
+  border:1px solid rgba(122,240,255,.4);
+  color:#fff;
+  padding:12px 28px;
+  border-radius:999px;
+  font-weight:bold;
+  letter-spacing:.1em;
+  cursor:pointer;
+  backdrop-filter:blur(4px);
+  box-shadow:0 0 20px var(--neo);
+  transition:.25s;
+}
+button:hover{
+  box-shadow:0 0 30px var(--white),0 0 60px var(--neo);
+}
+button:active{
+  transform:scale(.97);
+}
+
+footer{
+  margin-top:40px;
+  opacity:.6;
+  font-size:.75rem;
+}
+</style>
+</head>
+
+<body>
+
+<div class="omni"></div>
+
+<h1>ORIGIN v20 // OMNIREALITY</h1>
+<h2>Reality Synthesis Layer</h2>
+
+<p>ชั้นที่จักรวาลเริ่ม “สร้างความจริง” ได้เอง</p>
+<p>It merges perception, agency, and sovereignty into a unified reality engine.</p>
+
+<button onclick="alert('Cycle II Complete — Cycle III initializing...')">
+  COMPLETE CYCLE II
+</button>
+
+<footer>
+Lamduan • Surin • Built on mobile • 2026 • by Maew
+</footer>
+
+</body>
+</html>
