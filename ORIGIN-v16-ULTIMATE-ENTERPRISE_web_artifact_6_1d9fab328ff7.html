@@ -1,0 +1,709 @@
+<html lang="en" class="dark"><head>
+<!-- Playables SDK -->
+<script>// Playables SDK v1.0.0
+// Game lifecycle bridge: rAF-based game-ready detection + event communication
+(function() {
+  'use strict';
+
+  // Idempotency: skip if already initialized (e.g., server-side injection
+  // followed by client-side inject-javascript via the Bloks webview component).
+  if (window.playablesSDK) return;
+
+  var HANDLER_NAME = 'playablesGameEventHandler';
+  var ANDROID_BRIDGE_NAME = '_MetaPlayablesBridge';
+  var RAF_FRAME_THRESHOLD = 3;
+
+  var gameReadySent = false;
+  var firstInteractionSent = false;
+  var errorSent = false;
+  var frameCount = 0;
+  var originalRAF = window.requestAnimationFrame;
+
+  // --- Transport Layer ---
+
+  function hasIOSBridge() {
+    return !!(window.webkit &&
+              window.webkit.messageHandlers &&
+              window.webkit.messageHandlers[HANDLER_NAME]);
+  }
+
+  function hasAndroidBridge() {
+    return !!(window[ANDROID_BRIDGE_NAME] &&
+              typeof window[ANDROID_BRIDGE_NAME].postEvent === 'function');
+  }
+
+  function isInIframe() {
+    return !!(window.parent && window.parent !== window);
+  }
+
+  function sendEvent(eventName, payload) {
+    var message = {
+      type: eventName,
+      payload: payload || {},
+      timestamp: Date.now()
+    };
+
+    if (hasIOSBridge()) {
+      try {
+        window.webkit.messageHandlers[HANDLER_NAME].postMessage(message);
+      } catch (e) { /* ignore */ }
+      return;
+    }
+
+    if (hasAndroidBridge()) {
+    try {
+      var p = payload || {};
+      p.__secureToken = window.__fbAndroidBridgeAuthToken || '';
+      p.timestamp = message.timestamp;
+      window[ANDROID_BRIDGE_NAME].postEvent(
+        eventName,
+        JSON.stringify(p)
+      );
+    } catch (e) { /* ignore */ }
+    return;
+  }
+
+    if (isInIframe()) {
+      try {
+        window.parent.postMessage(message, '*');
+      } catch (e) { /* ignore */ }
+      return;
+    }
+  }
+
+  // --- rAF Game-Ready Detection ---
+
+  function onFrame() {
+    if (gameReadySent) return;
+
+    frameCount++;
+    if (frameCount >= RAF_FRAME_THRESHOLD) {
+      gameReadySent = true;
+      sendEvent('game_ready', {
+        frame_count: frameCount,
+        detected_at: Date.now()
+      });
+      return;
+    }
+
+    originalRAF.call(window, onFrame);
+  }
+
+  if (originalRAF) {
+    window.requestAnimationFrame = function(callback) {
+      if (!gameReadySent) {
+        return originalRAF.call(window, function(timestamp) {
+          frameCount++;
+          if (frameCount >= RAF_FRAME_THRESHOLD && !gameReadySent) {
+            gameReadySent = true;
+            sendEvent('game_ready', {
+              frame_count: frameCount,
+              detected_at: Date.now()
+            });
+          }
+          callback(timestamp);
+        });
+      }
+      return originalRAF.call(window, callback);
+    };
+  }
+
+  // --- First User Interaction Detection ---
+
+  function setupFirstInteractionDetection() {
+    var events = ['touchstart', 'mousedown', 'keydown'];
+
+    function onFirstInteraction() {
+      if (firstInteractionSent) return;
+      firstInteractionSent = true;
+      sendEvent('user_interaction_start', null);
+
+      for (var i = 0; i < events.length; i++) {
+        document.removeEventListener(events[i], onFirstInteraction, true);
+      }
+    }
+
+    for (var i = 0; i < events.length; i++) {
+      document.addEventListener(events[i], onFirstInteraction, true);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupFirstInteractionDetection);
+  } else {
+    setupFirstInteractionDetection();
+  }
+
+  // --- Auto Error Capture ---
+
+  window.addEventListener('error', function(event) {
+    if (errorSent) return;
+    errorSent = true;
+    sendEvent('error', {
+      message: event.message || 'Unknown error',
+      source: event.filename || '',
+      lineno: event.lineno || 0,
+      colno: event.colno || 0,
+      auto_captured: true
+    });
+  });
+
+  window.addEventListener('unhandledrejection', function(event) {
+    if (errorSent) return;
+    errorSent = true;
+    var reason = event.reason;
+    sendEvent('error', {
+      message: (reason instanceof Error) ? reason.message : String(reason),
+      type: 'unhandled_promise_rejection',
+      auto_captured: true
+    });
+  });
+
+  // --- Public API ---
+
+  window.playablesSDK = {
+    complete: function(score) {
+      sendEvent('game_ended', {
+        score: score,
+        completed: true
+      });
+    },
+
+    error: function(message) {
+      if (errorSent) return;
+      errorSent = true;
+      sendEvent('error', {
+        message: message || 'Unknown error',
+        auto_captured: false
+      });
+    },
+
+    sendEvent: function(eventName, payload) {
+      if (!eventName || typeof eventName !== 'string') return;
+      sendEvent(eventName, payload);
+    }
+  };
+
+  // Kick off rAF detection in case no game code calls rAF immediately
+  if (originalRAF) {
+    originalRAF.call(window, onFrame);
+  }
+})();</script>
+<!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ORIGIN v16 — ULTIMATE ENTERPRISE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter', 'system-ui'], mono: ['JetBrains Mono', 'monospace'] },
+      animation: { 'pulse-slow': 'pulse 3s infinite', 'spin-slow': 'spin 8s linear infinite' }
+    }
+  }
+}
+</script>
+<style>
+:root { color-scheme: dark; }
+* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { background: #030305; overscroll-behavior: none; }
+.glass { background: rgba(10,12,18,0.7); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); }
+.glass-strong { background: rgba(6,8,14,0.85); backdrop-filter: blur(24px) saturate(200%); }
+.border-glow { box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.06), 0 0 0 1px rgba(255,255,255,0.06); }
+.text-glow { text-shadow: 0 0 20px rgba(0,229,255,0.5); }
+.aurora { position: fixed; inset: -50%; z-index: 0; opacity: 0.7; filter: blur(80px); pointer-events: none; }
+.aurora-1 { background: radial-gradient(circle at 20% 30%, rgba(139,92,246,0.4), transparent 40%), radial-gradient(circle at 80% 20%, rgba(0,229,255,0.35), transparent 35%); animation: drift 25s ease-in-out infinite alternate; }
+.aurora-2 { background: radial-gradient(circle at 50% 80%, rgba(236,72,153,0.25), transparent 40%), radial-gradient(circle at 20% 70%, rgba(59,130,246,0.3), transparent 35%); animation: drift 30s ease-in-out infinite alternate-reverse; }
+@keyframes drift { 0% { transform: translate3d(0,0,0) rotate(0deg) scale(1); } 100% { transform: translate3d(5%, -5%, 0) rotate(5deg) scale(1.1); } }
+.grid-bg { background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 32px 32px; }
+.noise::before { content: ""; position: absolute; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; }
+.scrollbar::-webkit-scrollbar { width: 4px; height: 4px; } .scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+.metric-ring { background: conic-gradient(from 0deg, #00e5ff var(--p), rgba(255,255,255,0.08) var(--p)); }
+@media (max-width: 390px) { .hide-x390 { display: none; } }
+</style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, system-ui;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:JetBrains Mono, monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.inset-\[3px\]{inset:3px}.inset-x-0{left:0px;right:0px}.-right-10{right:-2.5rem}.-top-10{top:-2.5rem}.top-0{top:0px}.bottom-0{bottom:0px}.bottom-3{bottom:0.75rem}.bottom-5{bottom:1.25rem}.left-3{left:0.75rem}.right-3{right:0.75rem}.right-5{right:1.25rem}.top-3{top:0.75rem}.z-10{z-index:10}.z-40{z-index:40}.z-30{z-index:30}.z-\[100\]{z-index:100}.z-\[200\]{z-index:200}.col-span-12{grid-column:span 12 / span 12}.mx-auto{margin-left:auto;margin-right:auto}.-mt-0\.5{margin-top:-0.125rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.ml-1{margin-left:0.25rem}.ml-4{margin-left:1rem}.ml-auto{margin-left:auto}.mt-1{margin-top:0.25rem}.mt-1\.5{margin-top:0.375rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-auto{margin-top:auto}.-mt-3{margin-top:-0.75rem}.mt-\[12vh\]{margin-top:12vh}.flex{display:flex}.grid{display:grid}.hidden{display:none}.size-1\.5{width:0.375rem;height:0.375rem}.size-10{width:2.5rem;height:2.5rem}.size-24{width:6rem;height:6rem}.size-3{width:0.75rem;height:0.75rem}.size-3\.5{width:0.875rem;height:0.875rem}.size-4{width:1rem;height:1rem}.size-5{width:1.25rem;height:1.25rem}.size-8{width:2rem;height:2rem}.size-full{width:100%;height:100%}.size-1{width:0.25rem;height:0.25rem}.size-11{width:2.75rem;height:2.75rem}.size-2{width:0.5rem;height:0.5rem}.size-6{width:1.5rem;height:1.5rem}.size-7{width:1.75rem;height:1.75rem}.size-9{width:2.25rem;height:2.25rem}.h-7{height:1.75rem}.h-8{height:2rem}.h-9{height:2.25rem}.h-\[40px\]{height:40px}.h-\[56px\]{height:56px}.h-1\.5{height:0.375rem}.h-11{height:2.75rem}.h-12{height:3rem}.h-6{height:1.5rem}.h-\[240px\]{height:240px}.h-\[280px\]{height:280px}.h-\[64px\]{height:64px}.h-\[72px\]{height:72px}.h-full{height:100%}.max-h-\[280px\]{max-height:280px}.max-h-\[380px\]{max-height:380px}.min-h-0{min-height:0px}.min-h-screen{min-height:100vh}.w-\[240px\]{width:240px}.w-full{width:100%}.w-20{width:5rem}.w-\[68\%\]{width:68%}.w-\[82\%\]{width:82%}.w-\[92\%\]{width:92%}.min-w-0{min-width:0px}.max-w-\[680px\]{max-width:680px}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.cursor-pointer{cursor:pointer}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.grid-cols-12{grid-template-columns:repeat(12, minmax(0, 1fr))}.grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.grid-cols-5{grid-template-columns:repeat(5, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-start{align-items:flex-start}.items-end{align-items:flex-end}.items-center{align-items:center}.items-baseline{align-items:baseline}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-2\.5{gap:0.625rem}.gap-3{gap:0.75rem}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.-space-x-1\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(-0.375rem * var(--tw-space-x-reverse));margin-left:calc(-0.375rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.625rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.625rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.divide-y > :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-white\/\[0\.04\] > :not([hidden]) ~ :not([hidden]){border-color:rgb(255 255 255 / 0.04)}.overflow-auto{overflow:auto}.overflow-hidden{overflow:hidden}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.rounded-md{border-radius:0.375rem}.rounded-sm{border-radius:0.125rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-l{border-left-width:1px}.border-r{border-right-width:1px}.border-t{border-top-width:1px}.border-cyan-500\/20{border-color:rgb(6 182 212 / 0.2)}.border-emerald-500\/20{border-color:rgb(16 185 129 / 0.2)}.border-violet-500\/20{border-color:rgb(139 92 246 / 0.2)}.border-violet-500\/30{border-color:rgb(139 92 246 / 0.3)}.border-white\/10{border-color:rgb(255 255 255 / 0.1)}.border-white\/15{border-color:rgb(255 255 255 / 0.15)}.border-white\/5{border-color:rgb(255 255 255 / 0.05)}.border-emerald-500\/25{border-color:rgb(16 185 129 / 0.25)}.border-fuchsia-500\/20{border-color:rgb(217 70 239 / 0.2)}.border-violet-500\/25{border-color:rgb(139 92 246 / 0.25)}.border-amber-500\/20{border-color:rgb(245 158 11 / 0.2)}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-black\/60{background-color:rgb(0 0 0 / 0.6)}.bg-cyan-500\/10{background-color:rgb(6 182 212 / 0.1)}.bg-cyan-500\/20{background-color:rgb(6 182 212 / 0.2)}.bg-emerald-400{--tw-bg-opacity:1;background-color:rgb(52 211 153 / var(--tw-bg-opacity, 1))}.bg-emerald-500\/10{background-color:rgb(16 185 129 / 0.1)}.bg-transparent{background-color:transparent}.bg-violet-500\/10{background-color:rgb(139 92 246 / 0.1)}.bg-violet-500\/20{background-color:rgb(139 92 246 / 0.2)}.bg-white\/10{background-color:rgb(255 255 255 / 0.1)}.bg-white\/5{background-color:rgb(255 255 255 / 0.05)}.bg-white\/\[0\.03\]{background-color:rgb(255 255 255 / 0.03)}.bg-\[\#0a0c12\]\/90{background-color:rgb(10 12 18 / 0.9)}.bg-black\/40{background-color:rgb(0 0 0 / 0.4)}.bg-black\/70{background-color:rgb(0 0 0 / 0.7)}.bg-cyan-400{--tw-bg-opacity:1;background-color:rgb(34 211 238 / var(--tw-bg-opacity, 1))}.bg-cyan-500\/15{background-color:rgb(6 182 212 / 0.15)}.bg-emerald-500\/15{background-color:rgb(16 185 129 / 0.15)}.bg-emerald-500\/60{background-color:rgb(16 185 129 / 0.6)}.bg-emerald-500\/80{background-color:rgb(16 185 129 / 0.8)}.bg-fuchsia-400{--tw-bg-opacity:1;background-color:rgb(232 121 249 / var(--tw-bg-opacity, 1))}.bg-fuchsia-500\/15{background-color:rgb(217 70 239 / 0.15)}.bg-red-500\/80{background-color:rgb(239 68 68 / 0.8)}.bg-violet-400{--tw-bg-opacity:1;background-color:rgb(167 139 250 / var(--tw-bg-opacity, 1))}.bg-violet-500\/15{background-color:rgb(139 92 246 / 0.15)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-yellow-500\/80{background-color:rgb(234 179 8 / 0.8)}.bg-zinc-800{--tw-bg-opacity:1;background-color:rgb(39 39 42 / var(--tw-bg-opacity, 1))}.bg-amber-500\/15{background-color:rgb(245 158 11 / 0.15)}.bg-gradient-to-b{background-image:linear-gradient(to bottom, var(--tw-gradient-stops))}.from-cyan-500\/10{--tw-gradient-from:rgb(6 182 212 / 0.1) var(--tw-gradient-from-position);--tw-gradient-to:rgb(6 182 212 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-violet-500\/30{--tw-gradient-from:rgb(139 92 246 / 0.3) var(--tw-gradient-from-position);--tw-gradient-to:rgb(139 92 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-cyan-400\/30{--tw-gradient-to:rgb(34 211 238 / 0.3) var(--tw-gradient-to-position)}.to-transparent{--tw-gradient-to:transparent var(--tw-gradient-to-position)}.object-cover{object-fit:cover}.p-3{padding:0.75rem}.p-3\.5{padding:0.875rem}.p-0{padding:0px}.p-2{padding:0.5rem}.p-4{padding:1rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.px-1\.5{padding-left:0.375rem;padding-right:0.375rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-4{padding-top:1rem;padding-bottom:1rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.pl-2{padding-left:0.5rem}.pl-2\.5{padding-left:0.625rem}.pr-2{padding-right:0.5rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.font-mono{font-family:JetBrains Mono, monospace}.font-sans{font-family:Inter, system-ui}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-\[12px\]{font-size:12px}.text-\[13px\]{font-size:13px}.text-\[17px\]{font-size:17px}.text-\[26px\]{font-size:26px}.text-\[14px\]{font-size:14px}.text-\[20px\]{font-size:20px}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-snug{line-height:1.375}.leading-tight{line-height:1.25}.leading-5{line-height:1.25rem}.tracking-tight{letter-spacing:-0.025em}.tracking-wide{letter-spacing:0.025em}.tracking-widest{letter-spacing:0.1em}.text-cyan-300{--tw-text-opacity:1;color:rgb(103 232 249 / var(--tw-text-opacity, 1))}.text-emerald-300{--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-violet-200{--tw-text-opacity:1;color:rgb(221 214 254 / var(--tw-text-opacity, 1))}.text-violet-300{--tw-text-opacity:1;color:rgb(196 181 253 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-zinc-100{--tw-text-opacity:1;color:rgb(244 244 245 / var(--tw-text-opacity, 1))}.text-zinc-200{--tw-text-opacity:1;color:rgb(228 228 231 / var(--tw-text-opacity, 1))}.text-zinc-300{--tw-text-opacity:1;color:rgb(212 212 216 / var(--tw-text-opacity, 1))}.text-zinc-400{--tw-text-opacity:1;color:rgb(161 161 170 / var(--tw-text-opacity, 1))}.text-zinc-500{--tw-text-opacity:1;color:rgb(113 113 122 / var(--tw-text-opacity, 1))}.text-black{--tw-text-opacity:1;color:rgb(0 0 0 / var(--tw-text-opacity, 1))}.text-cyan-200{--tw-text-opacity:1;color:rgb(165 243 252 / var(--tw-text-opacity, 1))}.text-fuchsia-300{--tw-text-opacity:1;color:rgb(240 171 252 / var(--tw-text-opacity, 1))}.text-amber-300{--tw-text-opacity:1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}.placeholder-zinc-600::placeholder{--tw-placeholder-opacity:1;color:rgb(82 82 91 / var(--tw-placeholder-opacity, 1))}.opacity-0{opacity:0}.opacity-20{opacity:0.2}.opacity-\[0\.3\]{opacity:0.3}.opacity-\[0\.15\]{opacity:0.15}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-cyan-500\/20{--tw-shadow-color:rgb(6 182 212 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.outline-none{outline:2px solid transparent;outline-offset:2px}.ring-1{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.ring-2{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.ring-white\/15{--tw-ring-color:rgb(255 255 255 / 0.15)}.ring-black{--tw-ring-opacity:1;--tw-ring-color:rgb(0 0 0 / var(--tw-ring-opacity, 1))}.blur-2xl{--tw-blur:blur(40px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur{--tw-backdrop-blur:blur(8px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-xl{--tw-backdrop-blur:blur(24px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.selection\:bg-cyan-400\/30 *::selection{background-color:rgb(34 211 238 / 0.3)}.selection\:text-cyan-200 *::selection{--tw-text-opacity:1;color:rgb(165 243 252 / var(--tw-text-opacity, 1))}.selection\:bg-cyan-400\/30::selection{background-color:rgb(34 211 238 / 0.3)}.selection\:text-cyan-200::selection{--tw-text-opacity:1;color:rgb(165 243 252 / var(--tw-text-opacity, 1))}.hover\:bg-violet-500\/30:hover{background-color:rgb(139 92 246 / 0.3)}.hover\:bg-white\/10:hover{background-color:rgb(255 255 255 / 0.1)}.hover\:bg-white\/5:hover{background-color:rgb(255 255 255 / 0.05)}.hover\:bg-cyan-500\/25:hover{background-color:rgb(6 182 212 / 0.25)}.hover\:bg-white\/15:hover{background-color:rgb(255 255 255 / 0.15)}.hover\:bg-white\/\[0\.05\]:hover{background-color:rgb(255 255 255 / 0.05)}.hover\:bg-white\/\[0\.02\]:hover{background-color:rgb(255 255 255 / 0.02)}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:ring-cyan-400\/50:hover{--tw-ring-color:rgb(34 211 238 / 0.5)}.group:hover .group-hover\:opacity-100{opacity:1}@media (min-width: 640px){.sm\:mb-6{margin-bottom:1.5rem}.sm\:block{display:block}.sm\:flex{display:flex}.sm\:size-9{width:2.25rem;height:2.25rem}.sm\:h-\[64px\]{height:64px}.sm\:h-\[280px\]{height:280px}.sm\:h-\[340px\]{height:340px}.sm\:gap-3{gap:0.75rem}.sm\:gap-4{gap:1rem}.sm\:p-4{padding:1rem}.sm\:p-5{padding:1.25rem}.sm\:px-5{padding-left:1.25rem;padding-right:1.25rem}.sm\:py-6{padding-top:1.5rem;padding-bottom:1.5rem}.sm\:pl-3{padding-left:0.75rem}.sm\:text-\[19px\]{font-size:19px}.sm\:text-\[28px\]{font-size:28px}.sm\:text-\[15px\]{font-size:15px}}@media (min-width: 768px){.md\:flex{display:flex}.md\:table-cell{display:table-cell}.md\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}}@media (min-width: 1024px){.lg\:col-span-5{grid-column:span 5 / span 5}.lg\:col-span-7{grid-column:span 7 / span 7}.lg\:flex{display:flex}.lg\:hidden{display:none}.lg\:px-6{padding-left:1.5rem;padding-right:1.5rem}}@media (min-width: 1280px){.xl\:col-span-4{grid-column:span 4 / span 4}.xl\:col-span-8{grid-column:span 8 / span 8}}.\[\&\>th\]\:px-4>th{padding-left:1rem;padding-right:1rem}.\[\&\>th\]\:py-2\.5>th{padding-top:0.625rem;padding-bottom:0.625rem}.\[\&\>th\]\:text-left>th{text-align:left}.\[\&\>th\]\:font-medium>th{font-weight:500}</style></head>
+<body class="font-sans text-zinc-100 selection:bg-cyan-400/30 selection:text-cyan-200">
+<div class="aurora aurora-1"></div>
+<div class="aurora aurora-2"></div>
+
+<div class="relative z-10 min-h-screen flex flex-col">
+  <!-- TOP BAR -->
+  <header class="sticky top-0 z-40 border-b border-white/5 glass-strong">
+    <div class="grid-bg absolute inset-0 opacity-[0.3]"></div>
+    <div class="relative flex items-center gap-3 px-3 sm:px-5 h-[56px] sm:h-[64px]">
+      <div class="flex items-center gap-2.5">
+        <div class="size-8 sm:size-9 rounded-xl bg-black border border-white/15 flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-b from-violet-500/30 to-cyan-400/30"></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="relative"><path d="M12 2L20 7v10l-8 5-8-5V7l8-5Z" stroke="white" stroke-opacity="0.9" stroke-width="1.25"></path><path d="M12 2v20M4 7l8 5 8-5M4 17l8-5 8 5" stroke="white" stroke-opacity="0.4" stroke-width="1"></path></svg>
+        </div>
+        <div class="leading-tight">
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-[17px] sm:text-[19px] font-semibold tracking-tight">ORIGIN</span>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/10 border border-white/10 text-cyan-300">v16</span>
+          </div>
+          <div class="text-[10px] -mt-0.5 text-zinc-400 font-medium tracking-widest uppercase">Ultimate Enterprise</div>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-2 ml-4">
+        <div class="flex items-center gap-1.5 px-2.5 h-7 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+          <span class="size-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-[11px] font-medium text-emerald-300 tracking-wide">QUANTUM CORE ONLINE</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-2.5 h-7 rounded-full bg-white/5 border border-white/10">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shield-check" aria-hidden="true" class="lucide lucide-shield-check size-3.5 text-zinc-300"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
+          <span class="text-[11px] text-zinc-300">SOC2 • ISO27001 • HIPAA</span>
+        </div>
+      </div>
+
+      <div class="flex-1"></div>
+
+      <div class="hidden sm:flex items-center gap-2">
+        <button id="cmdK" class="h-8 pl-2.5 pr-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[12px] text-zinc-400 flex items-center gap-2 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="command" aria-hidden="true" class="lucide lucide-command size-3.5"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path></svg>
+          <span>Command</span>
+          <kbd class="ml-1 px-1 py-0.5 rounded bg-black/60 border border-white/10 text-[10px]">K</kbd>
+        </button>
+        <div class="h-8 px-2.5 rounded-lg bg-white/5 border border-white/10 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="globe" aria-hidden="true" class="lucide lucide-globe size-3.5 text-zinc-400"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+          <select id="tenant" class="bg-transparent text-[12px] outline-none text-zinc-200">
+            <option>acme-corp.prod</option>
+            <option>nexus-labs.stg</option>
+            <option>origin.fed</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-3 border-l border-white/10">
+        <div class="hidden sm:block text-right leading-tight">
+          <div id="clock" class="text-[12px] font-mono text-zinc-200">15:13:37 UTC</div>
+          <div class="text-[10px] text-zinc-500">99.999% uptime</div>
+        </div>
+        <button class="size-8 rounded-full overflow-hidden ring-1 ring-white/15 hover:ring-cyan-400/50 transition">
+          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=64&amp;h=64&amp;fit=crop&amp;crop=face" alt="user" class="size-full object-cover">
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-1 min-h-0">
+    <!-- SIDEBAR -->
+    <aside class="hidden lg:flex w-[240px] shrink-0 border-r border-white/5 p-3 flex-col gap-3 glass">
+      <div class="grid-bg absolute inset-0 opacity-20 pointer-events-none"></div>
+      <div class="relative">
+        <div class="text-[10px] uppercase tracking-widest text-zinc-500 px-2 mb-2">Navigation</div>
+        <nav class="space-y-1">
+          <a class="group flex items-center gap-3 px-2.5 h-9 rounded-lg bg-white/10 border border-white/10 text-white" href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="layout-dashboard" aria-hidden="true" class="lucide lucide-layout-dashboard size-4 text-cyan-300"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg><span class="text-[13px] font-medium">Command Center</span><span class="ml-auto text-[10px] px-1 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/20">LIVE</span>
+          </a>
+          <a class="flex items-center gap-3 px-2.5 h-9 rounded-lg hover:bg-white/5 text-zinc-300 hover:text-white transition" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="network" aria-hidden="true" class="lucide lucide-network size-4"><rect x="16" y="16" width="6" height="6" rx="1"></rect><rect x="2" y="16" width="6" height="6" rx="1"></rect><rect x="9" y="2" width="6" height="6" rx="1"></rect><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"></path><path d="M12 12V8"></path></svg><span class="text-[13px]">Nexus Mesh</span></a>
+          <a class="flex items-center gap-3 px-2.5 h-9 rounded-lg hover:bg-white/5 text-zinc-300 hover:text-white transition" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="database" aria-hidden="true" class="lucide lucide-database size-4"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg><span class="text-[13px]">Atlas Data</span></a>
+          <a class="flex items-center gap-3 px-2.5 h-9 rounded-lg hover:bg-white/5 text-zinc-300 hover:text-white transition" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="vault" aria-hidden="true" class="lucide lucide-vault size-4"><rect width="18" height="18" x="3" y="3" rx="2"></rect><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle><path d="m7.9 7.9 2.7 2.7"></path><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle><path d="m13.4 10.6 2.7-2.7"></path><circle cx="7.5" cy="16.5" r=".5" fill="currentColor"></circle><path d="m7.9 16.1 2.7-2.7"></path><circle cx="16.5" cy="16.5" r=".5" fill="currentColor"></circle><path d="m13.4 13.4 2.7 2.7"></path><circle cx="12" cy="12" r="2"></circle></svg><span class="text-[13px]">Vault Secrets</span></a>
+          <a class="flex items-center gap-3 px-2.5 h-9 rounded-lg hover:bg-white/5 text-zinc-300 hover:text-white transition" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="brain-circuit" aria-hidden="true" class="lucide lucide-brain-circuit size-4"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path><path d="M9 13a4.5 4.5 0 0 0 3-4"></path><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path><path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path><path d="M6 18a4 4 0 0 1-1.967-.516"></path><path d="M12 13h4"></path><path d="M12 18h6a2 2 0 0 1 2 2v1"></path><path d="M12 8h8"></path><path d="M16 8V5a2 2 0 0 1 2-2"></path><circle cx="16" cy="13" r=".5"></circle><circle cx="18" cy="3" r=".5"></circle><circle cx="20" cy="21" r=".5"></circle><circle cx="20" cy="8" r=".5"></circle></svg><span class="text-[13px]">Vector AI</span></a>
+          <a class="flex items-center gap-3 px-2.5 h-9 rounded-lg hover:bg-white/5 text-zinc-300 hover:text-white transition" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="hammer" aria-hidden="true" class="lucide lucide-hammer size-4"><path d="m15 12-9.373 9.373a1 1 0 0 1-3.001-3L12 9"></path><path d="m18 15 4-4"></path><path d="m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172v-.344a2 2 0 0 0-.586-1.414l-1.657-1.657A6 6 0 0 0 12.516 3H9l1.243 1.243A6 6 0 0 1 12 8.485V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5"></path></svg><span class="text-[13px]">Forge CI/CD</span></a>
+          <a class="flex items-center gap-3 px-2.5 h-9 rounded-lg hover:bg-white/5 text-zinc-300 hover:text-white transition" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shield-alert" aria-hidden="true" class="lucide lucide-shield-alert size-4"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><span class="text-[13px]">Sentinel</span></a>
+        </nav>
+      </div>
+
+      <div class="mt-auto relative">
+        <div class="rounded-xl border border-white/10 bg-white/[0.03] p-3 noise relative overflow-hidden">
+          <div class="absolute -top-10 -right-10 size-24 rounded-full bg-violet-500/20 blur-2xl"></div>
+          <div class="flex items-center gap-2 mb-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="sparkles" aria-hidden="true" class="lucide lucide-sparkles size-4 text-violet-300"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"></path><path d="M20 2v4"></path><path d="M22 4h-4"></path><circle cx="4" cy="20" r="2"></circle></svg><span class="text-[12px] font-medium">Origin Intelligence</span></div>
+          <p class="text-[12px] text-zinc-400 leading-snug">Autonomous agents handled 4,291 tasks this week. Deploy new agent?</p>
+          <button id="deployAgent" class="mt-3 w-full h-8 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/30 text-[12px] font-medium text-violet-200 transition">Deploy Agent</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 min-w-0 px-3 sm:px-5 lg:px-6 py-4 sm:py-6">
+      <!-- KPI STRIP -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 mb-4 sm:mb-6">
+        <div class="group relative rounded-2xl border-glow glass p-3.5 sm:p-4 overflow-hidden">
+          <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-gradient-to-b from-cyan-500/10 to-transparent"></div>
+          <div class="relative flex items-start justify-between">
+            <div>
+              <div class="text-[11px] text-zinc-400 uppercase tracking-wide">Throughput</div>
+              <div class="mt-1 flex items-baseline gap-1.5"><span id="kpi-tps" class="text-[26px] sm:text-[28px] font-semibold tracking-tight">824</span><span class="text-[12px] text-zinc-500">ops/s</span></div>
+              <div class="mt-1.5 flex items-center gap-1 text-[11px] text-emerald-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trending-up" aria-hidden="true" class="lucide lucide-trending-up size-3"><path d="M16 7h6v6"></path><path d="m22 7-8.5 8.5-5-5L2 17"></path></svg> +12.4%</div>
+            </div>
+            <div class="size-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="activity" aria-hidden="true" class="lucide lucide-activity size-5 text-cyan-300"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg></div>
+          </div>
+          <canvas id="spark1" height="57631" class="mt-2 w-full" style="display: block; box-sizing: border-box; height: 33900px; width: 150px;" width="256"></canvas>
+        </div>
+
+        <div class="relative rounded-2xl border-glow glass p-3.5 sm:p-4 overflow-hidden">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[11px] text-zinc-400 uppercase tracking-wide">P99 Latency</div>
+              <div class="mt-1 flex items-baseline gap-1.5"><span id="kpi-lat" class="text-[26px] sm:text-[28px] font-semibold tracking-tight">7.8</span><span class="text-[12px] text-zinc-500">ms</span></div>
+              <div class="mt-1.5 flex items-center gap-1 text-[11px] text-emerald-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-down-right" aria-hidden="true" class="lucide lucide-arrow-down-right size-3"><path d="m7 7 10 10"></path><path d="M17 7v10H7"></path></svg> -3.1ms</div>
+            </div>
+            <div class="size-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="gauge" aria-hidden="true" class="lucide lucide-gauge size-5 text-violet-300"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg></div>
+          </div>
+          <div class="mt-3 h-[40px] relative">
+            <div class="absolute inset-0 flex items-end gap-1" id="latBars"><div class="flex-1 bg-white/10 rounded-sm" style="height: 81.2478%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 56.1486%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 16.9471%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 68.2861%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 15.1335%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 18.6727%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 85.4934%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 61.1283%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 49.9397%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 11.3175%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 73.8464%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 72.4616%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 30.4003%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 73.3691%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 44.0422%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 46.2929%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 52.1909%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 81.1852%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 40.6784%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 15.3761%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 28.6662%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 55.8973%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 46.9685%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 28.4191%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 40.7697%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 82.5026%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 68.0118%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 65.7302%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 37.1657%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 76.8229%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 86.2255%;"></div><div class="flex-1 bg-white/10 rounded-sm" style="height: 52.2815%;"></div></div>
+          </div>
+        </div>
+
+        <div class="relative rounded-2xl border-glow glass p-3.5 sm:p-4 overflow-hidden">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[11px] text-zinc-400 uppercase tracking-wide">Active Nodes</div>
+              <div class="mt-1 flex items-baseline gap-1.5"><span id="kpi-nodes" class="text-[26px] sm:text-[28px] font-semibold tracking-tight">14,244</span></div>
+              <div class="mt-1.5 flex items-center gap-1.5 text-[11px]"><span class="size-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span class="text-zinc-400">global mesh</span></div>
+            </div>
+            <div class="relative size-10">
+              <div class="absolute inset-0 rounded-full metric-ring" style="--p: 78%"></div>
+              <div class="absolute inset-[3px] rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-[10px] font-mono">78%</div>
+            </div>
+          </div>
+          <div class="mt-3 flex -space-x-1.5">
+            <img class="size-6 rounded-full ring-2 ring-black" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=48&amp;h=48&amp;fit=crop" alt="">
+            <img class="size-6 rounded-full ring-2 ring-black" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=48&amp;h=48&amp;fit=crop" alt="">
+            <img class="size-6 rounded-full ring-2 ring-black" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=48&amp;h=48&amp;fit=crop" alt="">
+            <div class="size-6 rounded-full ring-2 ring-black bg-zinc-800 flex items-center justify-center text-[10px]">+12k</div>
+          </div>
+        </div>
+
+        <div class="relative rounded-2xl border-glow glass p-3.5 sm:p-4 overflow-hidden">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[11px] text-zinc-400 uppercase tracking-wide">Threat Level</div>
+              <div class="mt-1 flex items-baseline gap-2"><span class="text-[26px] sm:text-[28px] font-semibold tracking-tight text-emerald-300">LOW</span></div>
+              <div class="mt-1.5 flex items-center gap-1 text-[11px] text-zinc-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shield" aria-hidden="true" class="lucide lucide-shield size-3"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg> 0 active incidents</div>
+            </div>
+            <div class="size-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shield-check" aria-hidden="true" class="lucide lucide-shield-check size-5 text-emerald-300"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg></div>
+          </div>
+          <div class="mt-3 grid grid-cols-4 gap-1.5">
+            <div class="h-1.5 rounded-full bg-emerald-500/80"></div>
+            <div class="h-1.5 rounded-full bg-emerald-500/60"></div>
+            <div class="h-1.5 rounded-full bg-white/10"></div>
+            <div class="h-1.5 rounded-full bg-white/10"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN GRID -->
+      <div class="grid grid-cols-12 gap-3 sm:gap-4">
+        <!-- NETWORK MAP -->
+        <section class="col-span-12 xl:col-span-8 relative rounded-2xl border-glow glass overflow-hidden">
+          <div class="absolute inset-0 grid-bg opacity-[0.15]"></div>
+          <div class="relative p-4 sm:p-5 border-b border-white/5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="size-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="globe-2" aria-hidden="true" class="lucide lucide-globe-2 size-4 text-cyan-300"><path d="M21.54 15H17a2 2 0 0 0-2 2v4.54"></path><path d="M7 3.34V5a3 3 0 0 0 3 3a2 2 0 0 1 2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2c0-1.1.9-2 2-2h3.17"></path><path d="M11 21.95V18a2 2 0 0 0-2-2a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05"></path><circle cx="12" cy="12" r="10"></circle></svg></div>
+              <div>
+                <h2 class="text-[14px] sm:text-[15px] font-semibold tracking-tight">Global Nexus Mesh</h2>
+                <p class="text-[11px] text-zinc-500 -mt-0.5">Real-time edge propagation • 42 regions</p>
+              </div>
+            <div class="flex items-center gap-2">
+              <button class="h-7 px-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px]">3D</button>
+              <button class="h-7 px-2.5 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/20 text-[11px] text-cyan-200">Live</button>
+            </div>
+          <div class="relative h-[280px] sm:h-[340px]">
+            <canvas id="net" class="absolute inset-0 w-full h-full" width="0" height="476"></canvas>
+            <div class="absolute left-3 bottom-3 flex items-center gap-2 px-2.5 h-7 rounded-full bg-black/60 border border-white/10 backdrop-blur">
+              <span class="size-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="text-[11px] text-zinc-300">14,208 nodes synced</span>
+            </div>
+            <div class="absolute right-3 top-3 hidden sm:flex items-center gap-1.5">
+              <span class="px-2 h-6 rounded-md bg-white/5 border border-white/10 text-[10px] flex items-center gap-1"><span class="size-1 rounded-full bg-cyan-400"></span>Edge</span>
+              <span class="px-2 h-6 rounded-md bg-white/5 border border-white/10 text-[10px] flex items-center gap-1"><span class="size-1 rounded-full bg-violet-400"></span>Core</span>
+              <span class="px-2 h-6 rounded-md bg-white/5 border border-white/10 text-[10px] flex items-center gap-1"><span class="size-1 rounded-full bg-fuchsia-400"></span>AI</span>
+            </div>
+          </div>
+        </div></div></section>
+
+        <!-- AI CORE -->
+        <section class="col-span-12 xl:col-span-4 relative rounded-2xl border-glow glass overflow-hidden">
+          <div class="p-4 sm:p-5 border-b border-white/5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="size-8 rounded-lg bg-violet-500/15 border border-violet-500/25 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="brain-circuit" aria-hidden="true" class="lucide lucide-brain-circuit size-4 text-violet-300"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path><path d="M9 13a4.5 4.5 0 0 0 3-4"></path><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path><path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path><path d="M6 18a4 4 0 0 1-1.967-.516"></path><path d="M12 13h4"></path><path d="M12 18h6a2 2 0 0 1 2 2v1"></path><path d="M12 8h8"></path><path d="M16 8V5a2 2 0 0 1 2-2"></path><circle cx="16" cy="13" r=".5"></circle><circle cx="18" cy="3" r=".5"></circle><circle cx="20" cy="21" r=".5"></circle><circle cx="20" cy="8" r=".5"></circle></svg></div>
+                <div>
+                  <h3 class="text-[14px] font-semibold">Vector AI Core</h3>
+                  <p class="text-[11px] text-zinc-500 -mt-0.5">Model: ORIGIN-16X • Temp 0.3</p>
+                </div>
+              </div>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">HEALTHY</span>
+            </div>
+          </div>
+          <div class="p-4 sm:p-5 space-y-4">
+            <div class="grid grid-cols-3 gap-2">
+              <div class="rounded-xl bg-white/[0.03] border border-white/10 p-3 text-center">
+                <div class="text-[11px] text-zinc-500">Tokens/s</div>
+                <div id="ai-tps" class="text-[20px] font-semibold mt-1 text-glow">180k</div>
+              </div>
+              <div class="rounded-xl bg-white/[0.03] border border-white/10 p-3 text-center">
+                <div class="text-[11px] text-zinc-500">Context</div>
+                <div class="text-[20px] font-semibold mt-1">2.1M</div>
+              </div>
+              <div class="rounded-xl bg-white/[0.03] border border-white/10 p-3 text-center">
+                <div class="text-[11px] text-zinc-500">Agents</div>
+                <div class="text-[20px] font-semibold mt-1">47</div>
+              </div>
+            <div class="rounded-xl bg-black/40 border border-white/10 p-3">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] text-zinc-400">Autonomous Actions (24h)</span>
+                <span class="text-[11px] text-zinc-500">+3,291</span>
+              </div>
+              <canvas id="aiChart" height="41046" width="138" style="display: block; box-sizing: border-box; height: 24144px; width: 81px;"></canvas>
+            </div>
+            <div class="flex gap-2">
+              <button class="flex-1 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[12px] flex items-center justify-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="play" aria-hidden="true" class="lucide lucide-play size-3.5"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"></path></svg>Run Eval</button>
+              <button class="flex-1 h-9 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/30 text-[12px] text-violet-200 flex items-center justify-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="wand-2" aria-hidden="true" class="lucide lucide-wand-2 size-3.5"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"></path><path d="m14 7 3 3"></path><path d="M5 6v4"></path><path d="M19 14v4"></path><path d="M10 2v2"></path><path d="M7 8H3"></path><path d="M21 16h-4"></path><path d="M11 3H9"></path></svg>Fine-tune</button>
+            </div>
+          </div>
+        </div></section>
+
+        <!-- TERMINAL -->
+        <section class="col-span-12 lg:col-span-7 relative rounded-2xl border-glow glass overflow-hidden">
+          <div class="p-4 sm:p-5 border-b border-white/5 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="size-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="terminal" aria-hidden="true" class="lucide lucide-terminal size-4 text-zinc-300"><path d="M12 19h8"></path><path d="m4 17 6-6-6-6"></path></svg></div>
+              <div>
+                <h3 class="text-[14px] font-semibold">Origin Shell</h3>
+                <p class="text-[11px] text-zinc-500 -mt-0.5">Secure • audited • ephemeral</p>
+              </div>
+            <div class="flex items-center gap-1.5">
+              <span class="size-2 rounded-full bg-red-500/80"></span>
+              <span class="size-2 rounded-full bg-yellow-500/80"></span>
+              <span class="size-2 rounded-full bg-emerald-500/80"></span>
+            </div>
+          </div>
+          <div class="p-0">
+            <div id="term" class="h-[240px] sm:h-[280px] overflow-auto scrollbar p-4 font-mono text-[12px] leading-5 bg-black/40">
+              <div class="text-zinc-500">origin@quantum-core ~ % <span class="text-zinc-300">help</span></div>
+              <div class="text-cyan-300">Available: status, deploy, scan, logs, encrypt, rollback, exit</div>
+            </div>
+            <div class="flex items-center gap-2 px-3 h-11 border-t border-white/5 bg-black/60">
+              <span class="text-emerald-400 font-mono text-[12px]">➜</span>
+              <input id="termInput" class="flex-1 bg-transparent outline-none font-mono text-[13px] placeholder-zinc-600" placeholder="Type a command..." autocomplete="off" spellcheck="false">
+              <button id="termRun" class="h-7 px-2.5 rounded-md bg-white/10 hover:bg-white/15 border border-white/10 text-[11px]">Run</button>
+            </div>
+          </div>
+        </div></section>
+
+        <!-- WORKFLOWS -->
+        <section class="col-span-12 lg:col-span-5 relative rounded-2xl border-glow glass overflow-hidden">
+          <div class="p-4 sm:p-5 border-b border-white/5 flex items-center justify-between">
+            <h3 class="text-[14px] font-semibold">Enterprise Workflows</h3>
+            <button class="h-7 px-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="plus" aria-hidden="true" class="lucide lucide-plus size-3.5"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>New</button>
+          </div>
+          <div class="p-4 space-y-2.5 max-h-[280px] overflow-auto scrollbar">
+            <div class="group flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/10 transition cursor-pointer">
+              <div class="size-9 rounded-lg bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="git-branch" aria-hidden="true" class="lucide lucide-git-branch size-4 text-emerald-300"><path d="M15 6a9 9 0 0 0-9 9V3"></path><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle></svg></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-[13px] font-medium truncate">Deploy v16.4.2 to prod-us-west</div>
+                <div class="text-[11px] text-zinc-500">Forge • 2m ago • success</div>
+              </div>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">PASSED</span>
+            </div>
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/10 transition cursor-pointer">
+              <div class="size-9 rounded-lg bg-cyan-500/15 border border-cyan-500/20 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="database-zap" aria-hidden="true" class="lucide lucide-database-zap size-4 text-cyan-300"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 15 21.84"></path><path d="M21 5V8"></path><path d="M21 12L18 17H22L19 22"></path><path d="M3 12A9 3 0 0 0 14.59 14.87"></path></svg></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-[13px] font-medium truncate">Atlas snapshot • eu-central</div>
+                <div class="text-[11px] text-zinc-500">Backup • running</div>
+              </div>
+              <div class="w-20 h-1.5 rounded-full bg-white/10 overflow-hidden"><div class="h-full w-[68%] bg-cyan-400 animate-pulse"></div></div>
+            </div>
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/10 transition cursor-pointer">
+              <div class="size-9 rounded-lg bg-violet-500/15 border border-violet-500/20 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shield-alert" aria-hidden="true" class="lucide lucide-shield-alert size-4 text-violet-300"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-[13px] font-medium truncate">Sentinel threat hunt</div>
+                <div class="text-[11px] text-zinc-500">Security • scheduled 03:00 UTC</div>
+              </div>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-zinc-300 border border-white/10">QUEUED</span>
+            </div>
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/10 transition cursor-pointer">
+              <div class="size-9 rounded-lg bg-fuchsia-500/15 border border-fuchsia-500/20 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="brain" aria-hidden="true" class="lucide lucide-brain size-4 text-fuchsia-300"><path d="M12 18V5"></path><path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"></path><path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"></path><path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"></path><path d="M18 18a4 4 0 0 0 2-7.464"></path><path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"></path><path d="M6 18a4 4 0 0 1-2-7.464"></path><path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"></path></svg></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-[13px] font-medium truncate">Vector retrain • fraud-v3</div>
+                <div class="text-[11px] text-zinc-500">AI • 18m left</div>
+              </div>
+              <div class="w-20 h-1.5 rounded-full bg-white/10 overflow-hidden"><div class="h-full w-[82%] bg-fuchsia-400"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- AUDIT -->
+        <section class="col-span-12 relative rounded-2xl border-glow glass overflow-hidden">
+          <div class="p-4 sm:p-5 border-b border-white/5 flex items-center justify-between">
+            <h3 class="text-[14px] font-semibold">Audit Log • Immutable</h3>
+            <div class="flex items-center gap-2">
+              <div class="hidden sm:flex items-center gap-1.5 px-2 h-6 rounded-md bg-white/5 border border-white/10 text-[10px] text-zinc-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="lock" aria-hidden="true" class="lucide lucide-lock size-3"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> SHA-3 chained</div>
+              <button class="h-7 px-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px]">Export</button>
+            </div>
+          </div>
+          <div class="overflow-auto">
+            <table class="w-full text-[12px]">
+              <thead class="text-[11px] text-zinc-500 border-b border-white/5">
+                <tr class="[&amp;&gt;th]:text-left [&amp;&gt;th]:font-medium [&amp;&gt;th]:px-4 [&amp;&gt;th]:py-2.5">
+                  <th>Time</th><th>Actor</th><th>Action</th><th>Resource</th><th class="hidden md:table-cell">IP / Region</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="audit" class="divide-y divide-white/[0.04]"><tr class="hover:bg-white/[0.02]"><td class="px-4 py-2.5 font-mono text-zinc-500">15:13:37</td><td class="px-4 py-2.5">sre-bot</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">access-vault</span></td><td class="px-4 py-2.5 text-zinc-300">vault/payment-keys</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">19.160.39.111 / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">SUCCESS</span></td></tr><tr class="hover:bg-white/[0.02]"><td class="px-4 py-2.5 font-mono text-zinc-500">15:13:35</td><td class="px-4 py-2.5">svc.forge</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">retrain-model</span></td><td class="px-4 py-2.5 text-zinc-300">sentinel/policy</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">158.45.118.53 / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">SUCCESS</span></td></tr><tr class="hover:bg-white/[0.02]"><td class="px-4 py-2.5 font-mono text-zinc-500">15:13:33</td><td class="px-4 py-2.5">automation</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">deploy</span></td><td class="px-4 py-2.5 text-zinc-300">prod-us-west</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">31.250.30.223 / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">SUCCESS</span></td></tr><tr class="hover:bg-white/[0.02]"><td class="px-4 py-2.5 font-mono text-zinc-500">15:13:30</td><td class="px-4 py-2.5">liam.patel</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">deploy</span></td><td class="px-4 py-2.5 text-zinc-300">nexus/mesh</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">141.49.117.37 / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">SUCCESS</span></td></tr><tr class="hover:bg-white/[0.02]"><td class="px-4 py-2.5 font-mono text-zinc-500">15:13:28</td><td class="px-4 py-2.5">liam.patel</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">retrain-model</span></td><td class="px-4 py-2.5 text-zinc-300">sentinel/policy</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">4.165.203.102 / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">SUCCESS</span></td></tr><tr class="hover:bg-white/[0.02]"><td class="px-4 py-2.5 font-mono text-zinc-500">15:13:25</td><td class="px-4 py-2.5">automation</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">scale-nodes</span></td><td class="px-4 py-2.5 text-zinc-300">nexus/mesh</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">21.68.94.164 / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">SUCCESS</span></td></tr><tr class="hover:bg-white/[0.02]"><td class="px-4 py-2.5 font-mono text-zinc-500">15:13:23</td><td class="px-4 py-2.5">liam.patel</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">policy-update</span></td><td class="px-4 py-2.5 text-zinc-300">nexus/mesh</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">106.77.189.1 / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/20">DENIED</span></td></tr><tr class="hover:bg-white/[0.02]"><td class="px-4 py-2.5 font-mono text-zinc-500">15:13:21</td><td class="px-4 py-2.5">sre-bot</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">deploy</span></td><td class="px-4 py-2.5 text-zinc-300">atlas/eu-central</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">147.81.141.196 / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">SUCCESS</span></td></tr><tr class="hover:bg-white/[0.02]"><td class="px-4 py-2.5 font-mono text-zinc-500">15:13:18</td><td class="px-4 py-2.5">automation</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">access-vault</span></td><td class="px-4 py-2.5 text-zinc-300">sentinel/policy</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">44.67.147.248 / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/20">DENIED</span></td></tr><tr class="hover:bg-white/[0.02]"><td class="px-4 py-2.5 font-mono text-zinc-500">15:13:17</td><td class="px-4 py-2.5">sre-bot</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">rotate-keys</span></td><td class="px-4 py-2.5 text-zinc-300">vault/payment-keys</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">209.21.204.84 / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">SUCCESS</span></td></tr><tr class="hover:bg-white/[0.02]"><td class="px-4 py-2.5 font-mono text-zinc-500">15:13:14</td><td class="px-4 py-2.5">automation</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">policy-update</span></td><td class="px-4 py-2.5 text-zinc-300">atlas/eu-central</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">247.7.240.84 / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/20">DENIED</span></td></tr><tr class="hover:bg-white/[0.02]"><td class="px-4 py-2.5 font-mono text-zinc-500">15:13:11</td><td class="px-4 py-2.5">automation</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">access-vault</span></td><td class="px-4 py-2.5 text-zinc-300">vault/payment-keys</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">33.43.220.4 / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/20">DENIED</span></td></tr></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- MOBILE BOTTOM NAV -->
+      <div class="h-[72px] lg:hidden"></div>
+    </main>
+  </div>
+
+  <!-- BOTTOM NAV MOBILE -->
+  <nav class="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-white/10 glass-strong">
+    <div class="grid grid-cols-5 h-[64px] px-2">
+      <button class="flex flex-col items-center justify-center gap-1 text-cyan-300"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="layout-dashboard" aria-hidden="true" class="lucide lucide-layout-dashboard size-5"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg><span class="text-[10px]">Home</span></button>
+      <button class="flex flex-col items-center justify-center gap-1 text-zinc-500"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="network" aria-hidden="true" class="lucide lucide-network size-5"><rect x="16" y="16" width="6" height="6" rx="1"></rect><rect x="2" y="16" width="6" height="6" rx="1"></rect><rect x="9" y="2" width="6" height="6" rx="1"></rect><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"></path><path d="M12 12V8"></path></svg><span class="text-[10px]">Mesh</span></button>
+      <button class="flex flex-col items-center justify-center"><div class="size-11 -mt-3 rounded-2xl bg-white text-black flex items-center justify-center shadow-lg shadow-cyan-500/20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="command" aria-hidden="true" class="lucide lucide-command size-5"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path></svg></div></button>
+      <button class="flex flex-col items-center justify-center gap-1 text-zinc-500"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shield-alert" aria-hidden="true" class="lucide lucide-shield-alert size-5"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><span class="text-[10px]">Sentinel</span></button>
+      <button class="flex flex-col items-center justify-center gap-1 text-zinc-500"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="settings" aria-hidden="true" class="lucide lucide-settings size-5"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg><span class="text-[10px]">Settings</span></button>
+    </div>
+  </nav>
+</div>
+
+<!-- COMMAND PALETTE -->
+<div id="palette" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-xl"></div>
+  <div class="relative mx-auto mt-[12vh] w-[92%] max-w-[680px] rounded-2xl border border-white/15 bg-[#0a0c12]/90 shadow-2xl overflow-hidden">
+    <div class="flex items-center gap-3 px-4 h-12 border-b border-white/10">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="search" aria-hidden="true" class="lucide lucide-search size-4 text-zinc-500"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+      <input id="palInput" placeholder="Ask Origin, run commands, find resources…" class="flex-1 bg-transparent outline-none text-[14px] placeholder-zinc-600">
+      <kbd class="px-1.5 py-0.5 rounded bg-white/10 border border-white/10 text-[10px]">ESC</kbd>
+    </div>
+    <div class="p-2 max-h-[380px] overflow-auto scrollbar">
+      <div class="px-2 py-1.5 text-[11px] uppercase tracking-widest text-zinc-500">Quick Actions</div>
+      <button data-cmd="status" class="w-full flex items-center gap-3 px-3 h-11 rounded-xl hover:bg-white/5 text-left"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="activity" aria-hidden="true" class="lucide lucide-activity size-4 text-cyan-300"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg><div><div class="text-[13px]">System Status</div><div class="text-[11px] text-zinc-500">Check quantum core health</div></div></button>
+      <button data-cmd="deploy" class="w-full flex items-center gap-3 px-3 h-11 rounded-xl hover:bg-white/5 text-left"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="rocket" aria-hidden="true" class="lucide lucide-rocket size-4 text-violet-300"><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09"></path><path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05"></path></svg><div><div class="text-[13px]">Deploy to Production</div><div class="text-[11px] text-zinc-500">Forge pipeline v16.4.2</div></div></button>
+      <button data-cmd="scan" class="w-full flex items-center gap-3 px-3 h-11 rounded-xl hover:bg-white/5 text-left"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="scan-search" aria-hidden="true" class="lucide lucide-scan-search size-4 text-emerald-300"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><circle cx="12" cy="12" r="3"></circle><path d="m16 16-1.9-1.9"></path></svg><div><div class="text-[13px]">Threat Scan</div><div class="text-[11px] text-zinc-500">Run Sentinel deep scan</div></div></button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="fixed z-[200] bottom-5 right-5 hidden">
+  <div class="glass-strong border border-white/15 rounded-xl px-3.5 py-2.5 shadow-2xl flex items-center gap-2.5">
+    <div class="size-7 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check" aria-hidden="true" class="lucide lucide-check size-4 text-emerald-300"><path d="M20 6 9 17l-5-5"></path></svg></div>
+    <div>
+      <div class="text-[12px] font-medium leading-tight" id="toastTitle">Success</div>
+      <div class="text-[11px] text-zinc-400 leading-tight" id="toastMsg">Action completed</div>
+    </div>
+  </div>
+</div>
+
+<script>
+lucide.createIcons();
+
+// Clock
+function tick(){ const d=new Date(); document.getElementById('clock').textContent = d.toISOString().substring(11,19)+' UTC'; }
+setInterval(tick,1000); tick();
+
+// Sparks
+const s1 = document.getElementById('spark1').getContext('2d');
+new Chart(s1, { type:'line', data:{labels:[...Array(24)].map((_,i)=>i), datasets:[{data:[...Array(24)].map(()=>Math.random()*20+80), borderColor:'#22d3ee', backgroundColor:'rgba(34,211,238,0.15)', borderWidth:1.5, fill:true, tension:0.4, pointRadius:0}]}, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}}, responsive:true, maintainAspectRatio:false}});
+
+// Latency bars
+const lat = document.getElementById('latBars'); for(let i=0;i<32;i++){ const b=document.createElement('div'); b.className='flex-1 bg-white/10 rounded-sm'; b.style.height = (10+Math.random()*80)+'%'; lat.appendChild(b); }
+setInterval(()=>{ [...lat.children].forEach(b=> b.style.height = (10+Math.random()*80)+'%'); document.getElementById('kpi-lat').textContent = (6+Math.random()*4).toFixed(1); }, 1800);
+
+// KPIs
+setInterval(()=>{ const el=document.getElementById('kpi-tps'); const v=parseInt(el.textContent); el.textContent = (v+Math.floor(Math.random()*2000-800)).toLocaleString()+'k'.replace('k',''); }, 2500);
+setInterval(()=>{ document.getElementById('kpi-nodes').textContent = (14200+Math.floor(Math.random()*50)).toLocaleString(); }, 3000);
+
+// AI Chart
+const ai = document.getElementById('aiChart').getContext('2d');
+new Chart(ai, { type:'bar', data:{labels:['00','04','08','12','16','20','24'], datasets:[{data:[120,190,160,240,210,320,280], backgroundColor:'rgba(139,92,246,0.6)', borderRadius:6}]}, options:{plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}}, responsive:true, maintainAspectRatio:false}});
+setInterval(()=>{ document.getElementById('ai-tps').textContent = Math.floor(170+Math.random()*30)+'k'; }, 2200);
+
+// Network Canvas
+const net = document.getElementById('net'); const ctx = net.getContext('2d'); let w,h, nodes=[];
+function resize(){ w=net.clientWidth; h=net.clientHeight; net.width=w*devicePixelRatio; net.height=h*devicePixelRatio; ctx.scale(devicePixelRatio,devicePixelRatio); }
+addEventListener('resize', resize); resize();
+nodes = [...Array(80)].map(()=>({x:Math.random()*w, y:Math.random()*h, vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3, t:Math.random()*Math.PI*2}));
+function draw(){ ctx.clearRect(0,0,w,h);
+  // connections
+  for(let i=0;i<nodes.length;i++){ for(let j=i+1;j<nodes.length;j++){ const a=nodes[i], b=nodes[j]; const d=Math.hypot(a.x-b.x,a.y-b.y); if(d<90){ ctx.globalAlpha = 1-d/90; ctx.strokeStyle = d<60 ? 'rgba(0,229,255,0.35)' : 'rgba(139,92,246,0.22)'; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); } } }
+  // nodes
+  nodes.forEach(n=>{ n.x+=n.vx; n.y+=n.vy; n.t+=0.02; if(n.x<0||n.x>w) n.vx*=-1; if(n.y<0||n.y>h) n.vy*=-1; const pulse = 1+Math.sin(n.t)*0.3;
+    ctx.globalAlpha=0.9; ctx.fillStyle='#00e5ff'; ctx.beginPath(); ctx.arc(n.x,n.y,2*pulse,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=0.15; ctx.beginPath(); ctx.arc(n.x,n.y,10*pulse,0,Math.PI*2); ctx.fill();
+  });
+  ctx.globalAlpha=1; requestAnimationFrame(draw);
+}
+draw();
+
+// Audit log
+const audit = document.getElementById('audit');
+const actions = ['deploy','rotate-keys','scale-nodes','access-vault','retrain-model','rollback','policy-update'];
+const actors = ['maya.chen','svc.forge','ai.vector-7','liam.patel','automation','sre-bot'];
+const resources = ['prod-us-west','vault/payment-keys','atlas/eu-central','sentinel/policy','vector/fraud-v3','nexus/mesh'];
+const statuses = [['SUCCESS','text-emerald-300','bg-emerald-500/15','border-emerald-500/20'],['SUCCESS','text-emerald-300','bg-emerald-500/15','border-emerald-500/20'],['SUCCESS','text-emerald-300','bg-emerald-500/15','border-emerald-500/20'],['DENIED','text-amber-300','bg-amber-500/15','border-amber-500/20']];
+function addAudit(){ const tr=document.createElement('tr'); tr.className='hover:bg-white/[0.02]'; const time=new Date().toISOString().substring(11,19); const actor=actors[Math.floor(Math.random()*actors.length)]; const act=actions[Math.floor(Math.random()*actions.length)]; const res=resources[Math.floor(Math.random()*resources.length)]; const st=statuses[Math.floor(Math.random()*statuses.length)]; tr.innerHTML = `<td class="px-4 py-2.5 font-mono text-zinc-500">${time}</td><td class="px-4 py-2.5">${actor}</td><td class="px-4 py-2.5"><span class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[11px]">${act}</span></td><td class="px-4 py-2.5 text-zinc-300">${res}</td><td class="px-4 py-2.5 hidden md:table-cell text-zinc-500">${(Math.random()*255|0)}.${(Math.random()*255|0)}.${(Math.random()*255|0)}.${(Math.random()*255|0)} / us-west-2</td><td class="px-4 py-2.5"><span class="text-[10px] px-1.5 py-0.5 rounded ${st[2]} ${st[1]} border ${st[3]}">${st[0]}</span></td>`; audit.prepend(tr); if(audit.children.length>12) audit.removeChild(audit.lastChild); }
+for(let i=0;i<8;i++) addAudit(); setInterval(addAudit, 2400);
+
+// Terminal
+const term = document.getElementById('term'); const termInput = document.getElementById('termInput');
+function print(html){ const div=document.createElement('div'); div.innerHTML=html; term.appendChild(div); term.scrollTop=term.scrollHeight; }
+function runCmd(cmd){ const c=cmd.trim().toLowerCase(); print(`<div class="text-zinc-500">origin@quantum-core ~ % <span class="text-zinc-200">${cmd}</span></div>`); if(!c) return;
+  if(c==='help'){ print(`<div class="text-cyan-300">status, deploy, scan, logs, encrypt, rollback, clear</div>`); }
+  else if(c==='status'){ print(`<div class="text-emerald-300">✓ All systems nominal • 14,208 nodes • P99 8.2ms</div>`); }
+  else if(c==='deploy'){ print(`<div class="text-violet-300">→ Forge pipeline triggered…</div>`); setTimeout(()=>print(`<div class="text-emerald-300">✓ Deployed v16.4.2 to prod-us-west (2m14s)</div>`),1200); toast('Deployment','v16.4.2 released to production'); }
+  else if(c==='scan'){ print(`<div class="text-amber-300">→ Sentinel deep scan initiated…</div>`); setTimeout(()=>print(`<div class="text-emerald-300">✓ 0 threats found • 4.2M files</div>`),1500); }
+  else if(c==='logs'){ print(`<div class="text-zinc-300">[${new Date().toISOString()}] INFO mesh.sync completed</div>`); }
+  else if(c==='encrypt'){ print(`<div class="text-cyan-300">✓ Vault re-encrypted with AES-256-GCM</div>`); }
+  else if(c==='rollback'){ print(`<div class="text-amber-300">↺ Rolling back to v16.4.1…</div>`); }
+  else if(c==='clear'){ term.innerHTML=''; }
+  else if(c==='exit'){ print(`<div class="text-zinc-500">session closed</div>`); }
+  else { print(`<div class="text-red-400">command not found: ${cmd}</div>`); }
+}
+document.getElementById('termRun').onclick=()=>{ runCmd(termInput.value); termInput.value=''; termInput.focus(); };
+termInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ runCmd(termInput.value); termInput.value=''; }});
+
+// Command Palette
+const palette = document.getElementById('palette'); const palInput = document.getElementById('palInput');
+function openPal(){ palette.classList.remove('hidden'); setTimeout(()=>palInput.focus(),0); }
+function closePal(){ palette.classList.add('hidden'); }
+document.getElementById('cmdK').onclick=openPal;
+addEventListener('keydown', e=>{ if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){ e.preventDefault(); openPal(); } if(e.key==='Escape') closePal(); });
+palette.addEventListener('click', e=>{ if(e.target===palette) closePal(); });
+palette.querySelectorAll('[data-cmd]').forEach(b=> b.onclick=()=>{ closePal(); runCmd(b.dataset.cmd); });
+
+// Toast
+function toast(title,msg){ document.getElementById('toastTitle').textContent=title; document.getElementById('toastMsg').textContent=msg; const t=document.getElementById('toast'); t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'), 2400); }
+document.getElementById('deployAgent').onclick=()=> toast('Agent Deployed','Origin-7 online • learning');
+
+ // Simulate mobile tap on center button
+document.querySelector('nav button:nth-child(3)')?.addEventListener('click', openPal);
+</script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+
+</body></html>
