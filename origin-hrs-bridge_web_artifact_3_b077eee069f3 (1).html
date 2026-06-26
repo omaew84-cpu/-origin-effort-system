@@ -1,0 +1,547 @@
+<html lang="th"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ORIGIN-HRS Bridge — Maew Production</title>
+<style>
+:root {
+  --bg: #030609;
+  --panel: rgba(12, 18, 28, 0.85);
+  --panel-2: rgba(16, 24, 36, 0.9);
+  --emerald: #00ffa3;
+  --cyan: #00d4ff;
+  --violet: #8a5cff;
+  --red: #ff3b6b;
+  --amber: #ffb224;
+  --green: #00e58a;
+  --text: #e6f0ff;
+  --text-dim: #8ba0b8;
+  --border: rgba(0, 255, 163, 0.15);
+  --glow: 0 0 20px rgba(0,255,163,0.25);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "Noto Sans Thai", Inter, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(800px 400px at 15% 0%, rgba(0,212,255,0.12), transparent 60%),
+    radial-gradient(600px 300px at 85% 10%, rgba(0,255,163,0.1), transparent 60%),
+    radial-gradient(500px 300px at 50% 100%, rgba(138,92,255,0.08), transparent 60%),
+    linear-gradient(180deg, #030609 0%, #050a12 100%);
+  z-index: -2;
+}
+body::after {
+  content: ""; position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 32px 32px; z-index: -1; opacity: 0.4;
+}
+.app { max-width: 1400px; margin: 0 auto; padding: 12px; }
+
+/* Header */
+header {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+  padding: 12px 14px; backdrop-filter: blur(16px); box-shadow: var(--glow);
+  position: sticky; top: 10px; z-index: 100;
+}
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.logo {
+  width: 36px; height: 36px; border-radius: 10px; flex:0 0 36px;
+  background: conic-gradient(from 180deg, var(--emerald), var(--cyan), var(--violet), var(--emerald));
+  box-shadow: 0 0 16px rgba(0,255,163,0.4), inset 0 0 12px rgba(0,0,0,0.5);
+  position: relative;
+}
+.logo::after { content: "⇄"; position: absolute; inset: 0; display: grid; place-items: center; font-weight: 700; color: #001; text-shadow: 0 0 8px white; }
+h1 { font-size: 16px; letter-spacing: 0.5px; font-weight: 700; white-space: nowrap; }
+h1 span { color: var(--emerald); }
+.by { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+.header-right { display:flex; align-items:center; gap:8px; }
+.nav-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px; background: rgba(0,255,163,0.1); border:1px solid rgba(0,255,163,0.3); color:var(--emerald); font-size:12px; font-weight:700; text-decoration:none; white-space:nowrap; }
+.nav-btn:hover { background: rgba(0,255,163,0.18); }
+.status {
+  display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px;
+  background: rgba(0,229,138,0.1); border: 1px solid rgba(0,229,138,0.3); font-size: 11px; font-weight: 600; color: var(--green); white-space: nowrap;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:0.6; transform:scale(1.2)} }
+
+/* Layout */
+.grid { display: grid; gap: 14px; margin-top: 14px; grid-template-areas: "center" "left" "right"; }
+.panel {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 18px;
+  padding: 14px; backdrop-filter: blur(12px); box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.panel-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+.panel-title strong { color: var(--text); font-weight: 600; text-transform: none; letter-spacing: 0.3px; }
+.thai { font-size: 11px; opacity: 0.7; }
+
+/* Left */
+.left { grid-area: left; }
+.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.card {
+  background: var(--panel-2); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 12px;
+  position: relative; overflow: hidden; transition: transform 0.2s;
+}
+.card:hover { transform: translateY(-2px); border-color: rgba(0,255,163,0.3); }
+.card-label { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+.card-value { font-size: 24px; font-weight: 700; letter-spacing: 0.5px; }
+.card-value.small { font-size: 16px; }
+.card-unit { font-size: 11px; color: var(--text-dim); margin-left: 4px; font-weight: 500; }
+.card-sub { font-size: 10px; color: var(--text-dim); margin-top: 4px; }
+.bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+.bar-fill { height: 100%; width: 58%; background: linear-gradient(90deg, var(--cyan), var(--emerald)); transition: width 0.8s ease; box-shadow: 0 0 8px var(--emerald); }
+.bar-fill.risk { width: 88%; background: linear-gradient(90deg, var(--red), var(--amber)); }
+.status-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 5px 9px; border-radius: 8px; margin-top: 6px; font-weight: 700; }
+.status-pill.bad { background: rgba(255,59,107,0.15); color: var(--red); border: 1px solid rgba(255,59,107,0.3); }
+.status-pill.good { background: rgba(0,229,138,0.15); color: var(--green); border: 1px solid rgba(0,229,138,0.3); }
+
+/* Center */
+.center { grid-area: center; }
+.bridge {
+  background: linear-gradient(180deg, rgba(0,212,255,0.08), rgba(0,0,0,0));
+  border: 1px dashed rgba(0,255,163,0.25); border-radius: 16px; padding: 14px; position: relative;
+}
+.flow { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding: 8px 0 14px; scrollbar-width: none; }
+.flow::-webkit-scrollbar { display: none; }
+.node {
+  flex: 0 0 auto; min-width: 108px; text-align: center; padding: 12px 10px; border-radius: 12px;
+  background: var(--panel-2); border: 1px solid rgba(255,255,255,0.08); font-size: 12px; font-weight: 600; position: relative;
+}
+.node span { display: block; font-size: 10px; color: var(--text-dim); margin-top: 3px; font-weight: 500; }
+.node.active { border-color: var(--emerald); box-shadow: 0 0 16px rgba(0,255,163,0.3); background: rgba(0,255,163,0.08); }
+.node.active::after { content: ""; position: absolute; inset: -2px; border-radius: 12px; border: 1px solid var(--emerald); opacity: 0.5; animation: ping 2s infinite; }
+@keyframes ping { 0%{ transform: scale(1); opacity: 0.5 } 100%{ transform: scale(1.08); opacity: 0 } }
+.arrow { flex: 0 0 auto; width: 32px; height: 2px; background: linear-gradient(90deg, transparent, var(--cyan), transparent); position: relative; }
+.arrow::after { content: "›"; position: absolute; right: -6px; top: -9px; color: var(--cyan); font-size: 16px; }
+.arrow.back { background: linear-gradient(90deg, transparent, var(--violet), transparent); }
+.arrow.back::after { content: "‹"; left: -6px; right: auto; color: var(--violet); }
+
+.live-bar { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:10px; padding:10px 12px; background: rgba(0,0,0,0.35); border:1px solid rgba(0,255,163,0.18); border-radius:12px; font-size:12px; flex-wrap: wrap; }
+.live-bar strong { font-weight:700; color: var(--emerald); }
+#originLiveTitle { color: var(--text); font-weight:600; }
+#originLiveTime { color: var(--text-dim); font-size:11px; }
+
+.csv-bar { display:flex; gap:8px; margin: 12px 0 4px; }
+.csv-bar input { flex:1; min-height:48px; padding:12px 14px; border-radius:12px; background:#02070c; border:1px solid rgba(255,255,255,0.12); color:var(--text); font-size:14px; outline:none; }
+.csv-bar input:focus { border-color: var(--cyan); box-shadow:0 0 0 3px rgba(0,212,255,0.15); }
+.mini-btn { min-height:48px; padding:0 16px; border-radius:12px; background:rgba(0,212,255,0.12); border:1px solid rgba(0,212,255,0.3); color:var(--cyan); font-weight:700; font-size:13px; cursor:pointer; white-space:nowrap; }
+.mini-btn:active { transform:scale(0.98); }
+.csv-status { font-size:11px; color:var(--text-dim); margin:0 0 8px 4px; }
+
+.sync-wrap { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.btn {
+  width: 100%; padding: 16px; min-height:52px; border-radius: 12px; border: 1px solid rgba(0,255,163,0.4);
+  background: radial-gradient(200px 100px at 50% 0%, rgba(0,255,163,0.25), transparent), linear-gradient(180deg, rgba(0,255,163,0.15), rgba(0,212,255,0.1));
+  color: #001b12; font-weight: 800; letter-spacing: 0.5px; font-size: 16px; cursor: pointer; text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+  box-shadow: 0 0 20px rgba(0,255,163,0.2), inset 0 1px 0 rgba(255,255,255,0.2); transition: all 0.2s;
+}
+.btn:active { transform: translateY(1px) scale(0.99); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-sub { font-size: 11px; text-align: center; color: var(--text-dim); }
+
+.poll-info { display:flex; justify-content:space-between; align-items:center; margin-top:4px; padding:10px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; font-size:12px; color:var(--text-dim); }
+.poll-info b { color:var(--emerald); font-variant-numeric:tabular-nums; }
+.poll-info label { display:flex; align-items:center; gap:6px; cursor:pointer; }
+
+.log { margin-top: 14px; background: #050a0f; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; overflow: hidden; }
+.log-head { padding: 10px 12px; font-size: 12px; color: var(--text-dim); border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items:center; gap:8px; flex-wrap:wrap; }
+.log-list { max-height: 220px; overflow-y: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+.log-item { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); display: grid; grid-template-columns: 130px 110px 1fr; gap: 8px; }
+.log-item:last-child { border-bottom: none; }
+.log-t { color: var(--cyan); }
+.log-e { color: var(--emerald); }
+.log-d { color: #cfe7ff; opacity: 0.9; word-break: break-word; }
+.export { padding:8px 12px; min-height:32px; border-radius:8px; background:rgba(0,255,163,0.1); border:1px solid rgba(0,255,163,0.25); color:var(--emerald); font-size:11px; font-weight:700; cursor:pointer; }
+
+/* Right */
+.right { grid-area: right; }
+.versions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.vchip {
+  padding: 12px 6px; min-height:44px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  font-size: 13px; font-weight: 600; text-align: center; cursor: pointer; transition: all 0.15s; position: relative;
+}
+.vchip:hover { border-color: var(--cyan); transform: translateY(-1px); }
+.vchip.active { background: rgba(0,255,163,0.12); border-color: var(--emerald); color: var(--emerald); box-shadow: 0 0 12px rgba(0,255,163,0.2); }
+.vchip.special { background: linear-gradient(180deg, rgba(138,92,255,0.2), rgba(0,212,255,0.1)); border-color: rgba(138,92,255,0.5); }
+.legend { margin-top: 24px; font-size: 11px; color: var(--text-dim); line-height: 1.6; }
+.legend b { color: var(--violet); }
+
+/* Footer */
+footer {
+  margin-top: 14px; padding: 14px; background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+  font-size: 12px; line-height: 1.6; color: #bcd0e4;
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .grid { grid-template-columns: 320px 1fr 360px; grid-template-areas: "left center right"; align-items: start; }
+  h1 { font-size: 20px; }
+  .metrics { grid-template-columns: 1fr 1fr; }
+  .versions { grid-template-columns: repeat(5, 1fr); }
+  .node { min-width: 130px; font-size: 13px; }
+  .flow { justify-content: center; }
+  .log-list { max-height: 260px; }
+}
+@media (max-width: 768px) {
+  .metrics { grid-template-columns: 1fr; }
+  .versions { grid-template-columns: repeat(3, 1fr); }
+  .log-item { grid-template-columns: 1fr; gap: 2px; }
+  header { flex-wrap: wrap; }
+  .header-right { width: 100%; justify-content: space-between; margin-top: 6px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>ORIGIN <span>⇄</span> HRS Bridge</h1>
+        <div class="by">by Maew • HRS 2030 CHRONOS EDITION • Production</div>
+      </div>
+    <div class="header-right">
+      <a href="https://omaew84-cpu.github.io/-origin-effort-system/" class="nav-btn">← กลับไป ORIGIN</a>
+      <div class="status"><div class="dot"></div><span id="connStatus">CONNECTED</span></div>
+    </div>
+  </div></header>
+
+  <main class="grid">
+    <!-- LEFT -->
+    <section class="panel left">
+      <div class="panel-title"><strong>HRS Live Metrics</strong> <span class="thai">เมตริกสด</span></div>
+      <div class="metrics">
+        <div class="card">
+          <div class="card-label">Time Drift <span class="thai">เวลาเบี่ยงเบน</span></div>
+          <div class="card-value"><span id="m-drift">9.8</span><span class="card-unit">ms</span></div>
+          <div class="bar"><div class="bar-fill" id="bar-drift" style="width: 39.2%;"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Max Offset <span class="thai">ออฟเซ็ตสูงสุด</span></div>
+          <div class="card-value"><span id="m-offset">14,220</span><span class="card-unit">ms</span></div>
+          <div class="card-sub">จาก CSV: DRIFT_CORRECTION</div>
+        </div>
+        <div class="card">
+          <div class="card-label">ASIA Load <span class="thai">โหลดเอเชีย</span></div>
+          <div class="card-value"><span id="m-asia">55</span><span class="card-unit">%</span></div>
+          <div class="bar"><div class="bar-fill" id="bar-asia" style="width: 55%;"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Risk Level <span class="thai">ความเสี่ยง</span></div>
+          <div class="card-value"><span id="m-risk">42</span><span class="card-unit">%</span></div>
+          <div class="bar"><div class="bar-fill risk" id="bar-risk" style="width: 42%; background: linear-gradient(90deg, var(--green), var(--cyan));"></div></div>
+        </div>
+        <div class="card" style="grid-column: span 2;">
+          <div class="card-label">Host Integrity <span class="thai">ความสมบูรณ์โฮสต์</span></div>
+          <div class="card-value small" id="m-integrity-text">Validated</div>
+          <div id="m-integrity-pill" class="status-pill good">● ตรวจสอบแล้ว</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER -->
+    <section class="panel center">
+      <div class="panel-title"><strong>Bridge Logic</strong> <span class="thai">ตรรกะสะพาน</span></div>
+      <div class="bridge" id="bridge" style="">
+        <div class="flow">
+          <div class="node" id="n-csv">HRS CSV<span>2026-06-26 02:06:03</span></div>
+          <div class="arrow"></div>
+          <div class="node active" id="n-origin">ORIGIN v7<span>Meta Observer</span></div>
+          <div class="arrow"></div>
+          <div class="node" id="n-decision">Auto-Decision<span>สำเร็จ</span></div>
+          <div class="arrow back"></div>
+          <div class="node active" id="n-token">HRS Token<span>02:05:35</span></div>
+        </div>
+      </div>
+
+      <div class="live-bar">
+        <div><strong>ORIGIN Live:</strong> <span id="originLiveTitle">-origin-effort-system | Effort Observing Itself — from single word to self-deploying META-ORIGIN v1-v8</span></div>
+        <div id="originLiveTime">Last fetch: 26/6/2569 16:39:02</div>
+      </div>
+
+      <div class="csv-bar">
+        <input id="csvUrl" type="text" value="sample" placeholder="HRS CSV URL • ใส่ https://.../log.csv หรือ 'sample'" autocapitalize="off" autocomplete="off">
+        <button id="loadCsvBtn" class="mini-btn">โหลด CSV</button>
+      </div>
+      <div class="csv-status" id="csvStatus">ใช้ตัวอย่าง sample • พร้อม Auto-Poll</div>
+
+      <div class="sync-wrap">
+        <button class="btn" id="syncBtn">SYNC NOW • ซิงค์ทันที</button>
+        <div class="btn-sub">อ่าน CSV → ดึง ORIGIN → วิเคราะห์ v<span id="coreVersion">7</span> → อัปเดต Token กลับ HRS</div>
+        <div class="poll-info">
+          <span>Auto-poll ใน <b id="countdown">1</b> วินาที</span>
+          <label><input type="checkbox" id="autoToggle" checked=""> เปิดอัตโนมัติ</label>
+        </div>
+      </div>
+
+      <div class="log">
+        <div class="log-head">
+          <span>System Log / บันทึก</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="log-count">14 events</span>
+            <button id="exportBtn" class="export">Export Log ↓</button>
+          </div>
+        <div class="log-list" id="logList"><div class="log-item"><div class="log-t">2026-06-26 09:39:02</div><div class="log-e">AUTO_CLEAR</div><div class="log-d">Drift 9.8ms &lt;20ms → Host Integrity Validated • Risk → 42%</div></div><div class="log-item"><div class="log-t">2026-06-26 09:39:02</div><div class="log-e">ORIGIN_FETCH</div><div class="log-d">OK - -origin-effort-system | Effort Observing Itself — from single word to self-deploying META-ORIGIN v1-v8</div></div><div class="log-item"><div class="log-t">2026-06-26 09:39:02</div><div class="log-e">BRIDGE_START</div><div class="log-d">Auto-poll sync</div></div><div class="log-item"><div class="log-t">2026-06-26 09:38:51</div><div class="log-e">AUTO_CLEAR</div><div class="log-d">Drift 9.8ms &lt;20ms → Host Integrity Validated • Risk → 42%</div></div><div class="log-item"><div class="log-t">2026-06-26 02:06:03</div><div class="log-e">RISK_ASSESSMENT</div><div class="log-d">Level 42% - Normal</div></div><div class="log-item"><div class="log-t">2026-06-26 02:06:02</div><div class="log-e">LOAD_BALANCE</div><div class="log-d">ASIA 55%</div></div><div class="log-item"><div class="log-t">2026-06-26 02:06:01</div><div class="log-e">DRIFT_CORRECTION</div><div class="log-d">14,220ms → 9.8ms committed</div></div><div class="log-item"><div class="log-t">2026-06-26 02:05:35</div><div class="log-e">TOKEN_ISSUED</div><div class="log-d">HRS-2030-CHRONOS / v7 authorized</div></div><div class="log-item"><div class="log-t">2026-06-26 02:05:34</div><div class="log-e">DRIFT_CORRECTION</div><div class="log-d">14,220ms → 11ms pending</div></div><div class="log-item"><div class="log-t">2026-06-26 02:05:33</div><div class="log-e">LOAD_BALANCE</div><div class="log-d">ASIA 58% → rerouting initiated</div></div><div class="log-item"><div class="log-t">2026-06-26 02:05:32</div><div class="log-e">RISK_ASSESSMENT</div><div class="log-d">Level 88% - High</div></div><div class="log-item"><div class="log-t">2026-06-26 02:05:31</div><div class="log-e">HOST_INTEGRITY</div><div class="log-d">Anomaly Flagged by Chronos</div></div><div class="log-item"><div class="log-t">2026-06-26 09:38:51</div><div class="log-e">ORIGIN_FETCH</div><div class="log-d">OK - -origin-effort-system | Effort Observing Itself — from single word to self-deploying META-ORIGIN v1-v8</div></div><div class="log-item"><div class="log-t">2026-06-26 09:38:51</div><div class="log-e">BRIDGE_START</div><div class="log-d">Auto-poll sync</div></div></div>
+      </div>
+    </div></section>
+
+    <!-- RIGHT -->
+    <section class="panel right">
+      <div class="panel-title"><strong>ORIGIN Emerald Quantum PRO</strong> <span class="thai">40 เวอร์ชัน</span></div>
+      <div class="versions" id="versionGrid"><button class="vchip" data-v="1">v1</button><button class="vchip" data-v="2">v2</button><button class="vchip" data-v="3">v3</button><button class="vchip" data-v="4">v4</button><button class="vchip" data-v="5">v5</button><button class="vchip" data-v="6">v6</button><button class="vchip special active" data-v="7">v7</button><button class="vchip" data-v="8">v8</button><button class="vchip" data-v="9">v9</button><button class="vchip" data-v="10">v10</button><button class="vchip" data-v="11">v11</button><button class="vchip" data-v="12">v12</button><button class="vchip" data-v="13">v13</button><button class="vchip" data-v="14">v14</button><button class="vchip" data-v="15">v15</button><button class="vchip" data-v="16">v16</button><button class="vchip" data-v="17">v17</button><button class="vchip" data-v="18">v18</button><button class="vchip" data-v="19">v19</button><button class="vchip" data-v="20">v20</button><button class="vchip" data-v="21">v21</button><button class="vchip special" data-v="22">v22</button><button class="vchip" data-v="23">v23</button><button class="vchip" data-v="24">v24</button><button class="vchip" data-v="25">v25</button><button class="vchip" data-v="26">v26</button><button class="vchip" data-v="27">v27</button><button class="vchip" data-v="28">v28</button><button class="vchip" data-v="29">v29</button><button class="vchip" data-v="30">v30</button><button class="vchip" data-v="31">v31</button><button class="vchip" data-v="32">v32</button><button class="vchip" data-v="33">v33</button><button class="vchip" data-v="34">v34</button><button class="vchip" data-v="35">v35</button><button class="vchip" data-v="36">v36</button><button class="vchip special" data-v="37">v37</button><button class="vchip" data-v="38">v38</button><button class="vchip special" data-v="39">v39</button><button class="vchip" data-v="40">v40</button></div>
+      <div class="legend">
+        <b>ไฮไลต์:</b> v7 Meta Observer • v22 Conscious Fabric • v37 Chronos Gate • v39 Omega Pattern<br>
+        คลิกเพื่อเลือกเวอร์ชันสำหรับทำหน้าที่เป็น Bridge Core — ระบบจะใช้เวอร์ชันนี้วิเคราะห์ CSV แบบเรียลไทม์
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <strong>ORIGIN-HRS Bridge Production:</strong> ระบบเชื่อมต่ออัตโนมัติระหว่าง <b>HRS 2030 CHRONOS EDITION</b> และ <b>ORIGIN Effort System</b> โดยอ่านไฟล์ CSV จริง, ดึงสถานะสดจาก origin-effort-system, ทำ Auto-Poll ทุก 10 วินาที หาก Time Drift &lt; 20ms ระบบจะล้าง Anomaly อัตโนมัติ เปลี่ยน Host Integrity เป็น "Validated" และลด Risk จาก 88% → 42% พร้อม Export Log เป็น CSV ได้ทันที
+  </footer>
+</div>
+
+<script id="sampleCsv" type="text/plain">TIMESTAMP,EVENT_TYPE,DETAILS
+2026-06-26 02:05:31,HOST_INTEGRITY,Anomaly Flagged by Chronos
+2026-06-26 02:05:32,RISK_ASSESSMENT,Level 88% - High
+2026-06-26 02:05:33,LOAD_BALANCE,ASIA 58% → rerouting initiated
+2026-06-26 02:05:34,DRIFT_CORRECTION,"14,220ms → 11ms pending"
+2026-06-26 02:05:35,TOKEN_ISSUED,HRS-2030-CHRONOS / v7 authorized
+2026-06-26 02:06:01,DRIFT_CORRECTION,"14,220ms → 9.8ms committed"
+2026-06-26 02:06:02,LOAD_BALANCE,ASIA 55%
+2026-06-26 02:06:03,RISK_ASSESSMENT,Level 42% - Normal
+</script>
+
+<script>
+const specials = {7: 'Meta Observer', 22: 'Conscious Fabric', 37: 'Chronos Gate', 39: 'Omega Pattern'};
+const versionGrid = document.getElementById('versionGrid');
+let activeVersion = 7;
+
+for(let i=1;i<=40;i++){
+  const btn = document.createElement('button');
+  btn.className = 'vchip';
+  btn.textContent = 'v'+i;
+  btn.dataset.v = i;
+  if(specials[i]){ btn.classList.add('special'); }
+  if(i===7) btn.classList.add('active');
+  btn.onclick = () => selectVersion(i);
+  versionGrid.appendChild(btn);
+}
+
+function selectVersion(v){
+  activeVersion = v;
+  document.querySelectorAll('.vchip').forEach(c=>c.classList.toggle('active', +c.dataset.v===v));
+  const node = document.getElementById('n-origin');
+  node.innerHTML = `ORIGIN v${v}<span>${specials[v]||'Standard Core'}</span>`;
+  document.getElementById('coreVersion').textContent = v;
+  addLog(now(), 'VERSION_SWITCH', `Bridge core → v${v} ${specials[v]||''}`);
+}
+
+const logs = []; const seen = new Set();
+const logList = document.getElementById('logList');
+function renderLogs(){
+  logList.innerHTML = logs.map(l=>`<div class="log-item"><div class="log-t">${l.t}</div><div class="log-e">${l.e}</div><div class="log-d">${l.d}</div></div>`).join('');
+  document.getElementById('log-count').textContent = logs.length + ' events';
+}
+function addLog(t,e,d){ logs.unshift({t,e,d}); if(logs.length>200) logs.pop(); renderLogs(); }
+function now(){ return new Date().toISOString().slice(0,19).replace('T',' '); }
+
+const mDrift = document.getElementById('m-drift');
+const mOffset = document.getElementById('m-offset');
+const mAsia = document.getElementById('m-asia');
+const mRisk = document.getElementById('m-risk');
+const mIntegrityText = document.getElementById('m-integrity-text');
+const mIntegrityPill = document.getElementById('m-integrity-pill');
+const barAsia = document.getElementById('bar-asia');
+const barRisk = document.getElementById('bar-risk');
+const barDrift = document.getElementById('bar-drift');
+
+function animateValue(el, start, end, decimals=1){
+  const dur = 800; const t0 = performance.now();
+  function step(t){
+    const p = Math.min(1, (t-t0)/dur);
+    const v = start + (end-start)*(1-Math.pow(1-p,3));
+    el.textContent = decimals ? v.toFixed(decimals) : Math.round(v).toLocaleString();
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function parseCSV(text){
+  const lines = text.trim().split(/\r?\n/);
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const line = lines[i].trim(); if(!line) continue;
+    const m = line.match(/^([^,]+),([^,]+),(.*)$/);
+    if(!m) continue;
+    let [,ts,ev,det] = m;
+    det = det.replace(/^"(.*)"$/,'$1').replace(/""/g,'"');
+    rows.push({t: ts.trim(), e: ev.trim(), d: det.trim()});
+  }
+  return rows;
+}
+
+async function getCsvText(){
+  const url = document.getElementById('csvUrl').value.trim();
+  const status = document.getElementById('csvStatus');
+  if(!url || url.toLowerCase()==='sample'){
+    status.textContent = 'ใช้ตัวอย่าง sample • พร้อม Auto-Poll';
+    return document.getElementById('sampleCsv').textContent;
+  }
+  try{
+    addLog(now(), 'CSV_FETCH', `GET ${url}`);
+    const res = await fetch(url, {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const txt = await res.text();
+    status.textContent = 'โหลด CSV สำเร็จ • ' + new Date().toLocaleTimeString('th-TH');
+    document.getElementById('connStatus').textContent = 'CONNECTED';
+    return txt;
+  }catch(e){
+    status.textContent = 'โหลดล้มเหลว - ใช้ sample แทน ('+e.message+')';
+    addLog(now(), 'CSV_ERROR', e.message);
+    return document.getElementById('sampleCsv').textContent;
+  }
+}
+
+let isSyncing = false;
+async function performSync(manual=false){
+  if(isSyncing) return;
+  isSyncing = true;
+  const btn = document.getElementById('syncBtn');
+  btn.disabled = true; btn.textContent = 'SYNCING… กำลังซิงค์';
+  document.getElementById('bridge').style.boxShadow = '0 0 30px rgba(0,255,163,0.3)';
+
+  addLog(now(), 'BRIDGE_START', manual ? 'Manual sync triggered' : 'Auto-poll sync');
+
+  // ORIGIN live fetch
+  const liveTitleEl = document.getElementById('originLiveTitle');
+  const liveTimeEl = document.getElementById('originLiveTime');
+  try {
+    const resp = await fetch('https://omaew84-cpu.github.io/-origin-effort-system/', { cache: 'no-store' });
+    const html = await resp.text();
+    const mt = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    const title = mt ? mt[1].trim() : 'ORIGIN Effort System';
+    liveTitleEl.textContent = title;
+    liveTimeEl.textContent = 'Last fetch: ' + new Date().toLocaleString('th-TH');
+    addLog(now(), 'ORIGIN_FETCH', 'OK - '+title);
+  } catch(e) {
+    liveTitleEl.textContent = 'ORIGIN Effort System — Emerald Quantum PRO';
+    liveTimeEl.textContent = 'Fetch blocked (CORS) • using cached';
+    addLog(now(), 'ORIGIN_FETCH', 'Blocked - offline mode');
+  }
+
+  // CSV
+  const csvText = await getCsvText();
+  const rows = parseCSV(csvText);
+  
+  const latest = rows[rows.length-1];
+  if(latest){
+    document.getElementById('n-csv').innerHTML = `HRS CSV<span>${latest.t}</span>`;
+  }
+
+  rows.forEach(r=>{
+    const key = r.t+'|'+r.e+'|'+r.d;
+    if(!seen.has(key)){ seen.add(key); addLog(r.t, r.e, r.d); }
+  });
+
+  // Extract metrics
+  let driftVal = null, offsetVal = null, asiaVal = null;
+  const driftRows = rows.filter(r=>r.e==='DRIFT_CORRECTION');
+  if(driftRows.length){
+    const last = driftRows[driftRows.length-1];
+    const ms = [...last.d.matchAll(/([\d,]+(?:\.\d+)?)\s*ms/gi)].map(m=>parseFloat(m[1].replace(/,/g,'')));
+    if(ms.length>=1){ offsetVal = ms[0]; driftVal = ms[ms.length-1]; }
+  }
+  const loadRows = rows.filter(r=>r.e==='LOAD_BALANCE');
+  if(loadRows.length){
+    const m = loadRows[loadRows.length-1].d.match(/(\d+)\s*%/);
+    if(m) asiaVal = parseInt(m[1]);
+  }
+  const tokenRows = rows.filter(r=>r.e==='TOKEN_ISSUED');
+  if(tokenRows.length){
+    document.getElementById('n-token').innerHTML = `HRS Token<span>${tokenRows[tokenRows.length-1].t.slice(11)}</span>`;
+  }
+
+  // Update UI
+  if(driftVal!==null){
+    animateValue(mDrift, parseFloat(mDrift.textContent)||0, driftVal, 1);
+    barDrift.style.width = Math.min(100, Math.max(8, driftVal*4)) + '%';
+  }
+  if(offsetVal!==null){ mOffset.textContent = Math.round(offsetVal).toLocaleString(); }
+  if(asiaVal!==null){
+    animateValue(mAsia, parseInt(mAsia.textContent)||0, asiaVal, 0);
+    barAsia.style.width = asiaVal + '%';
+  }
+
+  // Auto-clear anomaly
+  if(driftVal!==null && driftVal < 20){
+    mIntegrityText.textContent = 'Validated';
+    mIntegrityPill.className = 'status-pill good';
+    mIntegrityPill.textContent = '● ตรวจสอบแล้ว';
+    const curRisk = parseInt(mRisk.textContent)||88;
+    if(curRisk>42) animateValue(mRisk, curRisk, 42, 0);
+    barRisk.style.width = '42%';
+    barRisk.style.background = 'linear-gradient(90deg, var(--green), var(--cyan))';
+    document.getElementById('n-decision').innerHTML = 'Auto-Decision<span>สำเร็จ</span>';
+    document.getElementById('n-token').classList.add('active');
+    addLog(now(), 'AUTO_CLEAR', `Drift ${driftVal}ms <20ms → Host Integrity Validated • Risk → 42%`);
+  } else {
+    mIntegrityText.textContent = 'Anomaly Flagged';
+    mIntegrityPill.className = 'status-pill bad';
+    mIntegrityPill.textContent = '● ต้องตรวจสอบ';
+    animateValue(mRisk, parseInt(mRisk.textContent)||42, 88, 0);
+    barRisk.style.width = '88%';
+    barRisk.style.background = 'linear-gradient(90deg, var(--red), var(--amber))';
+  }
+
+  await new Promise(r=>setTimeout(r, 400));
+  btn.disabled = false; btn.textContent = 'SYNC NOW • ซิงค์ทันที';
+  document.getElementById('bridge').style.boxShadow = '';
+  isSyncing = false;
+  remaining = pollInterval;
+}
+
+// Auto-poll
+let pollInterval = 10;
+let remaining = pollInterval;
+const countdownEl = document.getElementById('countdown');
+function tick(){
+  if(!document.getElementById('autoToggle').checked){ return; }
+  remaining--;
+  if(remaining <= 0){ performSync(false); remaining = pollInterval; }
+  countdownEl.textContent = remaining;
+}
+setInterval(tick, 1000);
+
+document.getElementById('syncBtn').onclick = () => { remaining = pollInterval; performSync(true); };
+document.getElementById('loadCsvBtn').onclick = () => { remaining = pollInterval; performSync(true); };
+
+// Export
+document.getElementById('exportBtn').onclick = ()=>{
+  const header = 'TIMESTAMP,EVENT_TYPE,DETAILS\n';
+  const csv = logs.slice().reverse().map(l => `${l.t},${l.e},"${l.d.replace(/"/g,'""')}"`).join('\n');
+  const blob = new Blob([header+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `hrs-bridge-log-${new Date().toISOString().replace(/[:.]/g,'-')}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  addLog(now(), 'EXPORT_CSV', 'Log exported successfully');
+};
+
+// Init
+renderLogs();
+performSync(false);
+countdownEl.textContent = remaining;
+</script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+
+</body></html>
