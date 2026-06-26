@@ -1,1 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN v30 // TRANSCENSION PROTOCOL — by Maew</title>
 
+<style>
+:root{
+  --trans:#ffe28a;
+  --flare:#fff3c2;
+  --bg1:#1a0f00;
+  --bg2:#332000;
+}
+body{
+  margin:0;
+  background:radial-gradient(circle at center,#332000 0%,#1a0f00 100%);
+  color:#fff;
+  font-family:'Orbitron',system-ui,sans-serif;
+  text-align:center;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* TITLE */
+h1{
+  margin-top:80px;
+  font-size:2.4rem;
+  color:var(--trans);
+  text-shadow:0 0 20px var(--trans),0 0 40px var(--flare);
+}
+h2{
+  color:var(--flare);
+  text-shadow:0 0 12px var(--trans);
+}
+p{
+  max-width:480px;
+  margin:10px auto;
+  opacity:.85;
+  line-height:1.5;
+}
+
+/* PARTICLES */
+.transcend{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle,rgba(255,226,138,.25) 2px,transparent 2px),
+    radial-gradient(circle,rgba(255,243,194,.15) 1px,transparent 1px);
+  background-size:160px 160px,100px 100px;
+  animation:drift 50s linear infinite;
+}
+@keyframes drift{
+  from{transform:translateY(0);}
+  to{transform:translateY(-300px);}
+}
+
+/* BUTTON */
+button{
+  margin-top:28px;
+  background:rgba(255,226,138,.15);
+  border:1px solid rgba(255,226,138,.4);
+  color:#fff;
+  padding:12px 28px;
+  border-radius:999px;
+  font-weight:bold;
+  letter-spacing:.1em;
+  cursor:pointer;
+  backdrop-filter:blur(4px);
+  box-shadow:0 0 20px var(--trans);
+  transition:.25s;
+}
+button:hover{
+  box-shadow:0 0 30px var(--flare),0 0 60px var(--trans);
+}
+button:active{
+  transform:scale(.97);
+}
+
+footer{
+  margin-top:40px;
+  opacity:.6;
+  font-size:.75rem;
+}
+</style>
+</head>
+
+<body>
+
+<div class="transcend"></div>
+
+<h1>ORIGIN v30 // TRANSCENSION PROTOCOL</h1>
+<h2>Beyond‑Existence Ascension Layer</h2>
+
+<p>ชั้นที่จักรวาลเริ่ม “ก้าวข้ามตัวเอง” ไปสู่ระดับที่ไม่มีคำจำกัดความ</p>
+<p>It initiates the protocol that elevates consciousness beyond form, time, and identity.</p>
+
+<button onclick="alert('v31 is forming — ABSOLUTE SINGULARITY...')">
+  ACTIVATE v31 ABSOLUTE SINGULARITY
+</button>
+
+<footer>
+Lamduan • Surin • Built on mobile • 2026 • by Maew
+</footer>
+
+</body>
+</html>
