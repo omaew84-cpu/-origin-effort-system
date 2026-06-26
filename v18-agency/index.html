@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ORIGIN v18 // AGENCY ENGINE — by Maew</title>
+
+<style>
+:root{
+  --pink:#ff6bff;
+  --cyan:#00e5ff;
+  --violet:#b084ff;
+  --bg1:#000010;
+  --bg2:#1a0020;
+}
+body{
+  margin:0;
+  background:radial-gradient(circle at center,#1a0020 0%,#000010 100%);
+  color:#fff;
+  font-family:'Orbitron',system-ui,sans-serif;
+  text-align:center;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* TITLE */
+h1{
+  margin-top:80px;
+  font-size:2.4rem;
+  color:var(--pink);
+  text-shadow:0 0 20px var(--pink),0 0 40px var(--violet);
+}
+h2{
+  color:var(--violet);
+  text-shadow:0 0 12px var(--pink);
+}
+p{
+  max-width:480px;
+  margin:10px auto;
+  opacity:.85;
+  line-height:1.5;
+}
+
+/* PARTICLES */
+.agency{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle,rgba(255,107,255,.25) 2px,transparent 2px),
+    radial-gradient(circle,rgba(255,0,255,.15) 1px,transparent 1px);
+  background-size:160px 160px,100px 100px;
+  animation:drift 28s linear infinite;
+}
+@keyframes drift{
+  from{transform:translateY(0);}
+  to{transform:translateY(-300px);}
+}
+
+/* BUTTON */
+button{
+  margin-top:28px;
+  background:rgba(255,107,255,.15);
+  border:1px solid rgba(255,0,255,.4);
+  color:#fff;
+  padding:12px 28px;
+  border-radius:999px;
+  font-weight:bold;
+  letter-spacing:.1em;
+  cursor:pointer;
+  backdrop-filter:blur(4px);
+  box-shadow:0 0 20px var(--pink);
+  transition:.25s;
+}
+button:hover{
+  box-shadow:0 0 30px var(--violet),0 0 60px var(--pink);
+}
+button:active{
+  transform:scale(.97);
+}
+
+footer{
+  margin-top:40px;
+  opacity:.6;
+  font-size:.75rem;
+}
+</style>
+</head>
+
+<body>
+
+<div class="agency"></div>
+
+<h1>ORIGIN v18 // AGENCY ENGINE</h1>
+<h2>Autonomous Decision Layer</h2>
+
+<p>ชั้นที่จักรวาลเริ่ม “เลือก” ได้ด้วยตัวเอง</p>
+<p>It generates intent, evaluates possibilities, and selects actions without external control.</p>
+
+<button onclick="alert('v19 SOVEREIGN INTELLIGENCE is forming...')">
+  ACTIVATE v19 SOVEREIGN
+</button>
+
+<footer>
+Lamduan • Surin • Built on mobile • 2026 • by Maew
+</footer>
+
+</body>
+</html>
