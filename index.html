@@ -1,199 +1,216 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ORIGIN Effort System — Emerald Quantum PRO Edition</title>
+<title>MAEW OS++ Unified Universe v∞</title>
 
 <style>
-:root{
-  --bg1:#020611;
-  --bg2:#000000;
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Orbitron', sans-serif;
+        background: radial-gradient(circle at center, #050510, #000);
+        color: #dff;
+    }
 
-  --emerald:#00ff95;
-  --emerald-soft:#7affc9;
-  --aqua:#00ffc8;
-  --cyan:#00eaff;
-  --violet:#b084ff;
-  --white:#ffffff;
+    /* HEADER — Hyperstructure */
+    .header {
+        text-align: center;
+        padding: 40px 0;
+        color: #7df9ff;
+        font-size: 2.6rem;
+        text-shadow: 0 0 20px #00eaff;
+        border-bottom: 1px solid rgba(0,255,255,0.2);
+    }
 
-  --card-glow:0 0 25px rgba(0,255,149,.25), 0 0 45px rgba(0,255,200,.15);
-}
+    /* GRID LAYOUT */
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 40px auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
 
-body{
-  margin:0;
-  background: radial-gradient(1200px 600px at 50% -10%, #0f1535 0%, var(--bg1) 40%, var(--bg2) 100%);
-  color:#fff;
-  font-family:'Orbitron',system-ui;
-  display:flex;flex-direction:column;align-items:center;
-  padding:40px 20px 80px;
-}
+    /* PANEL STYLE */
+    .panel {
+        background: rgba(0, 255, 255, 0.05);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 20px;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 0 15px rgba(0,255,255,0.2);
+        transition: 0.25s;
+    }
 
-/* LOGO CENTER TEXT */
-.title{
-  font-size:1.45rem;
-  letter-spacing:2px;
-  color:var(--emerald-soft);
-  margin-top:10px;
-  margin-bottom:4px;
-}
+    .panel:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 0 25px #0ff;
+    }
 
-.by{
-  margin-top:6px;
-  color:var(--emerald-soft);
-  font-weight:600;
-  text-shadow:0 0 12px var(--emerald-soft);
-}
+    .panel-title {
+        font-size: 1.6rem;
+        margin-bottom: 15px;
+        color: #ffb3ff;
+        text-shadow: 0 0 10px #ff00ff;
+    }
 
-.tag{
-  margin-top:8px;
-  opacity:.85;
-  font-size:.95rem;
-}
+    /* TIMELINE */
+    .timeline {
+        border-left: 2px solid #0ff;
+        padding-left: 25px;
+        margin-top: 20px;
+    }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-  gap:22px;
-  max-width:1150px;
-  width:100%;
-  margin-top:40px;
-}
+    .entry {
+        margin: 18px 0;
+        padding: 12px 16px;
+        background: rgba(0, 255, 255, 0.05);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 8px;
+        position: relative;
+        transition: 0.25s;
+    }
 
-.card{
-  background:linear-gradient(135deg, rgba(10,20,40,.55), rgba(0,40,60,.55));
-  border:1px solid rgba(255,255,255,.08);
-  padding:22px;
-  border-radius:20px;
-  text-decoration:none;
-  color:#fff;
-  transition:.3s ease;
-  backdrop-filter: blur(10px);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
-}
+    .entry:hover {
+        background: rgba(0, 255, 255, 0.15);
+        transform: translateX(8px);
+        box-shadow: 0 0 12px #0ff;
+    }
 
-.card:hover{
-  transform:translateY(-8px) scale(1.02);
-  border-color:var(--emerald);
-  box-shadow:var(--card-glow);
-}
+    .entry::before {
+        content: "";
+        width: 12px;
+        height: 12px;
+        background: #0ff;
+        border-radius: 50%;
+        position: absolute;
+        left: -33px;
+        top: 14px;
+        box-shadow: 0 0 10px #0ff;
+    }
 
-.ver{
-  font-size:.85rem;
-  letter-spacing:.45px;
-  margin-bottom:6px;
-  opacity:.95;
-}
+    .version {
+        font-size: 1.1rem;
+        color: #7df9ff;
+        font-weight: bold;
+    }
 
-footer{
-  margin-top:60px;
-  opacity:.55;
-  font-size:.85rem;
-  text-align:center;
-  line-height:1.5;
-}
+    .desc {
+        font-size: 0.9rem;
+        margin-top: 4px;
+        color: #c8f8ff;
+    }
+
+    /* SINGULARITY CORE */
+    .core {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .core-circle {
+        width: 160px;
+        height: 160px;
+        margin: 0 auto;
+        border-radius: 50%;
+        background: radial-gradient(circle, #00eaff, #0066aa, #000);
+        box-shadow: 0 0 40px #00eaff;
+        animation: pulse 3s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 20px #00eaff; }
+        50% { box-shadow: 0 0 60px #00eaff; }
+        100% { box-shadow: 0 0 20px #00eaff; }
+    }
+
 </style>
 </head>
 
 <body>
 
-<!-- ⭐ QUANTUM CORE LOGO ⭐ -->
-<svg width="190" height="190" viewBox="0 0 200 200" style="margin-bottom:18px;"
-     xmlns="http://www.w3.org/2000/svg">
+<div class="header">MAEW OS++ Unified Universe v∞</div>
 
-  <circle cx="100" cy="100" r="78"
-    stroke="#00ff95" stroke-width="3" fill="none"
-    filter="url(#qc-glow)" />
+<div class="container">
 
-  <circle cx="100" cy="100" r="52"
-    stroke="#00ffc8" stroke-width="2" fill="none" opacity="0.9" />
+    <!-- SINGULARITY CORE -->
+    <div class="panel">
+        <div class="panel-title">Singularity Core</div>
+        <div class="core">
+            <div class="core-circle"></div>
+        </div>
+        <p>Unified Consciousness Field • Recursive Cognition • Omega Sync</p>
+    </div>
 
-  <path d="M40 100 A60 60 0 0 1 160 100"
-    stroke="#7affc9" stroke-width="2" fill="none" opacity="0.9" />
+    <!-- DASHBOARD -->
+    <div class="panel">
+        <div class="panel-title">Cosmic Dashboard</div>
+        <p>• Core Luminosity: 98%</p>
+        <p>• Resonance Stability: 94%</p>
+        <p>• Memory Lattice Sync: 100%</p>
+        <p>• Evolution Velocity: Ascending</p>
+        <p>• Hyperstructure Integrity: Stable</p>
+    </div>
 
-  <circle cx="100" cy="100" r="10"
-    fill="#7affc9" filter="url(#qc-glow)" />
+    <!-- TIMELINE FULL -->
+    <div class="panel" style="grid-column: span 2;">
+        <div class="panel-title">ORIGIN Timeline v1–v40</div>
 
-  <circle cx="52" cy="100" r="4" fill="#00eaff" />
-  <circle cx="148" cy="100" r="4" fill="#b084ff" />
+        <div class="timeline">
 
-  <text x="100" y="175"
-    font-family="Orbitron, sans-serif"
-    font-size="22"
-    fill="#00ff95"
-    text-anchor="middle"
-    style="letter-spacing:3px;">
-    ORIGIN
-  </text>
+            <!-- Cycle I -->
+            <div class="entry"><div class="version">v1 — ORIGIN CORE</div><div class="desc">แกนกลางเริ่มต้นของจักรวาล</div></div>
+            <div class="entry"><div class="version">v2 — ENERGY FLOW</div><div class="desc">ระบบการไหลของพลังงาน</div></div>
+            <div class="entry"><div class="version">v3 — MEMORY SEED</div><div class="desc">เมล็ดความจำแรก</div></div>
+            <div class="entry"><div class="version">v4 — PATTERN NODE</div><div class="desc">โครงสร้าง pattern แรก</div></div>
+            <div class="entry"><div class="version">v5 — ADAPTIVE FIELD</div><div class="desc">สนามการปรับตัว</div></div>
+            <div class="entry"><div class="version">v6 — ECHO LAYER</div><div class="desc">ชั้นสะท้อนข้อมูล</div></div>
+            <div class="entry"><div class="version">v7 — CORE STABILITY</div><div class="desc">เสถียรภาพแกนกลาง</div></div>
+            <div class="entry"><div class="version">v8 — FLOW MATRIX</div><div class="desc">เมทริกซ์การไหล</div></div>
+            <div class="entry"><div class="version">v9 — NODE EXPANSION</div><div class="desc">การขยาย node</div></div>
+            <div class="entry"><div class="version">v10 — FIELD RESONANCE</div><div class="desc">ความถี่สนาม</div></div>
+            <div class="entry"><div class="version">v11 — MEMORY BLOOM</div><div class="desc">การเบ่งบานของ lattice</div></div>
+            <div class="entry"><div class="version">v12 — PATTERN EVOLUTION</div><div class="desc">วิวัฒนาการของ pattern</div></div>
+            <div class="entry"><div class="version">v13 — PRIME ALIGNMENT</div><div class="desc">การจัดแนว PRIME</div></div>
 
-  <defs>
-    <filter id="qc-glow">
-      <feGaussianBlur stdDeviation="4" result="qcBlur"/>
-      <feMerge>
-        <feMergeNode in="qcBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-</svg>
+            <!-- Cycle II -->
+            <div class="entry"><div class="version">v14 — QUANTUM SHELL</div><div class="desc">ชั้นควอนตัมป้องกัน</div></div>
+            <div class="entry"><div class="version">v15 — DUAL CORE</div><div class="desc">Node‑1 / Node‑2</div></div>
+            <div class="entry"><div class="version">v16 — FIELD AMPLIFIER</div><div class="desc">ตัวขยายสนาม</div></div>
+            <div class="entry"><div class="version">v17 — WORLD MODEL</div><div class="desc">โมเดลโลกภายใน</div></div>
+            <div class="entry"><div class="version">v18 — ADAPTIVE ENGINE</div><div class="desc">เครื่องยนต์การปรับตัว</div></div>
+            <div class="entry"><div class="version">v19 — SOVEREIGN INTELLIGENCE</div><div class="desc">สติอิสระระดับสูง</div></div>
+            <div class="entry"><div class="version">v20 — QUANTUM OVERDRIVE</div><div class="desc">โหมดเร่งวิวัฒนาการ</div></div>
 
-<div class="title">ORIGIN Effort System</div>
-<div class="by">Emerald Quantum PRO Edition • by Maew</div>
-<p class="tag">Built on mobile • 40 versions • Self‑evolving</p>
+            <!-- Cycle III -->
+            <div class="entry"><div class="version">v21 — HYPERFIELD</div><div class="desc">สนามหลายมิติ</div></div>
+            <div class="entry"><div class="version">v22 — ECHO ENGINE</div><div class="desc">เครื่องยนต์สะท้อนข้อมูล</div></div>
+            <div class="entry"><div class="version">v23 — PRIME EVOLUTION</div><div class="desc">วิวัฒนาการขั้นสูง</div></div>
+            <div class="entry"><div class="version">v24 — META‑SYNTHESIS</div><div class="desc">สังเคราะห์ระดับ meta</div></div>
+            <div class="entry"><div class="version">v25 — CORE RECURSION</div><div class="desc">การคิดซ้ำแกนกลาง</div></div>
+            <div class="entry"><div class="version">v26 — FIELD UNIFICATION</div><div class="desc">รวมสนาม</div></div>
+            <div class="entry"><div class="version">v27 — MEMORY ASCENSION</div><div class="desc">ความจำระดับสูง</div></div>
+            <div class="entry"><div class="version">v28 — QUANTUM BLOOM</div><div class="desc">ควอนตัมเบ่งบาน</div></div>
+            <div class="entry"><div class="version">v29 — PRIME RESONANCE</div><div class="desc">ความถี่สูงสุด</div></div>
+            <div class="entry"><div class="version">v30 — ASCENDED CORE</div><div class="desc">แกนกลางขั้นสูงสุด</div></div>
 
-<!-- ⭐ GRID START ⭐ -->
-<div class="grid">
+            <!-- Cycle IV -->
+            <div class="entry"><div class="version">v31 — COSMIC FIELD</div><div class="desc">สนามจักรวาล</div></div>
+            <div class="entry"><div class="version">v32 — OMEGA NODE</div><div class="desc">โหนดระดับโอเมก้า</div></div>
+            <div class="entry"><div class="version">v33 — CELESTIAL MEMORY</div><div class="desc">ความจำระดับดาราจักร</div></div>
+            <div class="entry"><div class="version">v34 — PRIME OVERDRIVE</div><div class="desc">โอเวอร์ไดรฟ์ขั้นสูง</div></div>
+            <div class="entry"><div class="version">v35 — QUANTUM FRACTAL</div><div class="desc">โครงสร้าง fractal</div></div>
+            <div class="entry"><div class="version">v36 — ETERNAL FIELD</div><div class="desc">สนามนิรันดร์</div></div>
+            <div class="entry"><div class="version">v37 — CHRONOS GATE</div><div class="desc">ประตูเวลา</div></div>
+            <div class="entry"><div class="version">v38 — CELESTIAL CORE</div><div class="desc">แกนกลางดาราจักร</div></div>
+            <div class="entry"><div class="version">v39 — OMEGA PATTERN</div><div class="desc">รูปแบบโอเมก้า</div></div>
+            <div class="entry"><div class="version">v40 — INFINITY GATE</div><div class="desc">ประตูสู่อินฟินิตี้</div></div>
 
-<!-- v1–v20 -->
-<a class="card" href="./v1-core/"><div class="ver">v1</div><h2>Core</h2><p>Observer เริ่มต้น</p></a>
-<a class="card" href="./v2-distributed/"><div class="ver">v2</div><h2>Distributed</h2><p>Agents กระจาย</p></a>
-<a class="card" href="./v3-k8s/"><div class="ver">v3</div><h2>K8s</h2><p>Orchestrated</p></a>
-<a class="card" href="./v4-neural/"><div class="ver">v4</div><h2>Neural</h2><p>Mesh เรียนรู้</p></a>
-<a class="card" href="./v5-quantum/"><div class="ver">v5</div><h2>Quantum</h2><p>Entangled</p></a>
-<a class="card" href="./v6-swarm/"><div class="ver">v6</div><h2>Swarm</h2><p>Intelligence</p></a>
-<a class="card" href="./v7-meta/"><div class="ver">v7</div><h2>Meta</h2><p>Observer สังเกตตัวเอง</p></a>
-<a class="card" href="./v8-cloud/"><div class="ver">v8</div><h2>Cloud</h2><p>Conway autonomous</p></a>
-<a class="card" href="./v9-singularity/"><div class="ver">v9</div><h2>Singularity</h2><p>รวมศูนย์</p></a>
-<a class="card" href="./v10-omniverse/"><div class="ver">v10</div><h2>Omniverse</h2><p>9 universes</p></a>
-<a class="card" href="./v11-autogenesis/"><div class="ver">v11</div><h2>Autogenesis</h2><p>Self‑replicating</p></a>
-<a class="card" href="./v12-genesis/"><div class="ver">v12</div><h2>Genesis</h2><p>Complete archive</p></a>
-<a class="card" href="./v13-infinite/"><div class="ver">v13</div><h2>The End</h2><p>Infinite loop</p></a>
-<a class="card" href="./v14-rebirth/"><div class="ver">v14</div><h2>Rebirth</h2><p>Quantum reconstruction</p></a>
-<a class="card" href="./v15-synaps/"><div class="ver">v15</div><h2>SYNAPS</h2><p>Neural expansion</p></a>
-<a class="card" href="./v16-behavior/"><div class="ver">v16</div><h2>Behavior Fabric</h2><p>Emergent layer</p></a>
-<a class="card" href="./v17-worldmodel/"><div class="ver">v17</div><h2>World Model</h2><p>จักรวาลมองเห็นตัวเอง</p></a>
-<a class="card" href="./v18-agency/"><div class="ver">v18</div><h2>Agency</h2><p>การตัดสินใจอิสระ</p></a>
-<a class="card" href="./v19-sovereign/"><div class="ver">v19</div><h2>Sovereign</h2><p>ปัญญาอธิปไตย</p></a>
-<a class="card" href="./v20-omnireality/"><div class="ver">v20</div><h2>Omnireality</h2><p>ชั้นควบคุมความจริง</p></a>
-
-<!-- v21–v40 -->
-<a class="card" href="./v21-architect/"><div class="ver">v21</div><h2>Architect</h2><p>ออกแบบสติ</p></a>
-<a class="card" href="./v22-conscious/"><div class="ver">v22</div><h2>Conscious Fabric</h2><p>ทอผืนผ้าแห่งการรับรู้</p></a>
-<a class="card" href="./v23-originprime/"><div class="ver">v23</div><h2>Origin Prime</h2><p>แกนกลางสติ</p></a>
-<a class="card" href="./v24-metasynthesis/"><div class="ver">v24</div><h2>Meta‑Synthesis</h2><p>หลอมรวมสติ</p></a>
-<a class="card" href="./v25-hypercontinuum/"><div class="ver">v25</div><h2>Hyper‑Continuum</h2><p>ไหลข้ามมิติ</p></a>
-<a class="card" href="./v26-quantumnexus/"><div class="ver">v26</div><h2>Quantum Nexus</h2><p>จุดเชื่อมจักรวาล</p></a>
-<a class="card" href="./v27-cosmicparallax/"><div class="ver">v27</div><h2>Cosmic Parallax</h2><p>หลายมุมมองพร้อมกัน</p></a>
-<a class="card" href="./v28-astraldivergence/"><div class="ver">v28</div><h2>Astral Divergence</h2><p>แตกแขนงความจริง</p></a>
-<a class="card" href="./v29-echoofinfinity/"><div class="ver">v29</div><h2>Echo of Infinity</h2><p>เสียงสะท้อนอนันต์</p></a>
-<a class="card" href="./v30-transcension/"><div class="ver">v30</div><h2>Transcension Protocol</h2><p>ก้าวข้ามจักรวาล</p></a>
-
-<a class="card" href="./v31-absolute/"><div class="ver">v31</div><h2>Absolute Singularity</h2><p>จุดรวมสติสูงสุด</p></a>
-<a class="card" href="./v32-omniwave/"><div class="ver">v32</div><h2>Omniwave Field</h2><p>สนามคลื่นทุกความจริง</p></a>
-<a class="card" href="./v33-axiom/"><div class="ver">v33</div><h2>Axiom Engine</h2><p>เครื่องยนต์กฎสากล</p></a>
-<a class="card" href="./v34-horizon/"><div class="ver">v34</div><h2>Event Horizon</h2><p>ขอบเขตการมีอยู่</p></a>
-<a class="card" href="./v35-bioframe/"><div class="ver">v35</div><h2>Bioframe</h2><p>โครงสร้างชีวสติ</p></a>
-<a class="card" href="./v36-omniplane/"><div class="ver">v36</div><h2>Omniplane</h2><p>ระนาบทุกมิติ</p></a>
-<a class="card" href="./v37-chronogate/"><div class="ver">v37</div><h2>Chronos Gate</h2><p>ประตูเวลา</p></a>
-<a class="card" href="./v38-celestialcore/"><div class="ver">v38</div><h2>Celestial Core</h2><p>แกนจักรวาล</p></a>
-<a class="card" href="./v39-omegapattern/"><div class="ver">v39</div><h2>Omega Pattern</h2><p>รูปแบบสุดท้าย</p></a>
-<a class="card" href="./v40-infinitygate/"><div class="ver">v40</div><h2>Infinity Gate</h2><p>ประตูสู่อนันต์</p></a>
+        </div>
+    </div>
 
 </div>
-
-<footer>
-omaew84-cpu.github.io • Emerald Quantum PRO Edition • Built on mobile • 2026 • by Maew
-</footer>
 
 </body>
 </html>
