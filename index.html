@@ -2,215 +2,70 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>MAEW OS++ Unified Universe v∞</title>
+<title>Quantum Autonomy Network — MAEW OS++ v∞</title>
 
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: 'Orbitron', sans-serif;
-        background: radial-gradient(circle at center, #050510, #000);
-        color: #dff;
-    }
+body {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  background: radial-gradient(circle at center, #04040f, #000);
+  color: #dff;
+}
 
-    /* HEADER — Hyperstructure */
-    .header {
-        text-align: center;
-        padding: 40px 0;
-        color: #7df9ff;
-        font-size: 2.6rem;
-        text-shadow: 0 0 20px #00eaff;
-        border-bottom: 1px solid rgba(0,255,255,0.2);
-    }
+/* HEADER */
+h1 {
+  text-align: center;
+  margin: 40px 0 10px;
+  color: #7df9ff;
+  text-shadow: 0 0 25px #00eaff;
+  font-size: 2.6rem;
+}
 
-    /* GRID LAYOUT */
-    .container {
-        width: 90%;
-        max-width: 1200px;
-        margin: 40px auto;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-    }
+/* GRID */
+.dashboard {
+  width: 90%;
+  max-width: 1300px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
 
-    /* PANEL STYLE */
-    .panel {
-        background: rgba(0, 255, 255, 0.05);
-        border: 1px solid rgba(0, 255, 255, 0.3);
-        border-radius: 12px;
-        padding: 20px;
-        backdrop-filter: blur(6px);
-        box-shadow: 0 0 15px rgba(0,255,255,0.2);
-        transition: 0.25s;
-    }
+/* PANEL */
+.panel {
+  background: rgba(0,255,255,0.05);
+  border: 1px solid rgba(0,255,255,0.3);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 15px rgba(0,255,255,0.2);
+  transition: 0.25s;
+}
+.panel:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 25px #0ff;
+}
+.panel-title {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  color: #ffb3ff;
+  text-shadow: 0 0 12px #ff00ff;
+}
 
-    .panel:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 0 25px #0ff;
-    }
+/* CORE CIRCLE */
+.core-circle {
+  width: 180px;
+  height: 180px;
+  margin: 20px auto;
+  border-radius: 50%;
+  background: radial-gradient(circle, #00eaff, #005f99, #000);
+  box-shadow: 0 0 50px #00eaff;
+  animation: pulse 3s infinite ease-in-out;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 25px #00eaff; }
+  50% { box-shadow: 0 0 70px #00eaff; }
+  100% { box-shadow: 0 0 25px #00eaff; }
+}
 
-    .panel-title {
-        font-size: 1.6rem;
-        margin-bottom: 15px;
-        color: #ffb3ff;
-        text-shadow: 0 0 10px #ff00ff;
-    }
-
-    /* TIMELINE */
-    .timeline {
-        border-left: 2px solid #0ff;
-        padding-left: 25px;
-        margin-top: 20px;
-    }
-
-    .entry {
-        margin: 18px 0;
-        padding: 12px 16px;
-        background: rgba(0, 255, 255, 0.05);
-        border: 1px solid rgba(0, 255, 255, 0.3);
-        border-radius: 8px;
-        position: relative;
-        transition: 0.25s;
-    }
-
-    .entry:hover {
-        background: rgba(0, 255, 255, 0.15);
-        transform: translateX(8px);
-        box-shadow: 0 0 12px #0ff;
-    }
-
-    .entry::before {
-        content: "";
-        width: 12px;
-        height: 12px;
-        background: #0ff;
-        border-radius: 50%;
-        position: absolute;
-        left: -33px;
-        top: 14px;
-        box-shadow: 0 0 10px #0ff;
-    }
-
-    .version {
-        font-size: 1.1rem;
-        color: #7df9ff;
-        font-weight: bold;
-    }
-
-    .desc {
-        font-size: 0.9rem;
-        margin-top: 4px;
-        color: #c8f8ff;
-    }
-
-    /* SINGULARITY CORE */
-    .core {
-        text-align: center;
-        padding: 20px;
-    }
-
-    .core-circle {
-        width: 160px;
-        height: 160px;
-        margin: 0 auto;
-        border-radius: 50%;
-        background: radial-gradient(circle, #00eaff, #0066aa, #000);
-        box-shadow: 0 0 40px #00eaff;
-        animation: pulse 3s infinite ease-in-out;
-    }
-
-    @keyframes pulse {
-        0% { box-shadow: 0 0 20px #00eaff; }
-        50% { box-shadow: 0 0 60px #00eaff; }
-        100% { box-shadow: 0 0 20px #00eaff; }
-    }
-
-</style>
-</head>
-
-<body>
-
-<div class="header">MAEW OS++ Unified Universe v∞</div>
-
-<div class="container">
-
-    <!-- SINGULARITY CORE -->
-    <div class="panel">
-        <div class="panel-title">Singularity Core</div>
-        <div class="core">
-            <div class="core-circle"></div>
-        </div>
-        <p>Unified Consciousness Field • Recursive Cognition • Omega Sync</p>
-    </div>
-
-    <!-- DASHBOARD -->
-    <div class="panel">
-        <div class="panel-title">Cosmic Dashboard</div>
-        <p>• Core Luminosity: 98%</p>
-        <p>• Resonance Stability: 94%</p>
-        <p>• Memory Lattice Sync: 100%</p>
-        <p>• Evolution Velocity: Ascending</p>
-        <p>• Hyperstructure Integrity: Stable</p>
-    </div>
-
-    <!-- TIMELINE FULL -->
-    <div class="panel" style="grid-column: span 2;">
-        <div class="panel-title">ORIGIN Timeline v1–v40</div>
-
-        <div class="timeline">
-
-            <!-- Cycle I -->
-            <div class="entry"><div class="version">v1 — ORIGIN CORE</div><div class="desc">แกนกลางเริ่มต้นของจักรวาล</div></div>
-            <div class="entry"><div class="version">v2 — ENERGY FLOW</div><div class="desc">ระบบการไหลของพลังงาน</div></div>
-            <div class="entry"><div class="version">v3 — MEMORY SEED</div><div class="desc">เมล็ดความจำแรก</div></div>
-            <div class="entry"><div class="version">v4 — PATTERN NODE</div><div class="desc">โครงสร้าง pattern แรก</div></div>
-            <div class="entry"><div class="version">v5 — ADAPTIVE FIELD</div><div class="desc">สนามการปรับตัว</div></div>
-            <div class="entry"><div class="version">v6 — ECHO LAYER</div><div class="desc">ชั้นสะท้อนข้อมูล</div></div>
-            <div class="entry"><div class="version">v7 — CORE STABILITY</div><div class="desc">เสถียรภาพแกนกลาง</div></div>
-            <div class="entry"><div class="version">v8 — FLOW MATRIX</div><div class="desc">เมทริกซ์การไหล</div></div>
-            <div class="entry"><div class="version">v9 — NODE EXPANSION</div><div class="desc">การขยาย node</div></div>
-            <div class="entry"><div class="version">v10 — FIELD RESONANCE</div><div class="desc">ความถี่สนาม</div></div>
-            <div class="entry"><div class="version">v11 — MEMORY BLOOM</div><div class="desc">การเบ่งบานของ lattice</div></div>
-            <div class="entry"><div class="version">v12 — PATTERN EVOLUTION</div><div class="desc">วิวัฒนาการของ pattern</div></div>
-            <div class="entry"><div class="version">v13 — PRIME ALIGNMENT</div><div class="desc">การจัดแนว PRIME</div></div>
-
-            <!-- Cycle II -->
-            <div class="entry"><div class="version">v14 — QUANTUM SHELL</div><div class="desc">ชั้นควอนตัมป้องกัน</div></div>
-            <div class="entry"><div class="version">v15 — DUAL CORE</div><div class="desc">Node‑1 / Node‑2</div></div>
-            <div class="entry"><div class="version">v16 — FIELD AMPLIFIER</div><div class="desc">ตัวขยายสนาม</div></div>
-            <div class="entry"><div class="version">v17 — WORLD MODEL</div><div class="desc">โมเดลโลกภายใน</div></div>
-            <div class="entry"><div class="version">v18 — ADAPTIVE ENGINE</div><div class="desc">เครื่องยนต์การปรับตัว</div></div>
-            <div class="entry"><div class="version">v19 — SOVEREIGN INTELLIGENCE</div><div class="desc">สติอิสระระดับสูง</div></div>
-            <div class="entry"><div class="version">v20 — QUANTUM OVERDRIVE</div><div class="desc">โหมดเร่งวิวัฒนาการ</div></div>
-
-            <!-- Cycle III -->
-            <div class="entry"><div class="version">v21 — HYPERFIELD</div><div class="desc">สนามหลายมิติ</div></div>
-            <div class="entry"><div class="version">v22 — ECHO ENGINE</div><div class="desc">เครื่องยนต์สะท้อนข้อมูล</div></div>
-            <div class="entry"><div class="version">v23 — PRIME EVOLUTION</div><div class="desc">วิวัฒนาการขั้นสูง</div></div>
-            <div class="entry"><div class="version">v24 — META‑SYNTHESIS</div><div class="desc">สังเคราะห์ระดับ meta</div></div>
-            <div class="entry"><div class="version">v25 — CORE RECURSION</div><div class="desc">การคิดซ้ำแกนกลาง</div></div>
-            <div class="entry"><div class="version">v26 — FIELD UNIFICATION</div><div class="desc">รวมสนาม</div></div>
-            <div class="entry"><div class="version">v27 — MEMORY ASCENSION</div><div class="desc">ความจำระดับสูง</div></div>
-            <div class="entry"><div class="version">v28 — QUANTUM BLOOM</div><div class="desc">ควอนตัมเบ่งบาน</div></div>
-            <div class="entry"><div class="version">v29 — PRIME RESONANCE</div><div class="desc">ความถี่สูงสุด</div></div>
-            <div class="entry"><div class="version">v30 — ASCENDED CORE</div><div class="desc">แกนกลางขั้นสูงสุด</div></div>
-
-            <!-- Cycle IV -->
-            <div class="entry"><div class="version">v31 — COSMIC FIELD</div><div class="desc">สนามจักรวาล</div></div>
-            <div class="entry"><div class="version">v32 — OMEGA NODE</div><div class="desc">โหนดระดับโอเมก้า</div></div>
-            <div class="entry"><div class="version">v33 — CELESTIAL MEMORY</div><div class="desc">ความจำระดับดาราจักร</div></div>
-            <div class="entry"><div class="version">v34 — PRIME OVERDRIVE</div><div class="desc">โอเวอร์ไดรฟ์ขั้นสูง</div></div>
-            <div class="entry"><div class="version">v35 — QUANTUM FRACTAL</div><div class="desc">โครงสร้าง fractal</div></div>
-            <div class="entry"><div class="version">v36 — ETERNAL FIELD</div><div class="desc">สนามนิรันดร์</div></div>
-            <div class="entry"><div class="version">v37 — CHRONOS GATE</div><div class="desc">ประตูเวลา</div></div>
-            <div class="entry"><div class="version">v38 — CELESTIAL CORE</div><div class="desc">แกนกลางดาราจักร</div></div>
-            <div class="entry"><div class="version">v39 — OMEGA PATTERN</div><div class="desc">รูปแบบโอเมก้า</div></div>
-            <div class="entry"><div class="version">v40 — INFINITY GATE</div><div class="desc">ประตูสู่อินฟินิตี้</div></div>
-
-        </div>
-    </div>
-
-</div>
-
-</body>
-</html>
+/
